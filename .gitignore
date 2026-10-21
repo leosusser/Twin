@@ -1,0 +1,8 @@
+data/twin.json
+data/*.tmp
+.DS_Store
+.env
+coverage/
+node_modules/
+data/assets/
+data/pg/

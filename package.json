@@ -1,0 +1,22 @@
+{
+  "name": "personal-twin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "dev": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env --watch src/server.ts",
+    "dev:all": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env src/dev.ts",
+    "start": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env src/server.ts",
+    "worker": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env src/worker.ts",
+    "check": "OPENSSL_CONF=/dev/null node --check src/server.ts && OPENSSL_CONF=/dev/null node --check src/worker.ts && OPENSSL_CONF=/dev/null node --check public/app.js",
+    "test": "OPENSSL_CONF=/dev/null node --test test/*.test.ts",
+    "db:migrate": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env src/storage/migrate.ts",
+    "db:import": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env src/storage/import-json.ts",
+    "db:seed": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env src/storage/seed.ts",
+    "test:postgres": "OPENSSL_CONF=/dev/null node --env-file-if-exists=.env --test test/postgres.test.ts"
+  },
+  "dependencies": {"pg":"^8.16.3"}
+}
