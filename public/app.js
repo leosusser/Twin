@@ -1117,6 +1117,24 @@ function photoPlaceholder() {
 function calendarIcon() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 2v6M16 2v6"/></svg>`;
 }
+function talkGlyph() {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 9.5v5M12 6v12M17 9.5v5"/></svg>`;
+}
+function twinDaypart() {
+  const zone = app.settings?.timezone ?? app.home?.twinDayVersion?.timezone;
+  let minutes;
+  try {
+    minutes = localMinutes(new Date().toISOString(), zone);
+  } catch {
+    const now = new Date();
+    minutes = now.getHours() * 60 + now.getMinutes();
+  }
+  if (minutes >= 300 && minutes < 600) return "morning";
+  if (minutes >= 600 && minutes < 900) return "midday";
+  if (minutes >= 900 && minutes < 1110) return "afternoon";
+  if (minutes >= 1110 && minutes < 1290) return "evening";
+  return "night";
+}
 function gmailIcon() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="m3 6 9 7 9-7"/></svg>`;
 }
@@ -1127,16 +1145,16 @@ render = function () {
   const shellClass = route === "home" ? "home-shell" : route === "schedule" ? "schedule-shell" : "settings-shell";
   const mainClass = route === "home" ? "home-main" : route === "schedule" ? "schedule-main" : "settings-main";
   const page = route === "home" ? homePage() : route === "schedule" ? schedulePage() : settingsPage();
-  root.innerHTML = `<div class="shell ${shellClass}">${topbar()}<main id="main" class="app-main ${mainClass}" tabindex="-1">${page}</main>${bottomNav()}</div>${talkLayer()}`;
+  root.innerHTML = `<div class="shell ${shellClass} daypart-${twinDaypart()}">${topbar()}<main id="main" class="app-main ${mainClass}" tabindex="-1">${page}</main>${bottomNav()}</div>${talkLayer()}`;
 };
 topbar = function () {
-  if (app.route === "home") return `<header class="app-top home-topbar"><button class="home-wordmark" data-route="home" aria-label="Twin home">TWIN</button><button class="home-talk-button" data-talk-toggle aria-label="Talk to your twin" aria-expanded="${app.talkOpen}">TALK</button></header>`;
-  if (app.route === "schedule") return `<header class="schedule-topbar"><button class="schedule-wordmark" data-route="home" aria-label="Twin home">TWIN</button><button class="schedule-talk-button" data-talk-toggle aria-label="Talk to your twin" aria-expanded="${app.talkOpen}">TALK</button></header>`;
+  if (app.route === "home") return `<header class="app-top home-topbar"><button class="home-wordmark" data-route="home" aria-label="Twin home">Twin</button><button class="home-talk-button talk-trigger" data-talk-toggle aria-label="Talk to your twin" aria-expanded="${app.talkOpen}">${talkGlyph()}</button></header>`;
+  if (app.route === "schedule") return `<header class="schedule-topbar"><button class="schedule-wordmark" data-route="home" aria-label="Twin home">Twin</button><button class="schedule-talk-button talk-trigger" data-talk-toggle aria-label="Talk to your twin" aria-expanded="${app.talkOpen}">${talkGlyph()}</button></header>`;
   return "";
 };
 bottomNav = function () {
-  if (app.route === "home") return `<nav class="bottom-nav home-bottom-nav" aria-label="Main navigation"><button data-route="schedule">SCHEDULE</button><button data-route="settings">SETTINGS</button></nav>`;
-  if (app.route === "schedule") return `<nav class="bottom-nav schedule-bottom-nav" aria-label="Main navigation"><button data-route="home">MY TWIN</button><button data-route="settings">SETTINGS</button></nav>`;
+  if (app.route === "home") return `<nav class="bottom-nav home-bottom-nav" aria-label="Main navigation"><button data-route="schedule">Schedule</button><button data-route="settings">Settings</button></nav>`;
+  if (app.route === "schedule") return `<nav class="bottom-nav schedule-bottom-nav" aria-label="Main navigation"><button data-route="home">My twin</button><button data-route="settings">Settings</button></nav>`;
   return "";
 };
 

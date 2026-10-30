@@ -1,0 +1,427 @@
+/*
+ * UI foundation for the post-onboarding app (Home, Schedule, Settings, Talk).
+ * Loaded last. Everything here is scoped to the app shell (.shell) or the Talk layer (.talk-layer);
+ * onboarding (#twin-onboarding) keeps its own --tw-* tokens in onboarding.css and is untouched.
+ * Token names are meant to map one-to-one onto SwiftUI later.
+ */
+:root {
+  /* Color */
+  --ink: #1d1d1f;
+  --ink-2: #545458; /* secondary text: >= 4.5:1 on every sky stop and on glass */
+  --hairline: rgba(60, 60, 67, .16);
+  --hairline-strong: rgba(60, 60, 67, .28);
+  --fill: rgba(118, 118, 128, .12);
+  --fill-pressed: rgba(118, 118, 128, .22);
+  --talk: #e5383b;
+  --talk-pressed: #c92a2e;
+  --danger: #c4262b;
+  --focus: #0a66d8;
+
+  /* The four meanings. Keep them distinct (AGENTS.md). */
+  --src-calendar: #0a66d8;
+  --src-gmail: #b25e00;
+  --src-reported: #2f8a46;
+  --src-imagined: var(--ink-2);
+
+  /* Glass */
+  --glass: rgba(255, 255, 255, .62);
+  --glass-strong: rgba(255, 255, 255, .82);
+  --glass-edge: rgba(255, 255, 255, .72);
+  --glass-blur: blur(24px) saturate(180%);
+  --shadow-card: 0 1px 2px rgba(30, 34, 48, .05), 0 8px 24px rgba(30, 34, 48, .06);
+  --shadow-float: 0 2px 6px rgba(30, 34, 48, .06), 0 18px 40px rgba(30, 34, 48, .12);
+
+  /* Shape and space */
+  --r-sheet: 22px;
+  --r-card: 16px;
+  --r-control: 12px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --gutter: 24px; /* screen side padding: 24px > 440px, 16px <= 440px, 14px <= 340px */
+  --tap: 44px;
+
+  /* Type: Apple system stack, iOS-like scale (size/line-height, weight set per use) */
+  --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  --type-large-title: 34px/1.12;
+  --type-title: 22px/1.22;
+  --type-headline: 17px/1.3;
+  --type-body: 17px/1.4;
+  --type-callout: 15px/1.4;
+  --type-footnote: 13px/1.35;
+  --tracking-large: -.022em;
+  --tracking-body: -.01em;
+
+  /* Motion */
+  --ease: cubic-bezier(.25, .1, .25, 1);
+  --spring: cubic-bezier(.32, .72, 0, 1);
+  --t-fast: 160ms;
+  --t-sheet: 420ms;
+
+  /* Sky: set per daypart below */
+  --sky-top: #b8d2ea;
+  --sky-mid: #dce8f3;
+  --sky-bottom: #f2f4f6;
+}
+
+/* ---------- Time-of-day backdrop (the one bold element) ---------- */
+/* render() puts daypart-{morning|midday|afternoon|evening|night} on .shell; :has() lets the Talk layer share it. */
+:root:has(.shell.daypart-morning) { --sky-top: #c9d8e6; --sky-mid: #e3e9ee; --sky-bottom: #f5ece1; }
+:root:has(.shell.daypart-midday) { --sky-top: #b8d2ea; --sky-mid: #dce8f3; --sky-bottom: #f2f4f6; }
+:root:has(.shell.daypart-afternoon) { --sky-top: #ecd2b4; --sky-mid: #f2e1cf; --sky-bottom: #f6eee6; }
+:root:has(.shell.daypart-evening) { --sky-top: #c6bccb; --sky-mid: #e0d3d5; --sky-bottom: #f1e3d9; }
+:root:has(.shell.daypart-night) { --sky-top: #bcc3d6; --sky-mid: #d2d6e2; --sky-bottom: #e6e6ec; }
+
+body:has(.shell) {
+  background: var(--sky-bottom);
+  color: var(--ink);
+}
+
+/* App surfaces drop the old poster frame and sit on the sky. Sizes are unchanged. */
+.shell.home-shell,
+.shell.schedule-shell,
+.shell.settings-shell {
+  position: relative;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shell::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 46%, var(--sky-bottom) 100%);
+}
+
+/* Use for a full-height surface that should show the sky itself (e.g. the Talk sheet). */
+.sky-surface {
+  background:
+    linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 255, .5)),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 46%, var(--sky-bottom) 100%);
+}
+
+/* ---------- Type ---------- */
+/* Screen CSS still reads --display/--body; inside the app they now resolve to the system stack. */
+.shell,
+.talk-layer {
+  --display: var(--font-display);
+  --body: var(--font-text);
+  --white: #fff;
+  --muted: var(--ink-2);
+  --line: var(--hairline);
+  --gutter: 24px;
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.t-large-title { font: 700 var(--type-large-title) var(--font-display); letter-spacing: var(--tracking-large); }
+.t-title { font: 700 var(--type-title) var(--font-display); letter-spacing: -.018em; }
+.t-headline { font: 600 var(--type-headline) var(--font-text); letter-spacing: var(--tracking-body); }
+.t-body { font: 400 var(--type-body) var(--font-text); letter-spacing: var(--tracking-body); }
+.t-callout { font: 400 var(--type-callout) var(--font-text); }
+.t-footnote { font: 400 var(--type-footnote) var(--font-text); }
+.t-secondary { color: var(--ink-2); }
+.t-tabular { font-variant-numeric: tabular-nums; }
+
+/* Strings that tests lock in capitals render in sentence case: wrap or class them with .sc. */
+.sc { display: inline-block; text-transform: lowercase; }
+.sc::first-letter { text-transform: uppercase; }
+
+/* ---------- Glass surfaces ---------- */
+/* !important on shadows only: home.css / mockup-pages.css still carry a blanket box-shadow:none !important. */
+.glass,
+.glass-card,
+.glass-bar {
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+.glass-strong { background: var(--glass-strong); }
+.glass-card { border-radius: var(--r-card); box-shadow: var(--shadow-card) !important; }
+.glass-sheet { border-radius: var(--r-sheet); box-shadow: var(--shadow-float) !important; }
+.glass-bar { border-radius: var(--r-sheet); box-shadow: var(--shadow-float) !important; }
+
+/* Inset grouped list: rows separated by hairlines inside one card. */
+.glass-list { padding: 0 16px; }
+.glass-list > * + * { border-top: 1px solid var(--hairline); }
+
+/* Buttons: neutral fill, primary (ink), destructive (red text). All >= 44px. */
+.ui-button {
+  min-height: var(--tap);
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  color: var(--ink);
+  font: 600 15px/1.2 var(--font-text);
+  letter-spacing: var(--tracking-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.ui-button.primary { background: var(--ink); color: #fff; }
+.ui-button.destructive { color: var(--danger); }
+.ui-button:active:not(:disabled) { transform: scale(.98); background: var(--fill-pressed); }
+.ui-button.primary:active:not(:disabled) { background: #000; }
+.ui-button:disabled { opacity: .42; cursor: not-allowed; }
+@media (hover: hover) {
+  .ui-button:hover:not(:disabled) { background: var(--fill-pressed); }
+  .ui-button.primary:hover:not(:disabled) { background: #000; }
+}
+
+/* Inputs: 16px so iOS never zooms. */
+.ui-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, .86);
+  color: var(--ink);
+  font: 400 16px/1.35 var(--font-text);
+}
+
+/* ---------- Source kinds (Calendar, Gmail, reported, imagined) ---------- */
+/* Dot: solid = real or reported, hollow ring = imagined. Chip: dot + short colored label. */
+.src-dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--src-imagined);
+}
+
+.src-calendar .src-dot,
+.src-dot.src-calendar { background: var(--src-calendar); }
+.src-gmail .src-dot,
+.src-dot.src-gmail { background: var(--src-gmail); }
+.src-reported .src-dot,
+.src-dot.src-reported { background: var(--src-reported); }
+.src-imagined .src-dot,
+.src-dot.src-imagined { background: transparent; box-shadow: inset 0 0 0 1.5px var(--src-imagined) !important; }
+
+.src-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-2);
+  font: 500 13px/1.3 var(--font-text);
+}
+
+.src-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Text colors are darker than the dot tokens so 13px labels pass 4.5:1 on glass. */
+.src-chip.src-calendar { color: var(--src-calendar); }
+.src-chip.src-gmail { color: #9a5200; }
+.src-chip.src-reported { color: #277a3c; }
+.src-chip.src-imagined::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor !important; }
+
+.src-legend {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  color: var(--ink-2);
+  font: 400 13px/1.35 var(--font-text);
+}
+
+.src-legend li { display: flex; align-items: baseline; gap: 10px; }
+.src-legend .src-dot { position: relative; top: -1px; }
+.src-legend strong { margin-right: 4px; color: var(--ink); font-weight: 600; }
+
+/* ---------- App shell: top bar ---------- */
+.shell .home-topbar,
+.shell .schedule-topbar {
+  padding-top: calc(33px + env(safe-area-inset-top));
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  background: transparent;
+}
+
+.shell .home-wordmark,
+.shell .schedule-wordmark {
+  min-height: var(--tap);
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 700 34px/1.2 var(--font-display);
+  letter-spacing: var(--tracking-large);
+  cursor: pointer;
+}
+
+/* Talk: the red orb, top right. */
+.shell .talk-trigger {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #ef5f61 0%, var(--talk) 46%, #cf2f33 100%);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 16px rgba(201, 42, 46, .28) !important;
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease), filter var(--t-fast) var(--ease);
+}
+
+.shell .talk-trigger svg { width: 26px; height: 26px; }
+.shell .talk-trigger:active { transform: scale(.94); filter: brightness(.92); }
+
+/* ---------- App shell: tab bar (floating glass capsule) ---------- */
+.shell .home-bottom-nav,
+.shell .schedule-bottom-nav {
+  min-height: 64px;
+  margin: 20px var(--gutter) calc(24px + env(safe-area-inset-bottom));
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-items: stretch;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-sheet);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-float) !important;
+}
+
+.shell .home-bottom-nav button,
+.shell .schedule-bottom-nav button,
+.shell .schedule-bottom-nav button + button {
+  justify-self: stretch;
+  width: auto;
+  min-height: 50px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: calc(var(--r-sheet) - 6px);
+  background: transparent;
+  color: var(--ink);
+  font: 600 17px/1 var(--font-text);
+  letter-spacing: var(--tracking-body);
+  text-transform: none;
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.shell .home-bottom-nav button:active,
+.shell .schedule-bottom-nav button:active { background: var(--fill-pressed); transform: scale(.98); }
+
+@media (hover: hover) {
+  .shell .talk-trigger:hover { filter: brightness(.94); }
+  .shell .home-wordmark:hover,
+  .shell .schedule-wordmark:hover { color: var(--ink); opacity: .72; }
+  .shell .home-bottom-nav button:hover,
+  .shell .schedule-bottom-nav button:hover { background: var(--fill); color: var(--ink); border-color: transparent; }
+}
+
+/* ---------- Focus: always visible ---------- */
+.shell :is(button, a, input, textarea, select, summary, [tabindex]):focus-visible,
+.talk-layer :is(button, a, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.shell main:focus-visible { outline-offset: -3px; }
+
+/* ---------- Toasts while the app is up ---------- */
+body:has(.shell) .toast-region {
+  right: 50%;
+  bottom: calc(108px + env(safe-area-inset-bottom));
+  transform: translateX(50%);
+}
+
+body:has(.shell) .toast {
+  width: min(360px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  font: 500 15px/1.4 var(--font-text);
+}
+
+body:has(.shell) .toast.error { color: #8f1c20; }
+
+/* ---------- Breakpoints (unchanged: 606, 440, 340) ---------- */
+@media (max-width: 440px) {
+  .shell,
+  .talk-layer { --gutter: 16px; }
+  .shell .home-topbar,
+  .shell .schedule-topbar { padding-top: calc(18px + env(safe-area-inset-top)); }
+  .shell .home-wordmark,
+  .shell .schedule-wordmark { margin-top: 4px; font-size: 30px; }
+  .shell .talk-trigger { width: 52px; height: 52px; }
+  .shell .home-bottom-nav,
+  .shell .schedule-bottom-nav { margin: 14px var(--gutter) calc(16px + env(safe-area-inset-bottom)); }
+  .shell .home-bottom-nav button,
+  .shell .schedule-bottom-nav button { font-size: 17px; }
+}
+
+@media (max-width: 340px) {
+  .shell,
+  .talk-layer { --gutter: 14px; }
+}
+
+/* ---------- Fallbacks ---------- */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  :root { --glass: rgba(255, 255, 255, .86); --glass-strong: rgba(255, 255, 255, .94); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass: #fbfbfc;
+    --glass-strong: #fff;
+    --glass-edge: rgba(60, 60, 67, .18);
+    --glass-blur: none;
+  }
+  .shell::before,
+  .sky-surface { background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); }
+}
+
+@media (prefers-contrast: more) {
+  :root { --ink-2: #3a3a3e; --hairline: rgba(60, 60, 67, .4); --glass: rgba(255, 255, 255, .92); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell *,
+  .talk-layer,
+  .talk-layer * {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
