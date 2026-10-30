@@ -1,6 +1,6 @@
 # UI redesign: glass, clean, Apple-like (post-onboarding only)
 
-Status: in progress on branch `ui-redesign`. Brief: `docs/prompts/ui-redesign.md`.
+Status: built, user-reviewed and fixed on branch `ui-redesign` (66779cb). Not merged into main; waiting on Leo. Brief: `docs/prompts/ui-redesign.md`.
 
 ## Goal, context, constraints, done
 
