@@ -28,16 +28,6 @@ body:has(.talk-layer.open) {
 }
 
 .schedule-shell,
-.settings-shell,
-.talk-surface,
-.schedule-shell *,
-.settings-shell *,
-.talk-surface * {
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-.schedule-shell,
 .settings-shell {
   width: min(100%, 606px);
   min-height: 100dvh;

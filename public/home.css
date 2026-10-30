@@ -3,17 +3,6 @@ body:has(.home-shell) {
   background: #f0f0ee;
 }
 
-.home-shell,
-.home-shell * {
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-.home-shell img,
-.home-shell svg {
-  filter: none !important;
-}
-
 .home-shell {
   width: min(100%, 606px);
   min-height: 100dvh;
