@@ -1,6 +1,7 @@
 Redesign the Twin UI so it looks and feels like a clean Apple app with a glass look. Use the frontend-design skill for the overall direction. Work in two passes with two different agents: a builder, then a reviewer who uses the app as a real user.
 
 If the `interfaces` skills (jakubkrehel/skills) are installed, use them for the details. Skip this section if they aren't.
+
 - **Builder:** `better-ui` (surfaces, icons, motion), `better-typography`, `better-colors` (palette, tokens, contrast), `better-layout` (grouping, alignment, responsive), `better-writing` (labels, empty states, errors), and `better-accessibility` (keyboard, focus, ARIA, WCAG 2.2).
 - **Reviewer:** `better-interface` for the ranked review across all areas.
 - frontend-design sets the overall direction. The `better-*` skills set the exact details. If they disagree, follow frontend-design for the look and the `better-*` skills for accessibility and contrast.
@@ -24,7 +25,7 @@ If the `interfaces` skills (jakubkrehel/skills) are installed, use them for the 
   - every element in a rounded pill with a drop shadow
   - generic hero copy, Inter on a dark gradient
   - identical card spacing everywhere
-  Make deliberate choices instead: real hierarchy, varied rhythm, restrained color, and custom details a designer would sign off on. If a screen looks like a default template, redo it.
+    Make deliberate choices instead: real hierarchy, varied rhythm, restrained color, and custom details a designer would sign off on. If a screen looks like a default template, redo it.
 
 ## Web app now, iPhone app later
 
