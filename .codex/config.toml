@@ -1,0 +1,11 @@
+# Work freely inside the repository and ask before crossing the sandbox boundary.
+approval_policy = "on-request"
+approvals_reviewer = "user"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3

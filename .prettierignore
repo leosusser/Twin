@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+data/
+docs/screenshots/
+docs/references/
+package-lock.json
+docs/product-direction.md
+public/

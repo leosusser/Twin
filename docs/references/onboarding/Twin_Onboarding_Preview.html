@@ -1,0 +1,2794 @@
+<!doctype html>
+<html lang="en" data-visualize-standalone>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Onboarding Fragment</title>
+<style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
+
+</head>
+<body>
+<iframe id="codex-visualization" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Onboarding Fragment" data-srcdoc="&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot; data-visualize-standalone&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
+&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
+&lt;title&gt;Onboarding Fragment&lt;/title&gt;
+&lt;style&gt;:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 16px);
+  --blue: light-dark(rgb(51 156 255), rgb(51 156 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans:
+    -apple-system-body, ui-sans-serif, -apple-system, system-ui, &quot;Segoe UI&quot;,
+    Helvetica, &quot;Apple Color Emoji&quot;, Arial, sans-serif, &quot;Segoe UI Emoji&quot;,
+    &quot;Segoe UI Symbol&quot;;
+  --font-mono:
+    ui-monospace, SFMono-Regular, &quot;SF Mono&quot;, Menlo, Consolas, &quot;Liberation Mono&quot;,
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --icon-size: 16px;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --corner-shape: round;
+  --radius: var(--border-radius-lg, 8px);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url(&quot;data:image/svg+xml,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; viewBox=&#x27;0 0 17 17&#x27;%3E%3Cpath d=&#x27;M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z&#x27;/%3E%3C/svg%3E&quot;);
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme=&quot;light&quot;] {
+  color-scheme: light;
+}
+
+:root[data-theme=&quot;dark&quot;] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html &gt; body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: var(--visualize-paint-gutter, 0px);
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-weight: var(--font-weight-normal);
+}
+
+.cursor-interaction {
+  cursor: var(--cursor-interaction, pointer);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  font-weight: inherit;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+.table {
+  font-family: var(--font-sans);
+}
+
+h1 {
+  font-size: calc(var(--font-size-base) * 1.5);
+  line-height: 1.3333333333;
+}
+
+h2 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  line-height: 1.4;
+}
+h3 {
+  font-size: calc(var(--font-size-base) * 1.125);
+  line-height: 1.5555555556;
+}
+h4 {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+h5,
+h6 {
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong,
+th {
+  font-weight: 600;
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+pre,
+pre code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: calc(var(--font-size-base) * 0.875);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-family: var(--font-sans);
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.table :is(th, td):not(:last-child) {
+  padding-inline-end: calc(var(--font-size-base) * 1.5);
+}
+
+.table-responsive &gt; .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead :is(th, td) {
+  border-bottom-color: var(--border-strong, var(--input));
+  padding-block: calc(var(--font-size-base) / 2);
+  line-height: var(--font-size-base);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.table tbody :is(th, td) {
+  padding-block: calc(var(--font-size-base) * 0.625);
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 8px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align=&quot;right&quot;]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align=&quot;center&quot;]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: var(--corner-shape);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+.widget {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  box-shadow: 0 0 0 0.5px var(--border-strong, var(--border));
+  color: var(--foreground);
+  background: var(--background);
+}
+
+#widget &gt; :not(.card, .widget, .progress) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  border: 1px solid var(--border);
+  corner-shape: var(--corner-shape);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+  padding: 5px 12px;
+  border-color: color-mix(
+    in oklab,
+    light-dark(var(--primary-foreground), var(--foreground)) 5%,
+    transparent
+  );
+  border-radius: var(--radius-2xl);
+  color: light-dark(var(--primary-foreground), var(--foreground));
+  background: light-dark(var(--foreground), var(--popover));
+  box-shadow: 0 8px 18px rgb(15 23 42 / 20%);
+  letter-spacing: -0.15px;
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin-block: 6px;
+  border: 0;
+  background: var(--border);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress {
+  display: flex;
+  height: 8px;
+  margin-block: calc((var(--line-height-normal, 1.5em) - 8px) / 2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.progress-bar:only-child {
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  height: 100%;
+  flex-shrink: 0;
+  border: 0;
+  background: var(--viz-series-1);
+}
+
+.viz-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--foreground) 40%, var(--muted-foreground));
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-family: var(--font-sans);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+}
+
+small,
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls &gt; .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls &gt; .form-label &gt; :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.nav-link,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+/* Match inline alignment without overriding a containing flex or grid layout. */
+.btn,
+.nav-link,
+.form-control,
+.form-select,
+.form-range,
+.form-check {
+  vertical-align: middle;
+}
+
+.btn,
+.nav-link {
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: inherit;
+  font-family: var(--font-sans);
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  border-color: transparent;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.btn {
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-link:not(:disabled):not([aria-disabled=&quot;true&quot;]):hover {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.btn-primary {
+  border-color: var(--border);
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: border-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: border-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--muted-foreground);
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-pills .nav-link {
+  min-width: 0;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.nav-justified .nav-link {
+  flex: 1 1 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.nav-pills .nav-link.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* Shared preview chrome; product styles stay inside each variant. */
+.viz-dotted-background {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0.8px,
+    transparent 0.8px
+  );
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.viz-carousel {
+  position: relative;
+  min-width: 0;
+}
+
+.viz-carousel:has(&gt; .viz-carousel-controls) {
+  min-height: calc(60px + var(--viz-carousel-picker-height, 0px));
+  padding-bottom: 60px;
+}
+
+.viz-carousel &gt; [data-variant][hidden] {
+  display: none !important;
+}
+
+.viz-carousel &gt; [data-variant] {
+  isolation: isolate;
+}
+
+.viz-carousel-controls {
+  --viz-carousel-hover: light-dark(
+    color-mix(in srgb, var(--foreground) 5.4%, transparent),
+    color-mix(in srgb, var(--foreground) 7.8%, transparent)
+  );
+  position: absolute;
+  z-index: 2;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  /* Leave room for the host&#x27;s design-controls launcher at the trailing edge. */
+  max-width: calc(100% - 96px);
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  /* Match the settings dropdown chrome independently of the content font size. */
+  font-size: 13px;
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+/* Keep authored mockup button styles out of the shared carousel chrome. */
+.viz-carousel-controls button,
+.viz-carousel-picker &gt; summary {
+  display: flex !important;
+  height: auto !important;
+  min-height: 30px;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px;
+  padding: 0 6px !important;
+  -webkit-app-region: no-drag;
+  border: 0 !important;
+  border-radius: 14px !important;
+  color: inherit !important;
+  background: transparent !important;
+  font: inherit !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viz-carousel-controls &gt; button,
+.viz-carousel-picker &gt; summary {
+  position: relative;
+  isolation: isolate;
+}
+
+.viz-carousel-controls &gt; button {
+  --icon-size: 16px;
+  width: 30px !important;
+  padding: 0 !important;
+}
+
+.viz-carousel-picker &gt; summary {
+  padding-inline: 12px !important;
+}
+
+.viz-carousel-controls .viz-carousel-caret {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin: 0;
+  color: inherit;
+  transform: rotate(180deg);
+}
+
+.viz-carousel-controls &gt; button &gt; svg,
+.viz-carousel-controls .viz-carousel-caret,
+.viz-carousel-count {
+  opacity: 0.5;
+}
+
+.viz-carousel-controls &gt; button::before,
+.viz-carousel-picker &gt; summary::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-radius: 12px;
+  content: &quot;&quot;;
+  pointer-events: none;
+}
+
+.viz-carousel-controls &gt; button:hover::before,
+.viz-carousel-picker &gt; summary:hover::before {
+  background: var(--viz-carousel-hover);
+}
+
+.viz-carousel-controls &gt; button,
+.viz-carousel-controls [data-lucide],
+.viz-carousel-controls .lucide {
+  flex-shrink: 0;
+}
+
+.viz-carousel-picker {
+  min-width: 0;
+}
+
+.viz-carousel-picker &gt; summary {
+  min-width: 0;
+  list-style: none;
+}
+
+.viz-carousel-picker &gt; summary::-webkit-details-marker {
+  display: none;
+}
+
+.viz-carousel-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.viz-carousel-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viz-carousel-options {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  max-height: 240px;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 25%));
+}
+
+.viz-carousel-options &gt; button {
+  border-radius: max(0px, calc(var(--radius-lg) - 5px)) !important;
+  width: 100% !important;
+  min-height: 28px;
+  justify-content: flex-start !important;
+  padding: 4px 8px !important;
+  font-size: var(--font-size-small) !important;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.viz-carousel-options &gt; [aria-current=&quot;true&quot;],
+.viz-carousel-options &gt; button:hover {
+  background: var(--viz-carousel-hover) !important;
+}
+
+.btn:disabled,
+.nav-link:disabled,
+.nav-link[aria-disabled=&quot;true&quot;] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: calc(4px + var(--control-spacing, 12px) / 2);
+  border-color: var(--input);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--popover) 96%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4285714286;
+}
+.form-control:is(
+  [type=&quot;file&quot;],
+  [type=&quot;date&quot;],
+  [type=&quot;datetime-local&quot;],
+  [type=&quot;month&quot;],
+  [type=&quot;week&quot;],
+  [type=&quot;color&quot;]
+) {
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  line-height: 18px;
+}
+.form-control:is(
+  [type=&quot;date&quot;],
+  [type=&quot;datetime-local&quot;],
+  [type=&quot;month&quot;],
+  [type=&quot;week&quot;]
+) {
+  padding-inline: var(--control-spacing, 12px);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type=&quot;file&quot;] {
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+  padding: 0;
+}
+
+.form-control[type=&quot;file&quot;]::file-selector-button {
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+  min-height: calc(10px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  margin-inline-end: var(--control-spacing, 12px);
+}
+
+.form-control[type=&quot;file&quot;]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type=&quot;color&quot;] {
+  width: 40px;
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: var(--corner-shape);
+}
+
+textarea.form-control {
+  height: auto;
+  resize: vertical;
+  min-height: 96px;
+  padding: 8px 10px;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.form-control:disabled {
+  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  opacity: 1;
+}
+.form-control[aria-invalid=&quot;true&quot;] {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  margin: 0;
+  /* The secondary icon role is 14px at compact density and 16px at web density. */
+  --icon-size: calc(10px + var(--control-spacing, 12px) / 2);
+  /* Settings dropdowns retain a 12px inset and a 4px text-to-chevron gap. */
+  padding: 0 calc(16px + var(--icon-size)) 0 12px;
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    );
+  background-position:
+    calc(100% - 12px - var(--icon-size) / 2) 50%,
+    calc(100% - 12px - var(--icon-size) * 0.18) 50%;
+  background-repeat: no-repeat;
+  background-size: calc(var(--icon-size) * 0.32) calc(var(--icon-size) * 0.32);
+  cursor: var(--cursor-interaction, default);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.form-select option {
+  color: var(--popover-foreground);
+  background-color: var(--popover);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.form-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+.form-select:disabled {
+  opacity: 0.4;
+}
+
+.form-check {
+  display: flex;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
+  corner-shape: round;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  width: calc(10px + var(--control-spacing, 12px) / 2);
+  height: calc(10px + var(--control-spacing, 12px) / 2);
+  border-color: var(--border-strong, var(--input));
+  border-radius: calc(var(--radius-sm) / 2);
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:is(:checked, :indeterminate) {
+  border-color: var(--border-strong, var(--input));
+  background-color: color-mix(in srgb, var(--popover) 96%, transparent);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: &quot;&quot;;
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+  background-color: var(--foreground);
+}
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:indeterminate::before {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 65%;
+  height: 6.65%;
+  margin: auto;
+  border-radius: var(--radius-full);
+  background: var(--foreground);
+  mask: none;
+  content: &quot;&quot;;
+}
+
+.form-check-input[type=&quot;radio&quot;] {
+  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--input);
+}
+
+.form-check-input[type=&quot;radio&quot;]:checked {
+  border: 0;
+  background: radial-gradient(
+    circle,
+    var(--primary-foreground) 0 3px,
+    var(--foreground) 3px
+  );
+  box-shadow: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;]:focus-visible {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+.form-check:not(.form-switch) .form-check-input[type=&quot;radio&quot;]:disabled,
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;radio&quot;]:disabled
+  + .form-check-label {
+  opacity: 0.5;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  content: &quot;&quot;;
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  border-color: #fff;
+  background: #fff;
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--blue);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+  outline: none;
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  accent-color: var(--primary);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  outline: none;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: transparent;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  margin-top: -9px;
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Outline the native track and thumb, preserving the larger input hit area. */
+.form-range:focus-visible::-webkit-slider-runnable-track {
+  outline: 2px auto Highlight;
+  outline-color: -webkit-focus-ring-color;
+}
+
+.form-range::-moz-range-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.form-range:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+  [aria-pressed=&quot;true&quot;],
+  [aria-selected=&quot;true&quot;],
+  .is-selected
+) {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--blue);
+}
+
+.btn.viz-tile:is([aria-pressed=&quot;true&quot;], [aria-selected=&quot;true&quot;], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.viz-carousel-controls :is(button, summary):focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Web recipes are the default, including on renderers without inline style queries. */
+@supports (border-radius: if(style(--corner-shape: round): 1px; else: 2px)) {
+  /* Match the host&#x27;s proportional text-sm scale at every text preference. */
+  .tooltip,
+  .viz-badge,
+  .btn,
+  .nav-link,
+  .form-control,
+  .form-select {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 14 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 13 / 14), 1px)
+    );
+  }
+
+  .btn,
+  .nav-link,
+  .form-select {
+    border-radius: if(
+      style(--corner-shape: round): var(--radius-full); else: var(--radius-lg)
+    );
+  }
+
+  .form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
+    border-radius: if(
+      style(--corner-shape: round): calc(var(--radius-sm) / 2);
+        else: calc(var(--radius-lg) * 0.4)
+    );
+  }
+
+  .tooltip {
+    font-weight: if(
+      style(--corner-shape: round): 600; else: var(--font-weight-normal)
+    );
+  }
+}
+
+@media (pointer: coarse) {
+  .viz-carousel:has(&gt; .viz-carousel-controls) {
+    min-height: calc(76px + var(--viz-carousel-picker-height, 0px));
+    padding-bottom: 76px;
+  }
+
+  .btn,
+  .nav-link,
+  .viz-carousel-controls button,
+  .viz-carousel-picker &gt; summary,
+  .form-control,
+  .form-select {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Keep small-screen WebKit from zooming when a text field receives focus. */
+  .form-control,
+  .form-select {
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+  .form-control:is(
+    [type=&quot;file&quot;],
+    [type=&quot;date&quot;],
+    [type=&quot;datetime-local&quot;],
+    [type=&quot;month&quot;],
+    [type=&quot;week&quot;],
+    [type=&quot;time&quot;],
+    [type=&quot;color&quot;]
+  ) {
+    height: 44px;
+    min-height: 44px;
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+
+  .form-control[type=&quot;file&quot;]::file-selector-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control-color[type=&quot;color&quot;] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-control:is(
+    [type=&quot;date&quot;],
+    [type=&quot;datetime-local&quot;],
+    [type=&quot;month&quot;],
+    [type=&quot;time&quot;],
+    [type=&quot;week&quot;]
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    padding-block: 8px;
+  }
+
+  .form-check {
+    min-height: 44px;
+    padding-inline: 15px;
+  }
+
+  .form-check-input {
+    position: relative;
+  }
+
+  .form-check-input::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    content: &quot;&quot;;
+    transform: translate(-50%, -50%);
+  }
+
+  .form-check-label {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .form-range {
+    height: 44px;
+    touch-action: pan-y;
+  }
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget &gt; svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html&gt;body{padding:0}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;script type=&quot;application/json&quot; id=&quot;codex-visualization-widget-state&quot;&gt;__CODEX_VISUALIZATION_WIDGET_STATE__&lt;/script&gt;
+&lt;script&gt;(() =&gt; {
+  const root = document.documentElement;
+  const mediaQuery = globalThis.matchMedia(&quot;(prefers-color-scheme: dark)&quot;);
+  const apply = Reflect.apply;
+  const isArray = Array.isArray;
+  const hasOwn = Object.hasOwn;
+  const parentWindow = globalThis.parent;
+  const stringify = JSON.stringify;
+  const parse = JSON.parse;
+  const encode = TextEncoder.prototype.encode.bind(new TextEncoder());
+  const initialStateElement = document.getElementById(
+    &quot;codex-visualization-widget-state&quot;,
+  );
+  const initialGlobals = parse(initialStateElement?.textContent ?? &quot;{}&quot;);
+  initialStateElement?.remove();
+  /** @type {Record&lt;string, unknown&gt; | null} */
+  let state = initialGlobals.widgetState ?? null;
+  const statePersistence = initialGlobals.statePersistence ?? &quot;none&quot;;
+  let nextStateRequestId = 0;
+  /** @type {Map&lt;number, { resolve: () =&gt; void; reject: (error: Error) =&gt; void; timeout: ReturnType&lt;typeof globalThis.setTimeout&gt;; serializedState: string }&gt;} */
+  const pendingStateWrites = new Map();
+  const persistenceError = () =&gt;
+    Object.assign(
+      new Error(&quot;The host could not persist the widget state update&quot;),
+      {
+        code: -32000,
+        data: { code: &quot;widget_state_persistence_failed&quot;, retryable: false },
+      },
+    );
+  /**
+   * @param {object} prototype
+   * @param {string} property
+   */
+  const getPrototypeGetter = (prototype, property) =&gt; {
+    // oxlint-disable-next-line typescript/unbound-method -- invoked through captured Reflect.apply
+    const getter = Object.getOwnPropertyDescriptor(prototype, property)?.get;
+    if (getter == null) {
+      throw new Error(`Missing ${property} getter`);
+    }
+    return getter;
+  };
+  const getMessageData = getPrototypeGetter(MessageEvent.prototype, &quot;data&quot;);
+  const getMessagePorts = getPrototypeGetter(MessageEvent.prototype, &quot;ports&quot;);
+  const getMessageSource = getPrototypeGetter(MessageEvent.prototype, &quot;source&quot;);
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const addHostMessageListener = MessagePort.prototype.addEventListener;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const postHostMessage = MessagePort.prototype.postMessage;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const startHostPort = MessagePort.prototype.start;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const stopMessagePropagation = Event.prototype.stopImmediatePropagation;
+  /** @type {MessagePort | null} */
+  let hostPort = null;
+  const postToHost = (type, payload) =&gt; {
+    if (hostPort != null) {
+      apply(postHostMessage, hostPort, [{ type, ...payload }]);
+    }
+  };
+  const openExternal = ({ href }) =&gt; {
+    if (globalThis.navigator.userActivation?.isActive === true) {
+      postToHost(&quot;open-external&quot;, { href });
+    }
+  };
+  const sendFollowUpMessage = ({ context, prompt, title }) =&gt; {
+    if (globalThis.navigator.userActivation?.isActive === true) {
+      postToHost(&quot;follow-up&quot;, { context, prompt, title });
+    }
+    return Promise.resolve();
+  };
+  /**
+   * @param {Record&lt;string, unknown&gt; | ((previous: Record&lt;string, unknown&gt; | null) =&gt; Record&lt;string, unknown&gt;)} next
+   * @returns {Promise&lt;void&gt;}
+   */
+  const setWidgetState = async (next) =&gt; {
+    const nextState = typeof next === &quot;function&quot; ? next(state) : next;
+    if (
+      nextState == null ||
+      typeof nextState !== &quot;object&quot; ||
+      isArray(nextState)
+    ) {
+      throw new TypeError(&quot;Widget state must be a JSON object&quot;);
+    }
+    const inputState = stringify(
+      nextState,
+      (_key, /** @type {unknown} */ value) =&gt; {
+        if (
+          typeof value === &quot;undefined&quot; ||
+          typeof value === &quot;function&quot; ||
+          typeof value === &quot;symbol&quot; ||
+          (typeof value === &quot;number&quot; &amp;&amp; !Number.isFinite(value))
+        ) {
+          throw new TypeError(&quot;Widget state must be a JSON object&quot;);
+        }
+        return value;
+      },
+    );
+    const parsedState = parse(inputState);
+    if (
+      parsedState == null ||
+      typeof parsedState !== &quot;object&quot; ||
+      isArray(parsedState)
+    ) {
+      throw new TypeError(&quot;Widget state must be a JSON object&quot;);
+    }
+    const storedState = {
+      modelContent: null,
+      privateContent: null,
+      ...parsedState,
+    };
+    const serializedState = stringify(storedState);
+    if (encode(serializedState).length &gt; 16 * 1024) {
+      throw new TypeError(
+        &quot;Widget state must be a JSON object of at most 16 KiB&quot;,
+      );
+    }
+    if (
+      hasOwn(storedState, &quot;imageIds&quot;) &amp;&amp;
+      (!isArray(storedState.imageIds) ||
+        storedState.imageIds.some(
+          (/** @type {unknown} */ id) =&gt; typeof id !== &quot;string&quot;,
+        ))
+    ) {
+      throw new TypeError(&quot;Widget state imageIds must be an array of strings&quot;);
+    }
+    if (storedState.imageIds?.length &gt; 0) {
+      throw Object.assign(
+        new TypeError(&quot;Visualization state does not support image attachments&quot;),
+        { code: -32602, data: { code: &quot;images_unsupported&quot; } },
+      );
+    }
+    state = storedState;
+    globalThis.openai.widgetState = state;
+    globalThis.dispatchEvent(
+      new CustomEvent(&quot;openai:set_globals&quot;, {
+        detail: { globals: { widgetState: state } },
+      }),
+    );
+    if (statePersistence === &quot;none&quot;) {
+      throw persistenceError();
+    }
+    const id = ++nextStateRequestId;
+    return new Promise((resolve, reject) =&gt; {
+      const timeout = globalThis.setTimeout(() =&gt; {
+        pendingStateWrites.delete(id);
+        reject(persistenceError());
+      }, 30_000);
+      pendingStateWrites.set(id, { resolve, reject, timeout, serializedState });
+      postToHost(&quot;widget-state-write&quot;, { id, state: serializedState });
+    });
+  };
+  const syncTheme = () =&gt; {
+    const theme = mediaQuery.matches ? &quot;dark&quot; : &quot;light&quot;;
+    root.dataset.theme = theme;
+    globalThis.openai = {
+      ...globalThis.openai,
+      openExternal,
+      sendFollowUpMessage,
+      setWidgetState,
+      theme,
+      visualizationStyleVariables: {},
+      visualizationTheme: theme,
+      widgetState: state,
+      statePersistence,
+      stateModelContext: &quot;none&quot;,
+    };
+    globalThis.dispatchEvent(
+      new CustomEvent(&quot;openai:set_globals&quot;, {
+        detail: { globals: globalThis.openai },
+      }),
+    );
+  };
+  const sendHeight = () =&gt; {
+    postToHost(&quot;height&quot;, {
+      height: Math.ceil(
+        Math.max(
+          document.body.scrollHeight,
+          document.body.getBoundingClientRect().height,
+        ),
+      ),
+    });
+  };
+
+  globalThis.addEventListener(
+    &quot;message&quot;,
+    (event) =&gt; {
+      const data = apply(getMessageData, event, []);
+      const ports = apply(getMessagePorts, event, []);
+      const source = apply(getMessageSource, event, []);
+      if (
+        hostPort != null ||
+        source !== parentWindow ||
+        typeof data !== &quot;object&quot; ||
+        data?.type !== &quot;codex-visualization-initialize&quot; ||
+        !isArray(ports) ||
+        ports.length !== 1
+      ) {
+        return;
+      }
+      apply(stopMessagePropagation, event, []);
+      const nextHostPort = ports[0];
+      try {
+        apply(addHostMessageListener, nextHostPort, [
+          &quot;message&quot;,
+          (event) =&gt; {
+            const data = apply(getMessageData, event, []);
+            if (typeof data === &quot;object&quot; &amp;&amp; data?.type === &quot;measure&quot;) {
+              sendHeight();
+            } else if (
+              typeof data === &quot;object&quot; &amp;&amp;
+              data?.type === &quot;widget-state-result&quot;
+            ) {
+              /** @type {unknown} */
+              const id = data.id;
+              if (typeof id !== &quot;number&quot;) {
+                return;
+              }
+              const pending = pendingStateWrites.get(id);
+              if (pending != null) {
+                pendingStateWrites.delete(id);
+                globalThis.clearTimeout(pending.timeout);
+                if (data.ok === true) {
+                  pending.resolve();
+                } else {
+                  pending.reject(persistenceError());
+                }
+              }
+            }
+          },
+        ]);
+        apply(startHostPort, nextHostPort, []);
+      } catch {
+        return;
+      }
+      hostPort = nextHostPort;
+      for (const [id, { serializedState }] of pendingStateWrites) {
+        postToHost(&quot;widget-state-write&quot;, { id, state: serializedState });
+      }
+      sendHeight();
+    },
+    { capture: true },
+  );
+  document.currentScript?.remove();
+  mediaQuery.addEventListener(&quot;change&quot;, syncTheme);
+  globalThis.addEventListener(&quot;click&quot;, (event) =&gt; {
+    if (event.defaultPrevented) {
+      return;
+    }
+    let element = null;
+    if (event.target instanceof globalThis.Element) {
+      element = event.target;
+    } else if (event.target instanceof globalThis.Node) {
+      element = event.target.parentElement;
+    }
+    const link = element?.closest(&quot;a[href]&quot;);
+    const href = link?.getAttribute(&quot;href&quot;);
+    if (href == null) {
+      return;
+    }
+    if (href.startsWith(&quot;#&quot;)) {
+      let id;
+      try {
+        id = decodeURIComponent(href.slice(1));
+      } catch {
+        return;
+      }
+      const target = id.length === 0 ? root : document.getElementById(id);
+      if (
+        target == null ||
+        globalThis.navigator.userActivation?.isActive !== true
+      ) {
+        return;
+      }
+      event.preventDefault();
+      postToHost(&quot;scroll-to&quot;, {
+        top: target.getBoundingClientRect().top + globalThis.scrollY,
+      });
+      return;
+    }
+    event.preventDefault();
+    openExternal({ href });
+  });
+  new ResizeObserver(sendHeight).observe(document.body);
+  syncTheme();
+})();
+&lt;/script&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@500;600;700;800;900&amp;display=swap&quot;&gt;
+&lt;style&gt;
+#twin-name-first{--tw-white:light-dark(#fff,#fff);--tw-ink:light-dark(#0b0b0b,#0b0b0b);--tw-red:#dd2e06;--tw-muted:#717171;--tw-line:#d9d9d6;--tw-paper:light-dark(#f0f0ee,#f0f0ee);--tw-display:&quot;Barlow Condensed&quot;,&quot;Arial Narrow&quot;,Impact,sans-serif;--tw-body:&quot;Barlow&quot;,Arial,sans-serif;width:100%;color:var(--tw-ink);font:400 16px/1.4 var(--tw-body)}
+#twin-name-first *{box-sizing:border-box}
+#twin-name-first button,#twin-name-first input,#twin-name-first textarea{font:inherit}
+#twin-name-first button,#twin-name-first a,#twin-name-first summary,#twin-name-first label[for]{-webkit-tap-highlight-color:transparent}
+#twin-name-first button:disabled{opacity:.36;cursor:default}
+#twin-name-first [hidden]{display:none!important}
+#twin-name-first .tw-preview-label{padding:5px 0 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:light-dark(#666,#aaa);font:500 11px/1.4 var(--tw-body);letter-spacing:.06em;text-transform:uppercase}
+#twin-name-first .tw-preview-label span:last-child{font-weight:400;letter-spacing:0;text-transform:none}
+#twin-name-first .tw-canvas{background:var(--tw-paper);padding:22px 14px}
+#twin-name-first .tw-screen{width:min(100%,460px);margin:auto;background:var(--tw-white);border-right:1px solid var(--tw-ink);border-bottom:1px solid var(--tw-ink);color:var(--tw-ink)}
+#twin-name-first .tw-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 25px 21px}
+#twin-name-first .tw-wordmark{font:900 34px/.9 var(--tw-display);letter-spacing:-.025em;margin:0;color:var(--tw-ink)}
+#twin-name-first .tw-account{display:flex;align-items:center;gap:8px;color:var(--tw-muted);font:600 11px/1 var(--tw-body);letter-spacing:.07em;text-transform:uppercase;max-width:58%;overflow-wrap:anywhere}
+#twin-name-first .tw-account-dot{width:6px;height:6px;background:var(--tw-red);flex:none}
+#twin-name-first .tw-progress{height:2px;margin:0 25px;background:var(--tw-line)}
+#twin-name-first .tw-progress-fill{height:100%;display:block;background:var(--tw-red)}
+#twin-name-first .tw-stage{padding:33px 25px 28px;min-height:460px}
+#twin-name-first .tw-kicker{display:flex;align-items:center;gap:9px;color:var(--tw-red);font:700 13px/1.2 var(--tw-display);letter-spacing:.11em;text-transform:uppercase;margin:0 0 17px}
+#twin-name-first .tw-square{display:inline-block;width:7px;height:7px;background:var(--tw-red);flex:none}
+#twin-name-first h1{color:var(--tw-ink);font:800 clamp(42px,7vw,57px)/.97 var(--tw-display);letter-spacing:-.025em;text-transform:none;margin:0 0 17px}
+#twin-name-first h2{color:var(--tw-ink);font:700 26px/1.05 var(--tw-display);letter-spacing:-.01em;margin:0 0 8px}
+#twin-name-first h3{color:var(--tw-ink);font:700 22px/1.1 var(--tw-display);margin:0 0 7px}
+#twin-name-first p{margin:0}
+#twin-name-first .tw-description{color:var(--tw-muted);font-size:16px;line-height:1.45;max-width:370px}
+#twin-name-first .tw-name-form{margin-top:47px}
+#twin-name-first .tw-label{display:block;font:600 11px/1.3 var(--tw-body);letter-spacing:.12em;margin-bottom:10px;text-transform:uppercase}
+#twin-name-first .tw-name-input{width:100%;border:1px solid var(--tw-line);border-radius:0;background:var(--tw-white);color:var(--tw-ink);padding:14px 15px;font:500 26px/1.2 var(--tw-body);box-shadow:none}
+#twin-name-first input::placeholder,#twin-name-first textarea::placeholder{color:#aaa}
+#twin-name-first .tw-name-footnote{color:var(--tw-muted);font-size:12px;margin-top:12px}
+#twin-name-first .tw-footer{padding:0 25px 23px}
+#twin-name-first .tw-footer-rule{height:1px;background:var(--tw-ink);margin:0 0 19px}
+#twin-name-first .tw-footer-content{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+#twin-name-first .tw-step-count{font:600 12px/1 var(--tw-display);letter-spacing:.1em;color:var(--tw-muted)}
+#twin-name-first .tw-primary{border:0;border-radius:999px;background:var(--tw-red);color:#fff;min-height:49px;padding:14px 24px;font:700 20px/1 var(--tw-display);letter-spacing:.025em;text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;gap:20px;text-decoration:none;white-space:nowrap}
+#twin-name-first .tw-primary:hover:not(:disabled){background:#c92804}
+#twin-name-first .tw-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--tw-ink);border-radius:0;background:var(--tw-white);color:var(--tw-ink);min-height:41px;padding:10px 13px;font:700 14px/1 var(--tw-display);letter-spacing:.04em;text-transform:uppercase;text-decoration:none}
+#twin-name-first .tw-text-button{border:0;border-radius:0;background:none;color:var(--tw-ink);font:600 12px/1.3 var(--tw-body);padding:9px 0;text-decoration:underline;text-underline-offset:3px}
+#twin-name-first .tw-back{border:1px solid var(--tw-ink);border-radius:0;background:var(--tw-white);color:var(--tw-ink);width:35px;height:35px;font:400 23px/1 var(--tw-body);padding:0}
+#twin-name-first .tw-back-row{display:flex;gap:10px;align-items:center}
+#twin-name-first .tw-how{list-style:none;padding:0;margin:25px 0 20px}
+#twin-name-first .tw-how li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;padding:13px 0;border-bottom:1px solid var(--tw-line);font-size:14px;color:var(--tw-muted)}
+#twin-name-first .tw-how li:first-child{border-top:1px solid var(--tw-ink)}
+#twin-name-first .tw-how strong{font-weight:500;color:var(--tw-ink)}
+#twin-name-first .tw-how .tw-num{font:700 18px/1.2 var(--tw-display);color:var(--tw-red)}
+#twin-name-first .tw-prompt-box{border:1px solid var(--tw-ink);margin:19px 0 13px;padding:17px}
+#twin-name-first .tw-prompt-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+#twin-name-first .tw-prompt-top span{font:600 11px/1 var(--tw-body);letter-spacing:.06em;text-transform:uppercase}
+#twin-name-first .tw-prompt-excerpt{font-size:13px;line-height:1.5;color:var(--tw-muted)}
+#twin-name-first details{margin-top:12px}
+#twin-name-first summary{font:600 12px/1.4 var(--tw-body);text-decoration:underline;text-underline-offset:3px}
+#twin-name-first pre{font:400 12px/1.5 ui-monospace,SFMono-Regular,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--tw-muted);margin:15px 0 0}
+#twin-name-first .tw-json-label{margin-top:30px}
+#twin-name-first .tw-json{display:block;width:100%;min-height:204px;padding:15px;border:1px solid var(--tw-ink);border-radius:0;background:var(--tw-white);color:var(--tw-ink);font:400 12px/1.5 ui-monospace,SFMono-Regular,monospace;resize:vertical}
+#twin-name-first .tw-import-links{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+#twin-name-first .tw-file-label{font:600 12px/1.3 var(--tw-body);text-decoration:underline;text-underline-offset:3px}
+#twin-name-first .tw-error{font-size:13px;color:#ba2707;margin-top:12px}
+#twin-name-first .tw-note{font-size:12px;color:var(--tw-muted);margin-top:14px;line-height:1.45}
+#twin-name-first .tw-import-success{font-size:12px;border-bottom:1px solid var(--tw-line);padding:0 0 17px;margin-bottom:22px;color:var(--tw-muted)}
+#twin-name-first .tw-photo-box{margin:24px 0 0;border:1px solid var(--tw-ink);min-height:224px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:22px;background:var(--tw-white)}
+#twin-name-first .tw-photo-box i{width:36px;height:36px;color:var(--tw-muted)}
+#twin-name-first .tw-photo-box img{width:100%;max-width:255px;max-height:260px;object-fit:contain}
+#twin-name-first .tw-photo-box .tw-avatar-image{max-height:310px;width:auto}
+#twin-name-first .tw-photo-box p{font-size:13px;color:var(--tw-muted)}
+#twin-name-first .tw-photo-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;flex-wrap:wrap}
+#twin-name-first .tw-sample-tag{color:var(--tw-muted);font:600 10px/1.2 var(--tw-body);letter-spacing:.08em;text-transform:uppercase}
+#twin-name-first .tw-avatar-confirm{margin-top:15px;border-top:1px solid var(--tw-ink);padding-top:16px}
+#twin-name-first .tw-review-nav{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:15px 4px 0}
+#twin-name-first .tw-review-nav button{border:0;border-radius:0;background:none;color:light-dark(#626262,#aaa);font:500 11px/1.4 var(--tw-body);padding:4px 0}
+#twin-name-first .tw-review-nav button[aria-current=&quot;step&quot;]{color:light-dark(#0b0b0b,#fff);text-decoration:underline;text-underline-offset:4px}
+#twin-name-first .tw-status{padding:10px 0 0;min-height:27px;font-size:12px;color:light-dark(#666,#aaa);text-align:center}
+@media(max-width:420px){#twin-name-first .tw-canvas{padding:12px 0}#twin-name-first .tw-header{padding:24px 20px 20px}#twin-name-first .tw-stage{padding:30px 20px 25px}#twin-name-first .tw-progress{margin:0 20px}#twin-name-first .tw-footer{padding:0 20px 22px}#twin-name-first h1{font-size:46px}#twin-name-first .tw-preview-label{padding-right:80px;align-items:flex-start;flex-direction:column;gap:3px}#twin-name-first .tw-plugin{gap:8px;grid-template-columns:35px minmax(0,1fr) auto}#twin-name-first .tw-plugin-icon{width:32px;height:32px}#twin-name-first .tw-primary{font-size:18px;padding:14px 19px;gap:12px}#twin-name-first .tw-step-count{font-size:11px}#twin-name-first .tw-review-nav{gap:9px}}
+@media(pointer:coarse){#twin-name-first input,#twin-name-first textarea{font-size:16px}#twin-name-first .tw-name-input{font-size:31px}#twin-name-first button,#twin-name-first label[for],#twin-name-first summary{min-height:44px}#twin-name-first .tw-review-nav button{padding:10px 0}}
+
+#twin-name-first .tw-gpt-actions{margin-top:27px}
+#twin-name-first .tw-gpt-step{padding:19px 0;border-top:1px solid var(--tw-line)}
+#twin-name-first .tw-gpt-step:first-child{border-color:var(--tw-ink)}
+#twin-name-first .tw-gpt-step-label{display:flex;align-items:baseline;gap:11px;font:700 23px/1.12 var(--tw-display);color:var(--tw-ink);margin-bottom:9px}
+#twin-name-first .tw-gpt-step-label&gt;span{font:700 18px/1 var(--tw-display);color:var(--tw-red);flex:none}
+#twin-name-first .tw-gpt-step-help{color:var(--tw-muted);font-size:14px;line-height:1.45;margin-bottom:13px}
+#twin-name-first .tw-gpt-button{display:flex;justify-content:space-between;width:100%;min-height:56px;padding:16px 23px;font-size:23px}
+#twin-name-first .tw-gpt-open{border:1px solid var(--tw-ink);background:var(--tw-white);color:var(--tw-ink)}
+#twin-name-first .tw-gpt-open:hover{background:var(--tw-paper)}
+#twin-name-first .tw-gpt-step details{margin-top:15px}
+#twin-name-first .tw-export-command{padding:11px 0 15px;font:600 21px/1.15 var(--tw-display);color:var(--tw-ink)}
+&lt;/style&gt;
+&lt;div id=&quot;twin-name-first&quot;&gt;
+  &lt;div class=&quot;tw-preview-label&quot;&gt;&lt;span&gt;Interactive mockup&lt;/span&gt;&lt;span&gt;First four screens · Sample avatar&lt;/span&gt;&lt;/div&gt;
+  &lt;div class=&quot;tw-canvas&quot;&gt;&lt;section class=&quot;tw-screen&quot; aria-label=&quot;Twin name-first onboarding&quot; data-screen&gt;&lt;/section&gt;&lt;/div&gt;
+  &lt;nav class=&quot;tw-review-nav&quot; aria-label=&quot;Preview each onboarding screen&quot;&gt;
+    &lt;button class=&quot;cursor-interaction&quot; type=&quot;button&quot; data-jump=&quot;0&quot; aria-current=&quot;step&quot;&gt;Name&lt;/button&gt;
+    &lt;button class=&quot;cursor-interaction&quot; type=&quot;button&quot; data-jump=&quot;1&quot;&gt;ChatGPT&lt;/button&gt;
+    &lt;button class=&quot;cursor-interaction&quot; type=&quot;button&quot; data-jump=&quot;2&quot;&gt;Import&lt;/button&gt;
+    &lt;button class=&quot;cursor-interaction&quot; type=&quot;button&quot; data-jump=&quot;3&quot;&gt;Avatar&lt;/button&gt;
+  &lt;/nav&gt;
+  &lt;div class=&quot;tw-status&quot; role=&quot;status&quot; aria-live=&quot;polite&quot; data-status&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+(()=&gt;{
+  const root=document.getElementById(&#x27;twin-name-first&#x27;);
+  const stage=root.querySelector(&#x27;[data-screen]&#x27;);
+  const status=root.querySelector(&#x27;[data-status]&#x27;);
+  const saved=window.openai?.widgetState?.privateContent;
+  const state={step:0,name:&#x27;&#x27;,json:&#x27;&#x27;,error:&#x27;&#x27;,photo:&#x27;&#x27;,sample:false,avatar:false,imported:0,...((saved&amp;&amp;saved.version===4)?{step:saved.step||0,name:saved.name||&#x27;&#x27;}:{})};
+  const AVATAR=&#x27;data:image/jpeg;base64,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&#x27;;
+  const PROMPT=`You are helping me create a private Personal Twin profile for a digital twin app. Talk with me naturally, one question at a time. Be warm, curious, and concise. I can skip any question. Do not assume facts when a follow-up question would help.
+
+First learn what my life looks like NOW. Ask about my current work or school, responsibilities, recurring commitments, and ordinary weekday and weekend routines. Learn about sleep, meals, movement, travel, focused work, breaks, and free time. Ask for my IANA time zone and distinguish fixed times from approximate or flexible times.
+
+Ask me to walk you through one representative CURRENT day, from waking up to going to sleep. Use a typical weekday unless another kind of day better represents my life. Ask which commitments are fixed, what varies, and whether weekends differ. This is a description of my existing routine, not an ideal schedule or a report of what I did today. Do not invent activities, durations, start times, or an ideal sample day to fill gaps.
+
+Then learn about what matters to me: current goals and priorities, habits I want to build, preferences, boundaries the app must respect, when I tend to have energy or feel drained, what helps me reset, and what distracts me. Clearly separate what I ACTUALLY DO NOW from what I WANT TO CHANGE. Wanting to exercise every morning does not mean I already exercise every morning. Do not diagnose me or infer permanent personality traits from a single comment.
+
+Do not ask for passwords, API keys, medical diagnoses, or a full email history. Include only information I willingly share. Do not present yourself as a therapist.
+
+Before exporting, summarize my current activities, representative day, goals, preferences, and boundaries in plain language. Let me correct anything inaccurate. Keep important distinctions and uncertainty in the final observations.
+
+When I say &quot;Finish and export JSON&quot;, output ONLY valid JSON, without a Markdown fence or explanation. Use the existing Twin handoff contract below. Do not add new top-level fields for a transcript, summary, sample_day, or schedule. Represent the representative day&#x27;s actual details as individual observations using the existing supported kinds.
+
+{
+  &quot;schema_version&quot;: 1,
+  &quot;source&quot;: &quot;chatgpt_voice_onboarding&quot;,
+  &quot;session_id&quot;: &quot;a stable unique ID for this conversation&quot;,
+  &quot;created_at&quot;: &quot;an ISO 8601 UTC timestamp&quot;,
+  &quot;timezone&quot;: &quot;an IANA time zone such as America/New_York&quot;,
+  &quot;observations&quot;: [
+    {
+      &quot;id&quot;: &quot;a unique ID within this export&quot;,
+      &quot;kind&quot;: &quot;routine&quot;,
+      &quot;statement&quot;: &quot;one concise, self-contained fact describing current behavior, a commitment, a goal, or another supported observation&quot;,
+      &quot;source_excerpt&quot;: &quot;a short supporting phrase from what I actually said&quot;,
+      &quot;confidence&quot;: &quot;user_stated&quot;
+    }
+  ]
+}
+
+Allowed kind values: routine, commitment, sleep, energy_cue, wellbeing_cue, distraction, goal, boundary.
+Allowed confidence values: user_stated, inferred.
+
+Use one observation per fact, between 1 and 100 observations, with unique IDs. Keep statements under 600 characters and source excerpts under 240 characters. Use user_stated only for information I explicitly provided. Mark interpretations inferred, and never make an inference sound certain.
+
+Include the recurring day or context in each relevant statement, such as &quot;On a typical weekday...&quot; or &quot;On Tuesdays...&quot;. Say whether times are fixed or approximate when known. Use goal for desired changes and routine for current habits. A sample-day description is not a calendar event and must not be presented as an activity completed today.
+
+Use my corrections in the final export. Do not invent calendar events, missing commitments, verbatim transcripts, or additional profile fields. Do not include the full transcript in source_excerpt. Ensure the final JSON parses and uses only the supported schema.`;
+  const example=()=&gt;JSON.stringify({schema_version:1,source:&#x27;chatgpt_voice_onboarding&#x27;,session_id:&#x27;mockup-example&#x27;,created_at:new Date().toISOString(),timezone:&#x27;America/New_York&#x27;,observations:[{&quot;id&quot;: &quot;current-role&quot;, &quot;kind&quot;: &quot;routine&quot;, &quot;statement&quot;: &quot;I currently attend classes on weekdays and study between classes.&quot;, &quot;source_excerpt&quot;: &quot;I have classes during the week.&quot;, &quot;confidence&quot;: &quot;user_stated&quot;}, {&quot;id&quot;: &quot;weekday-wake&quot;, &quot;kind&quot;: &quot;sleep&quot;, &quot;statement&quot;: &quot;On a typical weekday, I wake around 7:30 AM; the time is approximate.&quot;, &quot;source_excerpt&quot;: &quot;Usually around seven thirty.&quot;, &quot;confidence&quot;: &quot;user_stated&quot;}, {&quot;id&quot;: &quot;weekday-lunch&quot;, &quot;kind&quot;: &quot;routine&quot;, &quot;statement&quot;: &quot;On a typical weekday, lunch is around 12:30 PM and is flexible.&quot;, &quot;source_excerpt&quot;: &quot;Lunch around twelve thirty.&quot;, &quot;confidence&quot;: &quot;user_stated&quot;}, {&quot;id&quot;: &quot;walk&quot;, &quot;kind&quot;: &quot;wellbeing_cue&quot;, &quot;statement&quot;: &quot;A short walk after lunch helps me reset.&quot;, &quot;source_excerpt&quot;: &quot;Walking after lunch helps.&quot;, &quot;confidence&quot;: &quot;user_stated&quot;}, {&quot;id&quot;: &quot;study-goal&quot;, &quot;kind&quot;: &quot;goal&quot;, &quot;statement&quot;: &quot;I want to make more time for focused studying.&quot;, &quot;source_excerpt&quot;: &quot;I want to study with fewer interruptions.&quot;, &quot;confidence&quot;: &quot;user_stated&quot;}, {&quot;id&quot;: &quot;evening-boundary&quot;, &quot;kind&quot;: &quot;boundary&quot;, &quot;statement&quot;: &quot;I want to keep late evenings free of focused work.&quot;, &quot;source_excerpt&quot;: &quot;Keep late evenings free.&quot;, &quot;confidence&quot;: &quot;user_stated&quot;}]},null,2);
+  const esc=value=&gt;String(value??&#x27;&#x27;).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,c=&gt;({&#x27;&amp;&#x27;:&#x27;&amp;amp;&#x27;,&#x27;&lt;&#x27;:&#x27;&amp;lt;&#x27;,&#x27;&gt;&#x27;:&#x27;&amp;gt;&#x27;,&#x27;&quot;&#x27;:&#x27;&amp;quot;&#x27;,&quot;&#x27;&quot;:&#x27;&amp;#39;&#x27;}[c]));
+  const name=()=&gt;state.name.trim()||&#x27;you&#x27;;
+  const kicker=text=&gt;`&lt;p class=&quot;tw-kicker&quot;&gt;&lt;span class=&quot;tw-square&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;${text}&lt;/p&gt;`;
+  const primary=(text,action,disabled=false)=&gt;`&lt;button class=&quot;tw-primary cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;${action}&quot; ${disabled?&#x27;disabled&#x27;:&#x27;&#x27;}&gt;${text}&lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt;&lt;/button&gt;`;
+  const header=()=&gt;`&lt;header class=&quot;tw-header&quot;&gt;&lt;p class=&quot;tw-wordmark&quot;&gt;TWIN&lt;/p&gt;&lt;span class=&quot;tw-account&quot;&gt;${state.step===0?&#x27;LET’S BEGIN&#x27;:`&lt;span class=&quot;tw-account-dot&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;${esc(state.name?state.name+&#x27;’S TWIN&#x27;:&#x27;YOUR TWIN&#x27;)}`}&lt;/span&gt;&lt;/header&gt;`;
+  function footer(label,action,disabled=false,skip=&#x27;&#x27;){
+    return `&lt;footer class=&quot;tw-footer&quot;&gt;&lt;div class=&quot;tw-footer-rule&quot;&gt;&lt;/div&gt;&lt;div class=&quot;tw-footer-content&quot;&gt;&lt;div class=&quot;tw-back-row&quot;&gt;${state.step&gt;0?&#x27;&lt;button class=&quot;tw-back cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;back&quot; aria-label=&quot;Previous step&quot;&gt;←&lt;/button&gt;&#x27;:&#x27;&#x27;}&lt;span class=&quot;tw-step-count&quot;&gt;0${state.step+1} / 04&lt;/span&gt;&lt;/div&gt;${primary(label,action,disabled)}&lt;/div&gt;${skip?`&lt;button class=&quot;tw-text-button cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;${skip}&quot;&gt;I’ll do this later&lt;/button&gt;`:&#x27;&#x27;}&lt;/footer&gt;`;
+  }
+  function content(){
+    if(state.step===0)return `&lt;main class=&quot;tw-stage&quot;&gt;${kicker(&#x27;Your twin starts here&#x27;)}&lt;h1&gt;What should&lt;br&gt;we call you?&lt;/h1&gt;&lt;p class=&quot;tw-description&quot;&gt;A fresh start. A little about you.&lt;br&gt;A Twin that grows from there.&lt;/p&gt;&lt;form id=&quot;tw-name-form&quot; class=&quot;tw-name-form&quot;&gt;&lt;label class=&quot;tw-label&quot; for=&quot;tw-name&quot;&gt;Your name&lt;/label&gt;&lt;input class=&quot;tw-name-input&quot; id=&quot;tw-name&quot; name=&quot;name&quot; autocomplete=&quot;given-name&quot; maxlength=&quot;50&quot; placeholder=&quot;Enter your name&quot; value=&quot;${esc(state.name)}&quot; required&gt;&lt;p class=&quot;tw-name-footnote&quot;&gt;Start by creating your personal Twin profile.&lt;/p&gt;&lt;button type=&quot;submit&quot; hidden&gt;Create account&lt;/button&gt;&lt;/form&gt;&lt;/main&gt;${footer(&#x27;Create account&#x27;,&#x27;create&#x27;,!state.name.trim())}`;
+    if(state.step===1)return `&lt;main class=&quot;tw-stage&quot;&gt;${kicker(`Nice to meet you${state.name?&#x27;, &#x27;+esc(state.name):&#x27;&#x27;}`)}&lt;h1&gt;Let’s get&lt;br&gt;to know you.&lt;/h1&gt;&lt;p class=&quot;tw-description&quot;&gt;Use ChatGPT to tell Twin about your life.&lt;br&gt;Here’s how to get started.&lt;/p&gt;&lt;div class=&quot;tw-gpt-actions&quot;&gt;&lt;section class=&quot;tw-gpt-step&quot;&gt;&lt;p class=&quot;tw-gpt-step-label&quot;&gt;&lt;span&gt;01&lt;/span&gt; Copy this prompt&lt;/p&gt;&lt;p class=&quot;tw-gpt-step-help&quot;&gt;The prompt tells ChatGPT what to ask you.&lt;/p&gt;&lt;button class=&quot;tw-primary tw-gpt-button cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;copy&quot;&gt;Copy prompt &lt;span aria-hidden=&quot;true&quot;&gt;↗&lt;/span&gt;&lt;/button&gt;&lt;details data-prompt-details&gt;&lt;summary class=&quot;cursor-interaction&quot;&gt;See the full prompt&lt;/summary&gt;&lt;pre data-prompt-text&gt;${esc(PROMPT)}&lt;/pre&gt;&lt;/details&gt;&lt;/section&gt;&lt;section class=&quot;tw-gpt-step&quot;&gt;&lt;p class=&quot;tw-gpt-step-label&quot;&gt;&lt;span&gt;02&lt;/span&gt; Open ChatGPT and paste it&lt;/p&gt;&lt;p class=&quot;tw-gpt-step-help&quot;&gt;Start a new chat, then paste the prompt you copied.&lt;/p&gt;&lt;a class=&quot;tw-primary tw-gpt-button tw-gpt-open cursor-interaction&quot; href=&quot;https://chatgpt.com/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Open ChatGPT &lt;span aria-hidden=&quot;true&quot;&gt;↗&lt;/span&gt;&lt;/a&gt;&lt;/section&gt;&lt;section class=&quot;tw-gpt-step&quot;&gt;&lt;p class=&quot;tw-gpt-step-label&quot;&gt;&lt;span&gt;03&lt;/span&gt; Talk, then bring back your output&lt;/p&gt;&lt;p class=&quot;tw-gpt-step-help&quot;&gt;Paste and send the prompt. To talk, tap ChatGPT’s Voice icon, then answer its questions. When you’re done, say:&lt;/p&gt;&lt;p class=&quot;tw-export-command&quot;&gt;“Finish and export JSON”&lt;/p&gt;&lt;p class=&quot;tw-gpt-step-help&quot;&gt;Copy its final output. Come back here and tap the button below.&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/main&gt;${footer(&#x27;I have my output&#x27;,&#x27;next&#x27;)}`;
+    if(state.step===2)return `&lt;main class=&quot;tw-stage&quot;&gt;${kicker(&#x27;Bring it back&#x27;)}&lt;h1&gt;Your story.&lt;br&gt;Now in Twin.&lt;/h1&gt;&lt;p class=&quot;tw-description&quot;&gt;Paste ChatGPT’s final output below.&lt;br&gt;This is where your Twin starts learning.&lt;/p&gt;&lt;label class=&quot;tw-label tw-json-label&quot; for=&quot;tw-json&quot;&gt;ChatGPT’s final output&lt;/label&gt;&lt;textarea class=&quot;tw-json&quot; id=&quot;tw-json&quot; spellcheck=&quot;false&quot; placeholder=&#x27;Paste your JSON here…&#x27;&gt;${esc(state.json)}&lt;/textarea&gt;&lt;div class=&quot;tw-import-links&quot;&gt;&lt;label class=&quot;tw-file-label cursor-interaction&quot; for=&quot;tw-json-file&quot;&gt;Upload a JSON file ↗&lt;/label&gt;&lt;input hidden id=&quot;tw-json-file&quot; type=&quot;file&quot; accept=&quot;.json,application/json&quot;&gt;&lt;button class=&quot;tw-text-button cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;example&quot;&gt;Try example output&lt;/button&gt;&lt;/div&gt;${state.error?`&lt;p class=&quot;tw-error&quot; role=&quot;alert&quot;&gt;${esc(state.error)}&lt;/p&gt;`:&#x27;&#x27;}&lt;p class=&quot;tw-note&quot;&gt;You choose what to bring over. Your full ChatGPT conversation stays in ChatGPT.&lt;/p&gt;&lt;/main&gt;${footer(&#x27;Import &amp; continue&#x27;,&#x27;import&#x27;,!state.json.trim())}`;
+    if(state.step===3){
+      const photoBody=state.avatar?`&lt;img class=&quot;tw-avatar-image&quot; src=&quot;${AVATAR}&quot; alt=&quot;Example Twin avatar from the existing app&quot;&gt;&lt;span class=&quot;tw-sample-tag&quot;&gt;Sample avatar preview&lt;/span&gt;`:state.photo?`&lt;img src=&quot;${esc(state.photo)}&quot; alt=&quot;Your selected reference photo&quot;&gt;`:state.sample?`&lt;img class=&quot;tw-avatar-image&quot; src=&quot;${AVATAR}&quot; alt=&quot;Example avatar used for this mockup&quot;&gt;&lt;span class=&quot;tw-sample-tag&quot;&gt;Example reference&lt;/span&gt;`:`&lt;i data-lucide=&quot;user-round&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;&lt;p&gt;A clear photo of you.&lt;/p&gt;&lt;label class=&quot;tw-secondary cursor-interaction&quot; for=&quot;tw-photo&quot;&gt;Choose photo ↗&lt;/label&gt;`;
+      return `&lt;main class=&quot;tw-stage&quot;&gt;${state.imported?`&lt;p class=&quot;tw-import-success&quot;&gt;✓ ${state.imported} things brought over. Your Twin is taking shape.&lt;/p&gt;`:&#x27;&#x27;}${kicker(&#x27;Give your twin a face&#x27;)}&lt;h1&gt;A little&lt;br&gt;more like you.&lt;/h1&gt;&lt;p class=&quot;tw-description&quot;&gt;Upload a photo. Twin turns it into&lt;br&gt;your own illustrated avatar.&lt;/p&gt;&lt;div class=&quot;tw-photo-box&quot;&gt;${photoBody}&lt;/div&gt;&lt;input hidden id=&quot;tw-photo&quot; type=&quot;file&quot; accept=&quot;image/png,image/jpeg,image/webp&quot;&gt;&lt;div class=&quot;tw-photo-actions&quot;&gt;&lt;label class=&quot;tw-file-label cursor-interaction&quot; for=&quot;tw-photo&quot;&gt;${state.photo||state.sample?&#x27;Change photo ↗&#x27;:&#x27;PNG, JPEG, or WebP&#x27;}&lt;/label&gt;&lt;button class=&quot;tw-text-button cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;sample&quot;&gt;Try sample avatar&lt;/button&gt;&lt;/div&gt;${state.avatar?`&lt;div class=&quot;tw-avatar-confirm&quot;&gt;&lt;h3&gt;Does this feel like you?&lt;/h3&gt;&lt;p class=&quot;tw-description&quot;&gt;Approve your look, or try another version.&lt;/p&gt;&lt;button class=&quot;tw-text-button cursor-interaction&quot; type=&quot;button&quot; data-action=&quot;regenerate&quot;&gt;Try another version&lt;/button&gt;&lt;/div&gt;`:&#x27;&lt;p class=&quot;tw-note&quot;&gt;Your photo is used to create a consistent look for your Twin.&lt;/p&gt;&#x27;}&lt;/main&gt;${footer(state.avatar?&#x27;Finish setup&#x27;:state.photo||state.sample?&#x27;Create avatar&#x27;:&#x27;Continue later&#x27;,state.avatar?&#x27;next&#x27;:state.photo||state.sample?&#x27;generate&#x27;:&#x27;next&#x27;,false,state.photo||state.sample?&#x27;skip&#x27;:&#x27;&#x27;)}`;
+    }
+    return &#x27;&#x27;;
+  }
+  function render(){
+    stage.innerHTML=header()+`&lt;div class=&quot;tw-progress&quot; role=&quot;progressbar&quot; aria-label=&quot;Onboarding progress&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;4&quot; aria-valuenow=&quot;${state.step+1}&quot;&gt;&lt;span class=&quot;tw-progress-fill&quot; style=&quot;width:${(state.step+1)*25}%&quot;&gt;&lt;/span&gt;&lt;/div&gt;`+content();
+    root.querySelectorAll(&#x27;[data-jump]&#x27;).forEach(b=&gt;{if(Number(b.dataset.jump)===state.step)b.setAttribute(&#x27;aria-current&#x27;,&#x27;step&#x27;);else b.removeAttribute(&#x27;aria-current&#x27;);});
+    if(typeof lucide!==&#x27;undefined&#x27;)lucide.createIcons({attrs:{width:20,height:20}});
+  }
+  function persist(){
+    if(window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{mockup:&#x27;Twin name-first onboarding&#x27;,screen:state.step,phoneSignIn:&#x27;later&#x27;},privateContent:{version:4,step:state.step,name:state.name}}).catch(()=&gt;{});
+  }
+  function go(step){state.step=Math.max(0,Math.min(3,step));state.error=&#x27;&#x27;;status.textContent=&#x27;&#x27;;render();persist();}
+  function complete(){status.textContent=&#x27;First four screens complete. The app can now resume its existing connection flow or Home.&#x27;;root.dispatchEvent(new CustomEvent(&#x27;twin:onboarding-complete&#x27;,{bubbles:true,detail:{name:state.name,avatarApproved:state.avatar}}));}
+  function create(){state.name=state.name.trim();if(state.name)go(1);}
+  root.addEventListener(&#x27;submit&#x27;,event=&gt;{if(event.target.id===&#x27;tw-name-form&#x27;){event.preventDefault();create();}});
+  root.addEventListener(&#x27;input&#x27;,event=&gt;{
+    if(event.target.id===&#x27;tw-name&#x27;){state.name=event.target.value;root.querySelector(&#x27;[data-action=&quot;create&quot;]&#x27;).disabled=!state.name.trim();}
+    if(event.target.id===&#x27;tw-json&#x27;){state.json=event.target.value;root.querySelector(&#x27;[data-action=&quot;import&quot;]&#x27;).disabled=!state.json.trim();}
+  });
+  root.addEventListener(&#x27;change&#x27;,async event=&gt;{
+    if(![&#x27;tw-photo&#x27;,&#x27;tw-json-file&#x27;].includes(event.target.id))return;
+    const file=event.target.files?.[0];if(!file)return;
+    if(event.target.id===&#x27;tw-json-file&#x27;){
+      if(file.size&gt;256000){status.textContent=&#x27;Choose a JSON file under 256 KB.&#x27;;return;}
+      state.json=await file.text();render();status.textContent=&#x27;JSON file loaded. Review it, then import.&#x27;;return;
+    }
+    if(file.size&gt;8000000||![&#x27;image/png&#x27;,&#x27;image/jpeg&#x27;,&#x27;image/webp&#x27;].includes(file.type)){status.textContent=&#x27;Choose a PNG, JPEG, or WebP photo under 8 MB.&#x27;;return;}
+    const reader=new FileReader();reader.onload=()=&gt;{state.photo=String(reader.result);state.sample=false;state.avatar=false;render();status.textContent=&#x27;Photo selected for this preview only.&#x27;;};reader.readAsDataURL(file);
+  });
+  root.addEventListener(&#x27;click&#x27;,async event=&gt;{
+    const jump=event.target.closest(&#x27;[data-jump]&#x27;);if(jump){go(Number(jump.dataset.jump));return;}
+    const button=event.target.closest(&#x27;[data-action]&#x27;);if(!button||button.disabled)return;
+    const action=button.dataset.action;
+    if(action===&#x27;create&#x27;)return create();
+    if(action===&#x27;back&#x27;)return go(state.step-1);
+    if(action===&#x27;next&#x27;||action===&#x27;skip&#x27;){if(state.step===3)return complete();return go(state.step+1);}
+    if(action===&#x27;example&#x27;){state.json=example();state.error=&#x27;&#x27;;render();return;}
+    if(action===&#x27;import&#x27;){
+      let data;try{data=JSON.parse(state.json);}catch{state.error=&#x27;This needs to be valid JSON. Try the example to see how it works.&#x27;;render();return;}
+      if(data.schema_version!==1||!Array.isArray(data.observations)||!data.observations.length||data.observations.some(x=&gt;!x||typeof x.statement!==&#x27;string&#x27;)){state.error=&#x27;Paste the final Twin export, including its observations, or try the example.&#x27;;render();return;}
+      state.imported=data.observations.length;return go(3);
+    }
+    if(action===&#x27;copy&#x27;){
+      try{if(!navigator.clipboard?.writeText)throw new Error();await navigator.clipboard.writeText(PROMPT);button.textContent=&#x27;Copied ✓&#x27;;status.textContent=&#x27;Prompt copied. Paste it into a new ChatGPT conversation.&#x27;;}
+      catch{const details=root.querySelector(&#x27;[data-prompt-details]&#x27;);details.open=true;const text=root.querySelector(&#x27;[data-prompt-text]&#x27;);if(window.getSelection&amp;&amp;document.createRange){const range=document.createRange();range.selectNodeContents(text);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);}status.textContent=&#x27;The full prompt is selected. Use your copy shortcut.&#x27;;}
+      return;
+    }
+    if(action===&#x27;sample&#x27;){state.sample=true;state.photo=&#x27;&#x27;;state.avatar=true;render();return;}
+    if(action===&#x27;generate&#x27;||action===&#x27;regenerate&#x27;){state.avatar=true;render();status.textContent=&#x27;Mockup: showing the app’s existing sample avatar.&#x27;;return;}
+  });
+  window.addEventListener(&#x27;openai:set_globals&#x27;,event=&gt;{const next=event.detail?.globals?.widgetState?.privateContent;if(next?.version===4){state.name=next.name||&#x27;&#x27;;state.step=Math.max(0,Math.min(3,next.step||0));render();}});
+  render();
+})();
+&lt;/script&gt;
+
+&lt;script src=&quot;https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  if (window.FloatingUIDOM == null) {
+    return;
+  }
+  const { autoUpdate, computePosition, flip, offset, shift, size } =
+    window.FloatingUIDOM;
+  const tooltipPlacements = new Set([&quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, &quot;left&quot;]);
+  const tooltipId = `codex-visualization-tooltip-${
+    window.crypto?.randomUUID?.() ?? Date.now().toString(36)
+  }`;
+  const tooltipGap = 5;
+  const hoverDelay = 700;
+  const skipDelay = 300;
+  let activeTrigger = null;
+  let pendingTrigger = null;
+  let tooltip = null;
+  let openTimeout = null;
+  let autoUpdateCleanup = null;
+  let positionRequest = 0;
+  let skipDelayUntil = 0;
+  let lastPointerWasTouch = false;
+  let pinnedByTouch = false;
+
+  const getTrigger = (event) =&gt; {
+    for (const target of event.composedPath()) {
+      if (target?.nodeType === Node.ELEMENT_NODE) {
+        const trigger = target.closest(&quot;[data-tooltip]&quot;);
+        if (trigger) return trigger;
+      }
+    }
+    return null;
+  };
+  const containsTarget = (trigger, target) =&gt;
+    target?.nodeType != null &amp;&amp; trigger.contains(target);
+  const getContent = (trigger) =&gt;
+    trigger.getAttribute(&quot;data-tooltip&quot;)?.trim() ?? &quot;&quot;;
+  const getPlacement = (trigger) =&gt; {
+    const placement = trigger.getAttribute(&quot;data-tooltip-placement&quot;);
+    return tooltipPlacements.has(placement) ? placement : &quot;top&quot;;
+  };
+  const getTooltip = () =&gt; {
+    if (tooltip == null) {
+      tooltip = document.createElement(&quot;div&quot;);
+      tooltip.id = tooltipId;
+      tooltip.className = &quot;tooltip&quot;;
+      tooltip.setAttribute(&quot;role&quot;, &quot;tooltip&quot;);
+    }
+    return tooltip;
+  };
+  const setDescribedBy = (trigger, described) =&gt; {
+    const ids = new Set(
+      (trigger.getAttribute(&quot;aria-describedby&quot;) ?? &quot;&quot;)
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+    if (described) {
+      ids.add(tooltipId);
+    } else {
+      ids.delete(tooltipId);
+    }
+    if (ids.size === 0) {
+      trigger.removeAttribute(&quot;aria-describedby&quot;);
+    } else {
+      trigger.setAttribute(&quot;aria-describedby&quot;, [...ids].join(&quot; &quot;));
+    }
+  };
+  const clearOpenTimeout = () =&gt; {
+    if (openTimeout != null) {
+      window.clearTimeout(openTimeout);
+      openTimeout = null;
+    }
+    pendingTrigger = null;
+  };
+  const closeTooltip = (activateSkipDelay = true) =&gt; {
+    clearOpenTimeout();
+    pinnedByTouch = false;
+    positionRequest += 1;
+    autoUpdateCleanup?.();
+    autoUpdateCleanup = null;
+    if (activeTrigger == null) {
+      return;
+    }
+    setDescribedBy(activeTrigger, false);
+    activeTrigger = null;
+    tooltip?.remove();
+    if (activateSkipDelay) {
+      skipDelayUntil = Date.now() + skipDelay;
+    }
+  };
+  const updatePosition = (trigger, floating) =&gt; {
+    const request = ++positionRequest;
+    void computePosition(trigger, floating, {
+      middleware: [
+        offset(tooltipGap),
+        flip({ padding: tooltipGap }),
+        shift({ padding: tooltipGap }),
+        size({
+          padding: tooltipGap,
+          apply({ availableHeight, availableWidth, elements }) {
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-width&quot;,
+              `${Math.max(0, availableWidth)}px`,
+            );
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-height&quot;,
+              `${Math.max(0, availableHeight)}px`,
+            );
+          },
+        }),
+      ],
+      placement: getPlacement(trigger),
+      strategy: &quot;fixed&quot;,
+    })
+      .then(({ x, y }) =&gt; {
+        if (activeTrigger !== trigger || request !== positionRequest) {
+          return;
+        }
+        const scale = window.devicePixelRatio || 1;
+        floating.style.transform = `translate(${Math.round(x * scale) / scale}px, ${Math.round(y * scale) / scale}px)`;
+        floating.style.visibility = &quot;visible&quot;;
+      })
+      .catch(() =&gt; {
+        if (activeTrigger === trigger &amp;&amp; request === positionRequest) {
+          closeTooltip(false);
+        }
+      });
+  };
+  const openTooltip = (trigger) =&gt; {
+    const content = getContent(trigger);
+    if (!trigger.isConnected || content.length === 0) {
+      return;
+    }
+    clearOpenTimeout();
+    if (activeTrigger === trigger) {
+      return;
+    }
+    closeTooltip();
+    const floating = getTooltip();
+    floating.textContent = content;
+    floating.style.visibility = &quot;hidden&quot;;
+    floating.style.transform = &quot;translate(0, 0)&quot;;
+    document.body.appendChild(floating);
+    activeTrigger = trigger;
+    setDescribedBy(trigger, true);
+    autoUpdateCleanup = autoUpdate(trigger, floating, () =&gt; {
+      updatePosition(trigger, floating);
+    });
+  };
+  const requestOpen = (trigger, immediate = false) =&gt; {
+    if (
+      getContent(trigger).length === 0 ||
+      activeTrigger === trigger ||
+      pendingTrigger === trigger
+    ) {
+      return;
+    }
+    clearOpenTimeout();
+    pendingTrigger = trigger;
+    const delay =
+      immediate || activeTrigger != null || Date.now() &lt; skipDelayUntil
+        ? 0
+        : hoverDelay;
+    if (delay === 0) {
+      openTooltip(trigger);
+      return;
+    }
+    openTimeout = window.setTimeout(() =&gt; {
+      openTimeout = null;
+      pendingTrigger = null;
+      openTooltip(trigger);
+    }, delay);
+  };
+  const handlePointerOpen = (event) =&gt; {
+    if (event.pointerType === &quot;touch&quot;) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    requestOpen(trigger);
+  };
+  const handlePointer = (event) =&gt; {
+    lastPointerWasTouch =
+      event.type === &quot;pointerdown&quot; &amp;&amp; event.pointerType === &quot;touch&quot;;
+  };
+  const handleTouchClick = (event) =&gt; {
+    const isTouch = event.pointerType === &quot;touch&quot; || lastPointerWasTouch;
+    lastPointerWasTouch = false;
+    if (!isTouch || event.detail === 0) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (
+      trigger == null ||
+      !trigger.isConnected ||
+      getContent(trigger).length === 0 ||
+      (pinnedByTouch &amp;&amp; activeTrigger === trigger)
+    ) {
+      if (pinnedByTouch) {
+        closeTooltip();
+      }
+      return;
+    }
+    openTooltip(trigger);
+    pinnedByTouch = activeTrigger === trigger;
+    window.setTimeout(() =&gt; {
+      if (activeTrigger === trigger &amp;&amp; !trigger.isConnected) {
+        closeTooltip(false);
+      }
+    }, 0);
+  };
+  const handleLeave = (event) =&gt; {
+    if (pinnedByTouch) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handleFocusIn = (event) =&gt; {
+    const trigger = getTrigger(event);
+    if (trigger?.matches(&quot;:focus-visible&quot;)) {
+      requestOpen(trigger, true);
+    }
+  };
+  const handleKeyDown = (event) =&gt; {
+    if (event.key === &quot;Escape&quot;) {
+      closeTooltip();
+    }
+  };
+  const handleContextMenu = (event) =&gt; {
+    lastPointerWasTouch = false;
+    const trigger = getTrigger(event);
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handlers = {
+    pointerover: handlePointerOpen,
+    pointerdown: handlePointer,
+    pointercancel: handlePointer,
+    click: handleTouchClick,
+    pointerout: handleLeave,
+    focusin: handleFocusIn,
+    focusout: handleLeave,
+    keydown: handleKeyDown,
+    contextmenu: handleContextMenu,
+  };
+  const roots = new Map();
+  const handledEvents = new WeakSet();
+  const handleEvent = (event) =&gt; {
+    if (handledEvents.has(event)) return;
+    handledEvents.add(event);
+    handlers[event.type](event);
+  };
+  const discoverRoots = (node) =&gt; {
+    if (node.shadowRoot) listen(node.shadowRoot);
+    for (const element of node.querySelectorAll(&quot;*&quot;)) {
+      if (element.shadowRoot) listen(element.shadowRoot);
+    }
+  };
+  const listen = (root) =&gt; {
+    if (roots.has(root)) return;
+    for (const type of Object.keys(handlers)) root.addEventListener(type, handleEvent);
+    const observer = new window.MutationObserver((records) =&gt; {
+      for (const { addedNodes } of records) {
+        for (const node of addedNodes) {
+          if (node.nodeType === Node.ELEMENT_NODE) discoverRoots(node);
+        }
+      }
+      for (const [root, cleanup] of roots) {
+        if (root.host &amp;&amp; !root.host.isConnected) {
+          cleanup();
+          roots.delete(root);
+        }
+      }
+      if (activeTrigger &amp;&amp; !activeTrigger.isConnected) closeTooltip(false);
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    roots.set(root, () =&gt; {
+      observer.disconnect();
+      for (const type of Object.keys(handlers)) root.removeEventListener(type, handleEvent);
+    });
+    discoverRoots(root);
+  };
+  const destroy = () =&gt; {
+    closeTooltip(false);
+    lastPointerWasTouch = false;
+    for (const cleanup of roots.values()) cleanup();
+    roots.clear();
+    tooltip = null;
+  };
+
+  // Events between children of one shadow root never reach the document.
+  listen(document);
+  window.addEventListener(&quot;pagehide&quot;, destroy, { once: true });
+})();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-tabs&quot;&gt;
+(() =&gt; {
+  const selector = &#x27;.nav[role=&quot;tablist&quot;] [role=&quot;tab&quot;]&#x27;;
+  const disabled = &#x27;:disabled,[aria-disabled=&quot;true&quot;]&#x27;;
+  const selectTab = (selected) =&gt; {
+    const panelId = selected.getAttribute(&quot;aria-controls&quot;);
+    for (const tab of selected.closest(&#x27;[role=&quot;tablist&quot;]&#x27;).querySelectorAll(&#x27;[role=&quot;tab&quot;]&#x27;)) {
+      const active = tab === selected;
+      tab.classList.toggle(&quot;active&quot;, active);
+      tab.setAttribute(&quot;aria-selected&quot;, String(active));
+      const id = tab.getAttribute(&quot;aria-controls&quot;);
+      const panel = id &amp;&amp; document.getElementById(id);
+      if (panel != null) {
+        panel.hidden = id !== panelId;
+        if (!panel.hidden &amp;&amp; selected.id) {
+          panel.setAttribute(&quot;aria-labelledby&quot;, selected.id);
+        }
+      }
+    }
+  };
+  const interact = (event) =&gt; {
+    const tab = event.target?.closest?.(selector);
+    if (event.defaultPrevented || tab == null || tab.matches(disabled)) {
+      return;
+    }
+    if (event.type === &quot;click&quot;) {
+      selectTab(tab);
+      return;
+    }
+    const tabs = Array.from(
+      tab.closest(&#x27;[role=&quot;tablist&quot;]&#x27;).querySelectorAll(&#x27;[role=&quot;tab&quot;]&#x27;),
+    ).filter((candidate) =&gt; !candidate.matches(disabled));
+    const current = tabs.indexOf(tab);
+    let next;
+    if (event.key === &quot;ArrowRight&quot; || event.key === &quot;ArrowDown&quot;) {
+      next = (current + 1) % tabs.length;
+    } else if (event.key === &quot;ArrowLeft&quot; || event.key === &quot;ArrowUp&quot;) {
+      next = (current + tabs.length - 1) % tabs.length;
+    } else if (event.key === &quot;Home&quot;) {
+      next = 0;
+    } else if (event.key === &quot;End&quot;) {
+      next = tabs.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    tabs[next].focus();
+    selectTab(tabs[next]);
+  };
+
+  for (const list of document.querySelectorAll(&#x27;.nav[role=&quot;tablist&quot;]&#x27;)) {
+    const selected =
+      list.querySelector(&#x27;[role=&quot;tab&quot;][aria-selected=&quot;true&quot;]&#x27;) ??
+      list.querySelector(&#x27;[role=&quot;tab&quot;].active&#x27;) ??
+      list.querySelector(&#x27;[role=&quot;tab&quot;]&#x27;);
+    if (selected != null) {
+      selectTab(selected);
+    }
+  }
+  document.addEventListener(&quot;click&quot;, interact);
+  document.addEventListener(&quot;keydown&quot;, interact);
+  window.addEventListener(&quot;pagehide&quot;, () =&gt; {
+    document.removeEventListener(&quot;click&quot;, interact);
+    document.removeEventListener(&quot;keydown&quot;, interact);
+  }, { once: true });
+})();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-carousel&quot;&gt;
+  (() =&gt; {
+    for (const root of document.querySelectorAll(&quot;.viz-carousel&quot;)) {
+      const panels = Array.from(
+        root.querySelectorAll(&quot;:scope &gt; [data-variant]&quot;),
+      );
+      if (panels.length === 0) {
+        continue;
+      }
+      root.setAttribute(&quot;role&quot;, &quot;group&quot;);
+      panels.forEach((panel, index) =&gt; {
+        panel.hidden = index !== 0;
+        panel.setAttribute(&quot;role&quot;, &quot;group&quot;);
+        if (!panel.hasAttribute(&quot;aria-label&quot;)) {
+          panel.setAttribute(&quot;aria-label&quot;, panel.dataset.variant);
+        }
+      });
+      root.dataset.activeVariant = panels[0].dataset.variant;
+      if (panels.length === 1) {
+        continue;
+      }
+
+      const controls = document.createElement(&quot;div&quot;);
+      controls.className = &quot;viz-carousel-controls&quot;;
+      // Portable copy of the settings dropdown&#x27;s legacy glyph; no 14px icon-package preset matches it.
+      // https://github.com/openai/openai/blob/master/codex/codex-apps/webview/src/icons/chevron.svg
+      controls.innerHTML = `
+      &lt;button type=&quot;button&quot; class=&quot;viz-carousel-previous cursor-interaction&quot;&gt;&lt;i data-lucide=&quot;chevron-left&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;&lt;/button&gt;
+      &lt;details class=&quot;viz-carousel-picker&quot;&gt;
+        &lt;summary class=&quot;cursor-interaction&quot;&gt;
+          &lt;span class=&quot;viz-carousel-count tabular-nums&quot;&gt;&lt;/span&gt;
+          &lt;span class=&quot;viz-carousel-name&quot;&gt;&lt;/span&gt;
+          &lt;svg class=&quot;viz-carousel-caret&quot; width=&quot;14&quot; height=&quot;14&quot; viewBox=&quot;0 0 20 21&quot; fill=&quot;none&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;
+            &lt;path d=&quot;M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z&quot; fill=&quot;currentColor&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;0.6&quot; /&gt;
+          &lt;/svg&gt;
+        &lt;/summary&gt;
+        &lt;div class=&quot;viz-carousel-options&quot;&gt;&lt;/div&gt;
+      &lt;/details&gt;
+      &lt;button type=&quot;button&quot; class=&quot;viz-carousel-next cursor-interaction&quot;&gt;&lt;i data-lucide=&quot;chevron-right&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;&lt;/button&gt;`;
+      const previous = controls.querySelector(&quot;.viz-carousel-previous&quot;);
+      const next = controls.querySelector(&quot;.viz-carousel-next&quot;);
+      const picker = controls.querySelector(&quot;.viz-carousel-picker&quot;);
+      const summary = picker.querySelector(&quot;summary&quot;);
+      const count = controls.querySelector(&quot;.viz-carousel-count&quot;);
+      const name = controls.querySelector(&quot;.viz-carousel-name&quot;);
+      const options = controls.querySelector(&quot;.viz-carousel-options&quot;);
+      const status = document.createElement(&quot;span&quot;);
+      status.className = &quot;sr-only&quot;;
+      status.setAttribute(&quot;role&quot;, &quot;status&quot;);
+      status.setAttribute(&quot;aria-live&quot;, &quot;polite&quot;);
+      status.setAttribute(&quot;aria-atomic&quot;, &quot;true&quot;);
+      previous.setAttribute(
+        &quot;aria-label&quot;,
+        root.dataset.previousLabel ?? &quot;Previous variant&quot;,
+      );
+      next.setAttribute(&quot;aria-label&quot;, root.dataset.nextLabel ?? &quot;Next variant&quot;);
+
+      let active = 0;
+      let mousePointerId = null;
+      let summaryPointerHandled = false;
+      summary.addEventListener(&quot;pointerdown&quot;, (event) =&gt; {
+        summaryPointerHandled =
+          event.pointerType === &quot;mouse&quot; &amp;&amp; event.button === 0 &amp;&amp; !event.ctrlKey;
+        if (!summaryPointerHandled) {
+          return;
+        }
+        event.preventDefault();
+        summary.focus({ preventScroll: true });
+        picker.open = !picker.open;
+        mousePointerId = picker.open ? event.pointerId : null;
+      });
+      summary.addEventListener(&quot;click&quot;, (event) =&gt; {
+        if (summaryPointerHandled &amp;&amp; event.detail &gt; 0) {
+          event.preventDefault();
+        }
+      });
+      const choices = panels.map((panel, index) =&gt; {
+        const choice = document.createElement(&quot;button&quot;);
+        choice.type = &quot;button&quot;;
+        choice.className = &quot;cursor-interaction&quot;;
+        choice.textContent = panel.dataset.variant;
+        choice.addEventListener(&quot;click&quot;, () =&gt; {
+          select(index);
+          summary.focus();
+        });
+        choice.addEventListener(&quot;pointerup&quot;, (event) =&gt; {
+          if (
+            picker.open &amp;&amp;
+            event.pointerType === &quot;mouse&quot; &amp;&amp;
+            event.button === 0 &amp;&amp;
+            event.pointerId === mousePointerId
+          ) {
+            choice.click();
+          }
+        });
+        options.appendChild(choice);
+        return choice;
+      });
+      const select = (index) =&gt; {
+        const changed = active !== index;
+        active = index;
+        panels.forEach((panel, position) =&gt; {
+          panel.hidden = position !== active;
+          choices[position].setAttribute(
+            &quot;aria-current&quot;,
+            String(position === active),
+          );
+        });
+        root.dataset.activeVariant = panels[active].dataset.variant;
+        count.textContent = `${active + 1} / ${panels.length}`;
+        name.textContent = panels[active].dataset.variant;
+        picker.open = false;
+        mousePointerId = null;
+        if (changed) {
+          status.textContent = `${count.textContent}: ${name.textContent}`;
+        }
+      };
+      previous.addEventListener(&quot;click&quot;, () =&gt;
+        select((active + panels.length - 1) % panels.length),
+      );
+      next.addEventListener(&quot;click&quot;, () =&gt;
+        select((active + 1) % panels.length),
+      );
+      picker.addEventListener(&quot;keydown&quot;, (event) =&gt; {
+        if (event.key === &quot;Escape&quot; &amp;&amp; picker.open) {
+          event.preventDefault();
+          picker.open = false;
+          mousePointerId = null;
+          summary.focus();
+          return;
+        }
+        if (event.altKey || event.ctrlKey || event.metaKey) {
+          return;
+        }
+        const index = choices.indexOf(document.activeElement);
+        let nextIndex;
+        if (event.key === &quot;ArrowDown&quot;) {
+          nextIndex = index &lt; 0 ? active : (index + 1) % choices.length;
+        } else if (event.key === &quot;ArrowUp&quot;) {
+          nextIndex = index &lt; 0 ? active : (index + choices.length - 1) % choices.length;
+        } else if (picker.open &amp;&amp; event.key === &quot;Home&quot;) {
+          nextIndex = 0;
+        } else if (picker.open &amp;&amp; event.key === &quot;End&quot;) {
+          nextIndex = choices.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        picker.open = true;
+        choices[nextIndex].focus();
+      });
+      picker.addEventListener(&quot;focusout&quot;, (event) =&gt; {
+        if (!picker.contains(event.relatedTarget)) {
+          picker.open = false;
+          mousePointerId = null;
+        }
+      });
+      const dismiss = (event) =&gt; {
+        if (!summary.contains(event.target)) {
+          mousePointerId = null;
+        }
+        if (!picker.contains(event.target)) {
+          picker.open = false;
+        }
+      };
+      const endPointerSelection = () =&gt; {
+        mousePointerId = null;
+      };
+      const sizePicker = () =&gt; {
+        root.style.setProperty(
+          &quot;--viz-carousel-picker-height&quot;,
+          `${picker.open ? options.offsetHeight : 0}px`,
+        );
+      };
+      picker.addEventListener(&quot;toggle&quot;, sizePicker);
+      window.addEventListener(&quot;resize&quot;, sizePicker);
+      document.addEventListener(&quot;pointerdown&quot;, dismiss);
+      document.addEventListener(&quot;pointerup&quot;, endPointerSelection);
+      document.addEventListener(&quot;pointercancel&quot;, endPointerSelection);
+      window.addEventListener(&quot;blur&quot;, endPointerSelection);
+      window.addEventListener(
+        &quot;pagehide&quot;,
+        () =&gt; {
+          document.removeEventListener(&quot;pointerdown&quot;, dismiss);
+          document.removeEventListener(&quot;pointerup&quot;, endPointerSelection);
+          document.removeEventListener(&quot;pointercancel&quot;, endPointerSelection);
+          window.removeEventListener(&quot;blur&quot;, endPointerSelection);
+          window.removeEventListener(&quot;resize&quot;, sizePicker);
+        },
+        { once: true },
+      );
+      root.append(controls, status);
+      select(0);
+    }
+  })();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-lucide&quot; async src=&quot;https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  const initialize = () =&gt; {
+    globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
+  };
+  if (globalThis.lucide != null) {
+    initialize();
+    return;
+  }
+  document
+    .getElementById(&quot;codex-visualization-lucide&quot;)
+    ?.addEventListener(&quot;load&quot;, initialize, { once: true });
+})();
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+
+<script>(() => {
+  const frame = document.getElementById("codex-visualization");
+  if (!(frame instanceof HTMLIFrameElement)) {
+    return;
+  }
+  let viewportHeight = globalThis.innerHeight;
+  const storageKey = `codex:visualization-widget-state-v2:${JSON.stringify([
+    globalThis.location.pathname,
+    globalThis.location.search,
+  ])}`;
+  const parseState = (serializedState) => {
+    if (
+      typeof serializedState !== "string" ||
+      new TextEncoder().encode(serializedState).length > 16 * 1024
+    ) {
+      throw new TypeError(
+        "Widget state must be a JSON object of at most 16 KiB",
+      );
+    }
+    /** @type {unknown} */
+    const state = JSON.parse(serializedState);
+    if (
+      state == null ||
+      typeof state !== "object" ||
+      Array.isArray(state) ||
+      ("imageIds" in state &&
+        (!Array.isArray(state.imageIds) || state.imageIds.length > 0))
+    ) {
+      throw new TypeError("Widget state must be a JSON object");
+    }
+    const storedState = { modelContent: null, privateContent: null, ...state };
+    const canonicalState = JSON.stringify(
+      storedState,
+      (_key, /** @type {unknown} */ value) => {
+        if (typeof value === "number" && !Number.isFinite(value)) {
+          throw new TypeError("Widget state must contain finite numbers");
+        }
+        return value;
+      },
+    );
+    if (new TextEncoder().encode(canonicalState).length > 16 * 1024) {
+      throw new TypeError(
+        "Widget state must be a JSON object of at most 16 KiB",
+      );
+    }
+    return storedState;
+  };
+  let storage = null;
+  let state = null;
+  try {
+    const localStorage = globalThis.localStorage;
+    const probeKey = `${storageKey}:probe`;
+    localStorage.setItem(probeKey, "1");
+    localStorage.removeItem(probeKey);
+    storage = localStorage;
+    const savedState = storage.getItem(storageKey);
+    if (savedState != null) {
+      try {
+        state = parseState(savedState);
+      } catch {
+        // Invalid saved state does not disable future writes.
+      }
+    }
+  } catch {
+    storage = null;
+  }
+  const initialGlobals = {
+    widgetState: state,
+    statePersistence: storage == null ? "none" : "local",
+  };
+
+  const channel = new MessageChannel();
+  channel.port1.addEventListener("message", (event) => {
+    const data = event.data;
+    if (typeof data !== "object" || data == null) {
+      return;
+    }
+    if (data.type === "widget-state-write") {
+      if (!Number.isSafeInteger(data.id) || data.id <= 0) {
+        return;
+      }
+      let ok = false;
+      try {
+        if (storage != null) {
+          const state = parseState(data.state);
+          storage.setItem(storageKey, JSON.stringify(state));
+          ok = true;
+        }
+      } catch {
+        // Storage denial, quota limits, and invalid state return a failed receipt.
+      }
+      channel.port1.postMessage({
+        type: "widget-state-result",
+        id: data.id,
+        ok,
+      });
+      return;
+    }
+    if (data.type === "height") {
+      const height = data.height;
+      if (
+        typeof height === "number" &&
+        Number.isFinite(height) &&
+        height >= 0 &&
+        height <= 10_000
+      ) {
+        frame.style.height = Math.ceil(height) + "px";
+      }
+      return;
+    }
+    if (data.type === "scroll-to") {
+      const top = data.top;
+      if (
+        typeof top === "number" &&
+        Number.isFinite(top) &&
+        top >= 0 &&
+        globalThis.navigator.userActivation?.isActive === true
+      ) {
+        globalThis.scrollTo({
+          top: Math.ceil(
+            globalThis.scrollY + frame.getBoundingClientRect().top + top,
+          ),
+        });
+      }
+      return;
+    }
+    if (data.type === "open-external") {
+      const rawHref = data.href;
+      if (typeof rawHref !== "string") {
+        return;
+      }
+      let href;
+      try {
+        const url = new URL(rawHref, document.baseURI);
+        if (url.protocol !== "https:") {
+          return;
+        }
+        href = url.href;
+      } catch {
+        return;
+      }
+      if (globalThis.navigator.userActivation?.isActive === true) {
+        const anchor = document.createElement("a");
+        anchor.href = href;
+        anchor.rel = "noopener noreferrer";
+        anchor.target = "_blank";
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+      }
+      return;
+    }
+    if (data.type === "follow-up") {
+      const prompt = data.prompt;
+      if (
+        typeof prompt !== "string" ||
+        globalThis.navigator.userActivation?.isActive !== true
+      ) {
+        return;
+      }
+      const title = data.title;
+      globalThis.prompt(typeof title === "string" ? title : prompt, prompt);
+    }
+  });
+  channel.port1.start();
+  const srcdoc = frame.dataset.srcdoc;
+  if (srcdoc == null) {
+    return;
+  }
+  globalThis.addEventListener("resize", () => {
+    const height = Number.parseFloat(frame.style.height);
+    if (!Number.isFinite(height) || height <= viewportHeight) {
+      frame.style.removeProperty("height");
+    }
+    viewportHeight = globalThis.innerHeight;
+    channel.port1.postMessage({ type: "measure" });
+  });
+  frame.addEventListener(
+    "load",
+    () => {
+      frame.contentWindow?.postMessage(
+        { type: "codex-visualization-initialize" },
+        "*",
+        [channel.port2],
+      );
+    },
+    { once: true },
+  );
+  // Match the trusted bootstrap element, not the same text in an authored title.
+  frame.srcdoc = srcdoc.replace(
+    '<script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__<\/script>',
+    () =>
+      '<script type="application/json" id="codex-visualization-widget-state">' +
+      JSON.stringify(initialGlobals).replaceAll("<", "\\u003c") +
+      "<\/script>",
+  );
+  delete frame.dataset.srcdoc;
+})();
+</script>
+</body>
+</html>

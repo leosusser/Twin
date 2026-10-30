@@ -16,7 +16,7 @@ body:has(.home-shell) {
 
 .home-shell {
   width: min(100%, 606px);
-  min-height: 1283px;
+  min-height: 100dvh;
   margin: 0 auto;
   padding-bottom: 0;
   display: flex;
@@ -25,7 +25,6 @@ body:has(.home-shell) {
   color: #0b0b0b;
   border-right: 1px solid #0b0b0b;
   border-bottom: 1px solid #0b0b0b;
-  zoom: .5;
 }
 
 .home-shell .home-topbar {
@@ -110,12 +109,11 @@ body:has(.home-shell) {
 
 .home-detail {
   margin: 0;
-  overflow: hidden;
+  max-width: 46ch;
+  overflow-wrap: anywhere;
   color: #717171;
   font: 400 23px/1.3 var(--body);
   letter-spacing: .006em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .home-avatar {
@@ -220,6 +218,8 @@ body:has(.home-shell) {
   color: #808080;
   font: 800 25px/1 var(--display);
   letter-spacing: 0;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
 
 .home-shell .home-bottom-nav button + button {
@@ -229,6 +229,24 @@ body:has(.home-shell) {
 .home-shell .home-bottom-nav button:hover {
   background: transparent;
   color: #0b0b0b;
+}
+
+.home-wordmark,
+.home-talk-button {
+  transition: color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.home-talk-button:hover { background: #c92804; }
+.home-wordmark:hover { color: #dd2e06; }
+.home-wordmark:active,
+.home-talk-button:active,
+.home-shell .home-bottom-nav button:active { transform: translateY(1px); }
+
+.home-wordmark:focus-visible,
+.home-talk-button:focus-visible,
+.home-shell .home-bottom-nav button:focus-visible {
+  outline: 3px solid #f5a18d;
+  outline-offset: 4px;
 }
 
 .home-shell .home-bottom-nav button.active {
@@ -331,4 +349,20 @@ body:has(.home-shell) {
   .home-shell .home-bottom-nav button {
     font-size: 20px;
   }
+}
+
+@media (max-width: 340px) {
+  .home-shell .home-topbar { padding-right: 14px; }
+  .home-current,
+  .home-next { margin-right: 14px; }
+  .home-current { padding-left: 14px; }
+  .home-current h1 { font-size: 35px; }
+  .home-next { margin-left: 14px; }
+  .home-next-time { font-size: 21px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-wordmark,
+  .home-talk-button,
+  .home-shell .home-bottom-nav button { transition: none; }
 }

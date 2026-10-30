@@ -6,16 +6,21 @@
     <meta name="theme-color" content="#f5f2eb" />
     <meta name="description" content="A private, revisable model of your day." />
     <title>Personal Twin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/avatar.css" />
     <link rel="stylesheet" href="/home.css" />
+    <link rel="stylesheet" href="/mockup-pages.css" />
+    <link rel="stylesheet" href="/onboarding.css" />
     <script type="module" src="/app.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <div id="app" aria-live="polite">
+    <div id="app">
       <div class="boot"><span class="boot-mark">T</span><p>Waking your twin…</p></div>
     </div>
-    <div id="toast-region" class="toast-region" aria-live="assertive" aria-atomic="true"></div>
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
   </body>
 </html>

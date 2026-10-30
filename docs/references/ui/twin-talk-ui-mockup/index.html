@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Twin — Talk page mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="twin-screen" aria-label="Twin Talk screen mockup">
+      <header class="talk-header">
+        <a class="back-button" href="../twin-home-ui-mockup/index.html" aria-label="Back">&#8592;</a>
+        <h1>TALK</h1>
+        <span class="header-spacer" aria-hidden="true"></span>
+      </header>
+
+      <section class="invitation" aria-labelledby="invitation-title">
+        <h2 id="invitation-title">Explain your day.</h2>
+        <p>How are you feeling? What changes are you making today?</p>
+      </section>
+
+      <section class="conversation-stage" aria-label="Sample conversation around the Twin orb">
+        <p class="sample-label">SAMPLE CONVERSATION</p>
+        <div class="message-window">
+          <ol class="message-track" aria-label="Conversation transcript">
+            <li class="message you"><span class="speaker">YOU</span><p>Slept through my alarm and missed the run.</p></li>
+            <li class="message twin"><span class="speaker">TWIN</span><p>It happens. You're free from 4:30 to 6. Want to run then?</p></li>
+            <li class="message you"><span class="speaker">YOU</span><p>Yeah, 4:30 works.</p></li>
+            <li class="message twin"><span class="speaker">TWIN</span><p>Moved it. I'll remind you at 4:10.</p></li>
+          </ol>
+        </div>
+        <button class="orb-wrap" id="orb-toggle" type="button" aria-label="Preview talking animation" aria-pressed="false" aria-describedby="voice-status-text">
+          <span class="orb-halo" aria-hidden="true"></span>
+          <span class="orb" aria-hidden="true"><span class="orb-core"></span></span>
+        </button>
+      </section>
+
+      <footer class="voice-dock" aria-label="Talk preview status">
+        <div class="voice-status"><span class="status-dot" aria-hidden="true"></span><span id="voice-status-text" aria-live="polite">TAP ORB TO TALK</span><small>VISUAL PREVIEW</small></div>
+      </footer>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>

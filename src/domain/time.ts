@@ -7,6 +7,22 @@ export function localDateInZone(date = new Date(), timezone = "America/New_York"
   }).format(date);
 }
 
+export function localTimeInZone(date = new Date(), timezone = "America/New_York") {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(date);
+}
+
+export function addLocalDays(localDate: string, days: number) {
+  const result = new Date(`${localDate}T12:00:00Z`);
+  if (Number.isNaN(result.getTime())) throw new Error("INVALID_LOCAL_DATE");
+  result.setUTCDate(result.getUTCDate() + days);
+  return result.toISOString().slice(0, 10);
+}
+
 export function localDateTimeToUtc(localDate: string, time: string, timezone: string) {
   const [year, month, day] = localDate.split("-").map(Number);
   const [hour, minute] = time.split(":").map(Number);
@@ -36,6 +52,10 @@ export function localDateTimeToUtc(localDate: string, time: string, timezone: st
 
 export function addMinutes(iso: string, minutes: number) {
   return new Date(new Date(iso).getTime() + minutes * 60_000).toISOString();
+}
+
+export function ceilToMinute(date: Date) {
+  return new Date(Math.ceil(date.getTime() / 60_000) * 60_000);
 }
 
 export function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {

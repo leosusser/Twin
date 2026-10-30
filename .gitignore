@@ -2,7 +2,11 @@ data/twin.json
 data/*.tmp
 .DS_Store
 .env
+.env.*
+!.env.example
+*.log
 coverage/
 node_modules/
 data/assets/
 data/pg/
+config/*.local.json

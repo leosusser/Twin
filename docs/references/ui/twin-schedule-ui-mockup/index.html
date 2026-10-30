@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Twin — Schedule page mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="twin-screen" aria-label="Twin schedule screen mockup">
+      <header class="topbar">
+        <div class="wordmark" aria-label="Twin">TWIN</div>
+        <a class="talk-button" href="../twin-talk-ui-mockup/index.html?from=schedule">TALK</a>
+      </header>
+
+      <div class="page-heading">
+        <h1>Your twin's day</h1>
+      </div>
+
+      <section class="day-picker" aria-label="Selected day">
+        <button class="day-arrow" type="button" data-day-step="-1" aria-label="Previous day">&#8592;</button>
+        <time class="selected-date" id="selected-date" datetime="2026-10-24" aria-live="polite"><span class="day-name">SATURDAY</span><span class="day-date">OCTOBER 24</span></time>
+        <button class="day-arrow" type="button" data-day-step="1" aria-label="Next day">&#8594;</button>
+      </section>
+
+      <section class="schedule" aria-label="Your twin's activities">
+        <div class="schedule-heading"><span class="sample-pill">SAMPLE SCHEDULE</span><span class="scroll-hint">SCROLL THE DAY ↓</span></div>
+        <div class="day-scroll" tabindex="0" aria-label="Your twin's day in time order; scroll for more">
+          <ol class="timeline">
+            <li class="time-row past">
+              <time datetime="09:00">9:00</time>
+              <div class="event"><h2>Start the day</h2><p>Look ahead at the day's commitments</p></div>
+            </li>
+            <li class="time-row past">
+              <time datetime="12:00">12:00</time>
+              <div class="event"><h2>Take a lunch break</h2><p>Pause before the afternoon study block</p></div>
+            </li>
+            <li class="time-row focus-row">
+              <time datetime="14:00">2:00</time>
+              <div class="event"><span class="event-time">2:00–2:50 PM</span><h2>Practice Test 1</h2><p>Questions 1–10. One focused step toward the finance midterm.</p></div>
+            </li>
+            <li class="time-row future">
+              <time datetime="17:15">5:15</time>
+              <div class="event"><h2>Take a short walk</h2><p>A small step that fits the day</p></div>
+            </li>
+            <li class="time-row future">
+              <time datetime="19:00">7:00</time>
+              <div class="event"><h2>Wind down</h2><p>Make space for the evening</p></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="Main navigation">
+        <button type="button">MY TWIN</button>
+        <button type="button" class="active" aria-current="page">SCHEDULE</button>
+      </nav>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+Integrate ONLY the first FOUR onboarding screens from this Twin mockup into my existing Twin app. Add the onboarding UI and connect it to existing backend capabilities. Preserve the UI and backend behavior I already have.
+
+READ FIRST
+Inspect the current repository instructions, routes, profile/settings handling, import validator, PostgreSQL storage, memory processing, planner, avatar workflow, and existing screens. Use onboarding-fragment.html as the editable design reference and Twin_Onboarding_Preview.html as the clickable reference. Treat the mockup's sample data and local actions as demonstrations, not production logic.
+
+BACKEND BOUNDARY: DO NOT REDESIGN IT
+Preserve the current memory processing and update rules, PostgreSQL architecture, summary/retrieval behavior, import validation and duplicate handling, conversation storage, retention, planning, and schedule generation. Reuse existing endpoints and services.
+
+Do not add a new memory architecture, memory-summary generator, importance-scoring algorithm, background-agent process, provider-key system, or scheduling algorithm. Do not add tables, change database schemas, raise upload limits, change retention policies, or introduce full-source archiving in this task. If the UI needs an unsupported capability, identify the specific gap rather than silently rebuilding the backend.
+
+EXACTLY FOUR SCREENS
+1. NAME
+Show "What should we call you?", a name input, and Create account. For now, this means creating or resuming a local Twin profile through the existing profile/settings and identity mechanisms. Persist the name through an existing supported endpoint. This is not secure phone/password authentication; do not add phone verification. Do not clear an existing profile, create duplicates, switch identities, or seed demo memories, events, schedules, or avatars. Report any missing fresh-profile capability rather than creating a new account architecture.
+
+2. CHATGPT
+Keep the large Copy prompt and Open ChatGPT buttons with clear numbered instructions. Copy the complete revised onboarding prompt from CHATGPT_ONBOARDING_PROMPT.txt, including its existing JSON contract. Keep the full prompt readable. Open ChatGPT in a new tab. Tell users to paste and send the prompt, then tap ChatGPT's Voice icon if they want to talk. Do not claim that a prompt or link automatically enables Voice. Keep the "I have my output" action.
+
+3. IMPORT
+Accept pasted ChatGPT JSON or a selected JSON file through the current import endpoint and validator. Keep existing validation, size limits, duplicate protection, memory updates, and initial schedule generation. Show readable errors and retain the input on failure. After success, continue the UI to Avatar without duplicating the import. Do not change backend completion semantics or the processing pipeline to imitate the mockup; document any unsupported resume behavior.
+
+4. AVATAR
+Use the existing photo-upload, generation-job, polling/status, and baseline-approval endpoints. Show pending, failure, retry, approval, and skip states. Reuse current credential/provider setup. Never display the embedded sample avatar as a real generation from the user's uploaded photo. Approval or skipping ends this new module.
+
+REVISED INFORMATION COLLECTION
+The ChatGPT conversation must learn what the person ACTUALLY does now, alongside what they want to change. Collect current work/school, responsibilities, recurring commitments, sleep, meals, exercise, commuting, focused work, breaks, free time, preferences, energy patterns, priorities, and boundaries.
+
+Ask the user for a representative current day in chronological order, with approximate times and a distinction between fixed, flexible, occasional, and uncertain activities. Capture weekday/weekend differences when relevant. Ask follow-up questions without inventing an ideal day or filling missing times with guesses.
+
+Clearly separate current behavior from goals. Wanting to exercise each morning does not mean the person already exercises each morning. Use the existing supported observation categories and JSON handoff format. Record sample-day details as observations; do not invent a new incompatible schema. A representative day is routine information, not evidence that events happened today, an accepted calendar, or a prescribed schedule.
+
+AFTER AVATAR
+Hand control back to the existing app's connection flow if one exists; otherwise use the existing Home. Do not build or replace a fifth Connections page. Preserve Home, Schedule, Talk, Settings, integrations, and their components, styles, routes, and behavior.
+
+VISUAL REQUIREMENTS
+Match the mockup: white surface, condensed black Barlow headings, Barlow body text, #dd2e06 accent, simple dividers, large primary actions, clean outlined name input, and continuous four-step progress indicator. Keep the deleted "Then, make it yours" section removed. Scope new styles to onboarding. Preserve responsive layout and keyboard access.
+
+STORAGE AND LARGE FILES: FOLLOW-UP ONLY
+Use the backend's current supported import/export and memory representation. Do not claim it saves a full external transcript or complete original JSON unless it actually does. Document missing support for original JSON/transcript retention, larger uploads, and selective source/memory downloads as a separate additive follow-up. Do not implement it here or ask ChatGPT to reconstruct a supposedly verbatim transcript.
+
+VALIDATION
+Check name validation, all four screens, existing supported resume behavior, malformed and duplicate JSON, import-to-avatar navigation, avatar failure/retry/approval/skip, and final handoff. Verify existing screens and backend behavior remain intact. Run relevant existing checks. Summarize changed files, missing capabilities, and unavailable credentials. Do not publish, deploy, reset data, or replace app files wholesale.

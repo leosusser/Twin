@@ -64,12 +64,13 @@ references, rewrite history, or invent missing records.
 ```bash
 npm install
 npm run db:migrate
-npm run db:seed
 npm run dev
 ```
 
-Seeding is explicit and refuses nonempty databases. Startup never silently seeds,
-falls back to JSON, or imports private data.
+Open the app to create a clean local profile through onboarding. To use the labeled
+sample profile instead, run `npm run db:seed` before `npm run dev`. Seeding is explicit
+and refuses nonempty databases. Startup never silently seeds, falls back to JSON, or
+imports private data.
 
 ## Checks
 

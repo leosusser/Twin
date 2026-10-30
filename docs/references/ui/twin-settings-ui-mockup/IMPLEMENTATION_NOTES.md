@@ -1,0 +1,20 @@
+# Twin Settings page handoff
+
+Open `index.html` for the Settings mockup. Avatar Studio now sits directly at the top of the page: a private photo selection next to the approved standing baseline. Choosing a photo previews it in the browser only; this mockup does not upload or save it. The other settings buttons are visual entry points and do not change settings.
+
+## Existing product features to reuse
+
+- The app already embeds Avatar Studio inside Settings (`/Users/leosusser/Downloads/Twin/public/app.js`, `public/avatar.css`). It supports a private PNG/JPEG/WebP photo under 8 MB, local selection preview with **Use this photo** or **Cancel**, photo replacement/deletion, baseline generation, candidate approval/regeneration, an activity image library, and removal of avatar data. Reuse this existing behavior in the new inline layout.
+- `assets/approved-baseline.png` is a static snapshot of the current approved standing baseline from the local Twin app. The user's source photo is deliberately absent. The Activity Library's Studying and Running labels are examples. In the implemented app, load the actual approved baseline and saved activities through their existing private user-scoped asset URLs.
+- Google Calendar and Gmail are the two integrations implemented in the app today. Their existing controls cover demo/live mode, connection, sync, and disconnect. The mockup labels both as **Demo data** to reflect the sample state; replace these labels with each provider's actual mode and connection state. The reference settings board (`work/ui_reference/board_settings.png`) also depicts Strava and Whoop, but those providers are not implemented; they are omitted from the active list here.
+- The app has editable memory facts and tentative patterns. It does **not** currently have a stored or generated abstract profile paragraph. The paragraph on this page is sample copy inspired by the app's seeded facts and is labeled accordingly.
+
+## Codex implementation mapping
+
+1. Use the same 606px maximum width and 1283px desktop canvas as the Home, Schedule, and Talk mockups. Preserve white space, Barlow fonts, red-orange accents, thin black rules, and no drop shadows.
+2. Render Avatar Studio in Settings itself. Keep the two visible stages in order: **Upload your photo**, then **Baseline avatar**. At narrower widths, stack them vertically. After selecting a photo, offer the existing **Use this photo** and **Cancel** actions before saving. Handle invalid format/size and upload or generation errors inline.
+3. Bind the baseline preview and state to the current user. A new photo enables generation only after it has been saved; an actual generated candidate needs explicit **Approve baseline** or **Regenerate** actions. Show the approved baseline and **Make another version** only after approval. Keep the existing activity image library and avatar deletion controls within Settings below these primary stages, using disclosure if space is tight. Activity images remain unavailable until a baseline is approved.
+4. Bind each plug-in row to the existing provider state. Show accurate connected/demo/disconnected and last-sync information; **Manage** should open the existing connection controls. Do not imply Strava or Whoop work until implemented.
+5. Build the memory paragraph from active, user-authorized facts. Distinguish user-stated facts from tentative inferences; hedge uncertainty. Let users review, correct, and remove the underlying memory facts through the existing memory UI. Provide an empty state when there are no active facts, and do not generate a confident profile from sparse data.
+6. Keep the app's other existing Settings functions, including Twin timing, privacy, and OpenAI connection, reachable from the compact secondary section. These rows are entry points to the existing flows.
+7. Use the app's real data, route state, private image URLs, permissions, and error handling during implementation. The local photo preview in this mockup is the only working input; baseline generation and other settings controls are visual only.

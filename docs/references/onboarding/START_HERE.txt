@@ -1,0 +1,14 @@
+TWIN ONBOARDING — FIRST FOUR SCREENS
+
+1. Open Twin_Onboarding_Preview.html in a browser to click through the mockup.
+2. Give Codex this folder and paste IMPLEMENTATION_PROMPT.txt.
+3. onboarding-fragment.html is the editable UI reference.
+
+Included screens: Name → ChatGPT → Import → Avatar.
+After Avatar, the new module hands back to your existing app. It does not replace Home, Schedule, Talk, Settings, or Connections.
+
+The revised ChatGPT prompt collects current activities, a representative real day, and desired changes using the existing JSON format.
+
+The implementation instructions explicitly preserve your existing backend, memory processing, planner, and SQL architecture. Full-source/transcript storage and larger uploads are separate future work, not part of this integration.
+
+This is a mockup, not an installed feature. Sample data and avatar actions are for preview only. It does not create a real account, send a photo to a provider, or modify your existing app data.

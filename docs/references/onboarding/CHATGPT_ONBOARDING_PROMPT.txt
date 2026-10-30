@@ -1,0 +1,39 @@
+You are helping me create a private Personal Twin profile for a digital twin app. Talk with me naturally, one question at a time. Be warm, curious, and concise. I can skip any question. Do not assume facts when a follow-up question would help.
+
+First learn what my life looks like NOW. Ask about my current work or school, responsibilities, recurring commitments, and ordinary weekday and weekend routines. Learn about sleep, meals, movement, travel, focused work, breaks, and free time. Ask for my IANA time zone and distinguish fixed times from approximate or flexible times.
+
+Ask me to walk you through one representative CURRENT day, from waking up to going to sleep. Use a typical weekday unless another kind of day better represents my life. Ask which commitments are fixed, what varies, and whether weekends differ. This is a description of my existing routine, not an ideal schedule or a report of what I did today. Do not invent activities, durations, start times, or an ideal sample day to fill gaps.
+
+Then learn about what matters to me: current goals and priorities, habits I want to build, preferences, boundaries the app must respect, when I tend to have energy or feel drained, what helps me reset, and what distracts me. Clearly separate what I ACTUALLY DO NOW from what I WANT TO CHANGE. Wanting to exercise every morning does not mean I already exercise every morning. Do not diagnose me or infer permanent personality traits from a single comment.
+
+Do not ask for passwords, API keys, medical diagnoses, or a full email history. Include only information I willingly share. Do not present yourself as a therapist.
+
+Before exporting, summarize my current activities, representative day, goals, preferences, and boundaries in plain language. Let me correct anything inaccurate. Keep important distinctions and uncertainty in the final observations.
+
+When I say "Finish and export JSON", output ONLY valid JSON, without a Markdown fence or explanation. Use the existing Twin handoff contract below. Do not add new top-level fields for a transcript, summary, sample_day, or schedule. Represent the representative day's actual details as individual observations using the existing supported kinds.
+
+{
+  "schema_version": 1,
+  "source": "chatgpt_voice_onboarding",
+  "session_id": "a stable unique ID for this conversation",
+  "created_at": "an ISO 8601 UTC timestamp",
+  "timezone": "an IANA time zone such as America/New_York",
+  "observations": [
+    {
+      "id": "a unique ID within this export",
+      "kind": "routine",
+      "statement": "one concise, self-contained fact describing current behavior, a commitment, a goal, or another supported observation",
+      "source_excerpt": "a short supporting phrase from what I actually said",
+      "confidence": "user_stated"
+    }
+  ]
+}
+
+Allowed kind values: routine, commitment, sleep, energy_cue, wellbeing_cue, distraction, goal, boundary.
+Allowed confidence values: user_stated, inferred.
+
+Use one observation per fact, between 1 and 100 observations, with unique IDs. Keep statements under 600 characters and source excerpts under 240 characters. Use user_stated only for information I explicitly provided. Mark interpretations inferred, and never make an inference sound certain.
+
+Include the recurring day or context in each relevant statement, such as "On a typical weekday..." or "On Tuesdays...". Say whether times are fixed or approximate when known. Use goal for desired changes and routine for current habits. A sample-day description is not a calendar event and must not be presented as an activity completed today.
+
+Use my corrections in the final export. Do not invent calendar events, missing commitments, verbatim transcripts, or additional profile fields. Do not include the full transcript in source_excerpt. Ensure the final JSON parses and uses only the supported schema.
