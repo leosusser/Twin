@@ -20,7 +20,7 @@
   /* The four meanings. Keep them distinct (AGENTS.md). */
   --src-calendar: #0a66d8;
   --src-gmail: #b25e00;
-  --src-reported: #2f8a46;
+  --src-reported: #1f6b35; /* 5:1 at 13px on glass over the lightest-to-darkest sky */
   --src-imagined: var(--ink-2);
 
   /* Glass */
@@ -43,6 +43,9 @@
   --space-6: 32px;
   --gutter: 24px; /* screen side padding: 24px > 440px, 16px <= 440px, 14px <= 340px */
   --tap: 44px;
+  --nav-height: 64px;
+  --nav-gap: 24px; /* space between the floating tab bar and the bottom edge */
+  --nav-clearance: calc(var(--nav-height) + var(--nav-gap) + 20px + env(safe-area-inset-bottom)); /* screen bottom padding so nothing hides behind the bar */
 
   /* Type: Apple system stack, iOS-like scale (size/line-height, weight set per use) */
   --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
@@ -239,7 +242,7 @@ body:has(.shell) {
 /* Text colors are darker than the dot tokens so 13px labels pass 4.5:1 on glass. */
 .src-chip.src-calendar { color: var(--src-calendar); }
 .src-chip.src-gmail { color: #9a5200; }
-.src-chip.src-reported { color: #277a3c; }
+.src-chip.src-reported { color: var(--src-reported); }
 .src-chip.src-imagined::before { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor !important; }
 
 .src-legend {
@@ -278,31 +281,54 @@ body:has(.shell) {
   cursor: pointer;
 }
 
-/* Talk: the red orb, top right. */
+/* Talk: the red pill, top right, at the size of the old TALK button. */
+.shell .home-topbar,
+.shell .schedule-topbar { align-items: center; }
+
+.shell .home-wordmark,
+.shell .schedule-wordmark { margin-top: 0; }
+
 .shell .talk-trigger {
-  width: 56px;
-  height: 56px;
+  min-width: 132px;
+  height: 72px;
   flex: none;
-  padding: 0;
-  display: grid;
-  place-items: center;
+  padding: 0 26px 0 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #ef5f61 0%, var(--talk) 46%, #cf2f33 100%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ea4a4d 0%, var(--talk) 55%, #d93034 100%);
   color: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 16px rgba(201, 42, 46, .28) !important;
+  font: 600 22px/1 var(--font-text);
+  letter-spacing: -.012em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 6px 16px rgba(201, 42, 46, .26) !important;
   cursor: pointer;
   transition: transform var(--t-fast) var(--ease), filter var(--t-fast) var(--ease);
 }
 
-.shell .talk-trigger svg { width: 26px; height: 26px; }
-.shell .talk-trigger:active { transform: scale(.94); filter: brightness(.92); }
+.shell .talk-trigger svg { width: 26px; height: 26px; flex: none; }
+.shell .talk-trigger:active { transform: scale(.96); filter: brightness(.92); }
 
 /* ---------- App shell: tab bar (floating glass capsule) ---------- */
+/* Fixed to the viewport on Schedule (a long, scrolling list). Home is a single screen, so its bar
+ * stays at the end of the page as on main and never covers the next-activity card. */
+.shell.schedule-shell { padding-bottom: var(--nav-clearance); }
+
 .shell .home-bottom-nav,
 .shell .schedule-bottom-nav {
-  min-height: 64px;
-  margin: 20px var(--gutter) calc(24px + env(safe-area-inset-bottom));
+  position: fixed;
+  z-index: 20;
+  top: auto;
+  right: auto;
+  bottom: calc(var(--nav-gap) + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(min(100vw, 606px) - 2 * var(--gutter));
+  height: auto;
+  min-height: var(--nav-height);
+  margin: 0;
   padding: 6px;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -310,10 +336,17 @@ body:has(.shell) {
   align-items: stretch;
   border: 1px solid var(--glass-edge);
   border-radius: var(--r-sheet);
-  background: var(--glass);
+  background: var(--glass-strong); /* content scrolls under it, so labels need the denser glass */
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-float) !important;
+}
+
+.shell .home-bottom-nav {
+  position: static;
+  transform: none;
+  width: auto;
+  margin: 0 var(--gutter) calc(var(--nav-gap) + env(safe-area-inset-bottom));
 }
 
 .shell .home-bottom-nav button,
@@ -355,9 +388,11 @@ body:has(.shell) {
 .shell main:focus-visible { outline-offset: -3px; }
 
 /* ---------- Toasts while the app is up ---------- */
+/* Toasts sit just above the tab bar, clear of the page title and the main card's header. */
 body:has(.shell) .toast-region {
+  z-index: 90;
   right: 50%;
-  bottom: calc(108px + env(safe-area-inset-bottom));
+  bottom: calc(var(--nav-height) + var(--nav-gap) + 12px + env(safe-area-inset-bottom));
   transform: translateX(50%);
 }
 
@@ -366,7 +401,7 @@ body:has(.shell) .toast {
   padding: 12px 16px;
   border: 1px solid var(--glass-edge);
   border-radius: var(--r-card);
-  background: var(--glass-strong);
+  background: rgba(255, 255, 255, .95);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-float);
@@ -380,13 +415,13 @@ body:has(.shell) .toast.error { color: #8f1c20; }
 @media (max-width: 440px) {
   .shell,
   .talk-layer { --gutter: 16px; }
+  :root { --nav-gap: 16px; }
   .shell .home-topbar,
   .shell .schedule-topbar { padding-top: calc(18px + env(safe-area-inset-top)); }
   .shell .home-wordmark,
   .shell .schedule-wordmark { margin-top: 4px; font-size: 30px; }
-  .shell .talk-trigger { width: 52px; height: 52px; }
-  .shell .home-bottom-nav,
-  .shell .schedule-bottom-nav { margin: 14px var(--gutter) calc(16px + env(safe-area-inset-bottom)); }
+  .shell .talk-trigger { min-width: 108px; height: 60px; padding: 0 20px 0 17px; gap: 6px; font-size: 19px; }
+  .shell .talk-trigger svg { width: 22px; height: 22px; }
   .shell .home-bottom-nav button,
   .shell .schedule-bottom-nav button { font-size: 17px; }
 }

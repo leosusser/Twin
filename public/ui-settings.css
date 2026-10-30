@@ -69,6 +69,9 @@
 /* ---------- Scroll area and groups ---------- */
 .settings-shell .settings-scroll {
   padding: 18px var(--gutter) calc(48px + env(safe-area-inset-bottom));
+  /* Soft top edge: cards fade out under the large title instead of being cut off. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 22px);
   scrollbar-color: var(--hairline-strong) transparent;
 }
 
@@ -272,7 +275,14 @@
 .settings-shell .settings-version-actions button:last-child:not(:disabled),
 .settings-shell .settings-version-actions button.stop { background: var(--fill); color: var(--danger); }
 .settings-shell .settings-version-actions button:active:not(:disabled) { transform: scale(.98); }
-.settings-shell .settings-version-actions button:disabled { opacity: .42; cursor: not-allowed; }
+.settings-shell .settings-version-actions button:disabled,
+.settings-shell .ui-button:disabled {
+  opacity: 1;
+  background: rgba(118, 118, 128, .06);
+  box-shadow: inset 0 0 0 1px var(--hairline) !important;
+  color: var(--ink-2);
+  cursor: not-allowed;
+}
 
 .settings-shell .error-box {
   margin-top: 12px;
@@ -316,7 +326,7 @@
   border-top: 1px solid var(--hairline);
 }
 
-.settings-shell .settings-library-grid { gap: 12px; }
+.settings-shell .settings-library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 
 .settings-shell .settings-library-card {
   overflow: hidden;
@@ -609,6 +619,9 @@
 .settings-shell .settings-more-panel .ui-input { min-height: var(--tap); border-color: var(--hairline); border-radius: var(--r-control); }
 .settings-shell .settings-more-panel .form-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
 .settings-shell .settings-more-panel .ui-button { min-height: var(--tap); border: 0; border-radius: var(--r-control); font: 600 15px/1.2 var(--font-text); }
+/* Key actions stay on one row, phone included. */
+.settings-shell #key-form .form-actions { flex-wrap: nowrap; }
+.settings-shell #key-form .form-actions .ui-button { flex: 0 1 auto; padding: 0 12px; white-space: nowrap; }
 
 .settings-shell .secret-status {
   margin: 0 0 14px;
@@ -700,6 +713,15 @@
   .settings-shell .settings-privacy-row .ui-button { width: auto; }
   .settings-shell .settings-avatar-delete .settings-library-actions { width: 100%; }
   .settings-shell .settings-avatar-delete .ui-button { flex: 1; }
+  /* Two-up activity library on phone: smaller cards, actions stacked full width. */
+  .settings-shell .settings-library-grid { gap: 10px; }
+  .settings-shell .settings-library-card-copy { padding: 10px; }
+  .settings-shell .settings-library-card h4 { font-size: 15px; }
+  .settings-shell .settings-library-card p { margin-bottom: 8px; font-size: 12px; }
+  .settings-shell .settings-library-card .settings-library-actions { display: grid; grid-template-columns: 1fr; gap: 6px; }
+  .settings-shell .settings-library-card .settings-library-actions .ui-button { width: 100%; padding: 0 8px; }
+  .settings-shell #key-form .form-actions { gap: 6px; }
+  .settings-shell #key-form .form-actions .ui-button { flex: 1 1 auto; padding: 0 10px; }
 }
 
 @media (max-width: 340px) {
@@ -709,6 +731,7 @@
   .settings-shell .settings-privacy-row { flex-direction: column; align-items: stretch; }
   .settings-shell .settings-privacy-row .ui-button { width: 100%; }
   .settings-shell .settings-version-actions { grid-template-columns: 1fr; }
+  .settings-shell #key-form .form-actions { flex-wrap: wrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {

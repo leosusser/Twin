@@ -377,6 +377,11 @@
 }
 
 /* ---------- Breakpoints (606, 440, 340) ---------- */
+@media (max-width: 606px) {
+  /* Phone: the list box fills the viewport above the tab bar instead of a short fixed window. */
+  .schedule-shell .schedule-day-scroll { height: max(420px, calc(100dvh - 180px)); }
+}
+
 @media (max-width: 440px) {
   .schedule-shell { --sched-time-col: 66px; }
   .schedule-shell .schedule-page-heading { padding: 18px var(--gutter) 14px; }
