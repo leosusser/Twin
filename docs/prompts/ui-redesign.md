@@ -7,7 +7,7 @@ Also use the `interfaces` skills (jakubkrehel/skills):
 
 ## I must be able to go back
 
-- Before changing anything, create a branch `ui-redesign` from `main` (currently `8e10c32`) and do all the work there. Don't commit to `main` or merge into it.
+- Before changing anything, create a branch `ui-redesign` from the latest `main` and do all the work there. Don't commit to `main` or merge into it.
 - Commit after each step (plan, build, fix pass) so I can step back to any point. Push the branch to `origin`.
 - Finish by telling me exactly how to undo it: `git switch main` returns to the old UI, and `git branch -D ui-redesign` throws the redesign away. Only merge into `main` if I say I like it.
 
