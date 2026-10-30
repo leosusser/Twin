@@ -420,3 +420,16 @@
 @media (prefers-contrast: more) {
   .schedule-shell :is(.schedule-day-picker, .schedule-day-scroll, .schedule-plan-details) { border-color: var(--hairline-strong); background: #fff; }
 }
+
+/* Source text is shown by the row dot and legend; keep it for screen readers only. */
+.schedule-shell .schedule-source-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
