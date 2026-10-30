@@ -18,6 +18,13 @@ If the `interfaces` skills (jakubkrehel/skills) are installed, use them for the 
 - **Type:** the Apple system font stack (`-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif`) on the post-onboarding screens. Keep the Barlow font link in `index.html` because onboarding still uses it.
 - **Readable glass:** text on glass must meet WCAG contrast. Support `prefers-reduced-transparency` (switch to solid fills) and `prefers-reduced-motion`. Add a fallback for browsers without `backdrop-filter`.
 - **Motion:** subtle, quick, iOS-like springs and fades. Nothing bouncy or slow.
+- **Must not look AI-generated.** Avoid the common AI-template tells:
+  - purple or blue gradient blobs, glowing orbs, or sparkle ✨ icons
+  - emoji used as icons, or a three-cards-in-a-row "feature grid"
+  - every element in a rounded pill with a drop shadow
+  - generic hero copy, Inter on a dark gradient
+  - identical card spacing everywhere
+  Make deliberate choices instead: real hierarchy, varied rhythm, restrained color, and custom details a designer would sign off on. If a screen looks like a default template, redo it.
 
 ## Web app now, iPhone app later
 
@@ -43,7 +50,7 @@ If the `interfaces` skills (jakubkrehel/skills) are installed, use them for the 
 
 - **Onboarding is untouched.** Don't change `renderOnboarding()`, `onboardingSuccess()`, the onboarding prompt, `onboarding.css`, or any of the onboarding steps.
 - **No backend changes.** Don't touch `src/`, `db/`, `test/`, the API routes, request and response shapes, the worker, or the database. The UI must call the same endpoints with the same data.
-- **Keep every feature.** Every button, setting, action, link, and piece of information that exists today must still exist and still work. That includes Export, Delete Talk history, Restart onboarding, and Delete account. You may move or restyle features but not remove them.
+- **Keep every feature (top priority).** Every button, setting, action, link, and piece of information that exists today must still exist and still work. That includes Export, Delete Talk history, Restart onboarding, and Delete account. You may move or restyle features but not remove them.
 - **Keep accessibility.** Keep all labels, roles, `aria-*` attributes, `role="status"` regions, keyboard access, focus states, and the skip link. Don't lower contrast.
 - **Meaning labels can be minimal.** The labels for Calendar, Gmail, imagined twin activity, and user-reported activity can be toned down a lot: a small icon, a color accent, or a short tag instead of big pills or repeated text. A user still needs to be able to tell the four kinds apart at a glance, and a tooltip or legend should explain them.
 - **Ask, don't delete.** If you think something is useless or confusing, stop and ask me before removing or hiding it. Put these in one short batch of questions rather than asking one at a time.
