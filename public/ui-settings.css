@@ -1,1 +1,723 @@
 /* Settings screen styles for the glass redesign. Scope every rule under .settings-shell. Uses tokens from ui-foundation.css. */
+/* iOS Settings pattern: large title, then grouped sections. Each group is a title, one glass card, and an optional footnote. */
+
+.settings-shell {
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 14'%3E%3Cpath d='M1.2 1.2 6.8 7l-5.6 5.8' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --chevron-color: #8a8a8e;
+  --row-pad: 16px;
+  --tile: 29px;
+  font: 400 var(--type-body) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+/* ---------- Chevron (SVG mask so it follows currentColor) ---------- */
+.settings-shell .settings-chevron {
+  width: 8px;
+  height: 14px;
+  flex: none;
+  display: inline-block;
+  background: var(--chevron-color);
+  -webkit-mask: var(--chevron) center / contain no-repeat;
+  mask: var(--chevron) center / contain no-repeat;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.settings-shell details[open] > summary .settings-chevron { transform: rotate(90deg); }
+.settings-shell .settings-chevron.is-back { background: currentColor; transform: rotate(180deg); }
+
+.settings-shell summary { list-style: none; -webkit-tap-highlight-color: transparent; }
+.settings-shell summary::-webkit-details-marker { display: none; }
+
+/* ---------- Header: back control and large title ---------- */
+.settings-shell .settings-page-header {
+  min-height: 120px;
+  padding: calc(20px + env(safe-area-inset-top)) var(--gutter) 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.settings-shell .settings-back {
+  width: auto;
+  height: auto;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  margin-left: -6px;
+  padding: 0 10px 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--ink);
+  font: 400 17px/1 var(--font-text);
+  letter-spacing: var(--tracking-body);
+  cursor: pointer;
+}
+
+.settings-shell .settings-back:active { background: var(--fill-pressed); transform: none; }
+
+.settings-shell .settings-page-header h1 {
+  margin: 0;
+  text-align: left;
+  font: 700 var(--type-large-title) var(--font-display);
+  letter-spacing: var(--tracking-large);
+}
+
+/* ---------- Scroll area and groups ---------- */
+.settings-shell .settings-scroll {
+  padding: 18px var(--gutter) calc(48px + env(safe-area-inset-bottom));
+  scrollbar-color: var(--hairline-strong) transparent;
+}
+
+.settings-shell .settings-group { margin: 0; padding: 0; border: 0; }
+.settings-shell .settings-group + .settings-group { margin-top: 40px; }
+
+.settings-shell .settings-group-title {
+  margin: 0 0 10px;
+  font: 700 var(--type-title) var(--font-display);
+  letter-spacing: -.018em;
+}
+
+.settings-shell .settings-section-intro,
+.settings-shell .settings-avatar-footer,
+.settings-shell .settings-planner-date {
+  margin: 8px var(--row-pad) 0;
+  padding: 0;
+  max-width: 520px;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+/* Shared glass-card base for settings cards (keeps borders thin, no poster frame). */
+.settings-shell .glass-card { overflow: hidden; }
+
+/* ---------- Avatar studio ---------- */
+.settings-shell .settings-avatar { border: 0; }
+.settings-shell .settings-avatar-intro { padding: 0 0 16px; }
+.settings-shell .settings-avatar-intro h2 { margin-bottom: 6px; font: 700 var(--type-title) var(--font-display); letter-spacing: -.018em; }
+.settings-shell .settings-avatar-intro p {
+  max-width: 500px;
+  margin: 0;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .settings-avatar-grid { gap: 12px; }
+
+.settings-shell .settings-avatar-card {
+  padding: 16px;
+  overflow: visible;
+}
+
+.settings-shell .settings-step-kicker {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font: 600 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.settings-shell .settings-step-kicker span {
+  padding-left: 8px;
+  border-left: 1px solid var(--hairline-strong);
+  font-weight: 400;
+}
+
+.settings-shell .settings-avatar-card h3 {
+  margin: 10px 0 4px;
+  font: 700 var(--type-title) var(--font-display);
+  letter-spacing: -.018em;
+}
+
+.settings-shell .settings-step-description {
+  min-height: 42px;
+  margin: 0 0 14px;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .settings-avatar-preview {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, .5);
+}
+
+.settings-shell .settings-avatar-preview img,
+.settings-shell .settings-library-card img { background: rgba(255, 255, 255, .7); }
+
+.settings-shell .settings-photo-placeholder { gap: 10px; color: var(--ink-2); }
+.settings-shell .settings-photo-placeholder svg { width: 72px; height: 72px; opacity: .7; }
+.settings-shell .settings-photo-placeholder span { font: 500 var(--type-footnote) var(--font-text); letter-spacing: 0; }
+
+.settings-shell .settings-step-action {
+  width: 100%;
+  margin-top: 12px;
+  padding: 0 16px;
+  justify-content: center;
+  border: 0;
+  text-align: center;
+}
+
+.settings-shell .settings-step-action.primary { background: var(--ink); color: #fff; }
+.settings-shell .settings-step-action.destructive { background: var(--fill); color: var(--danger); }
+.settings-shell .settings-step-action:hover:not(:disabled) { background: var(--fill-pressed); }
+.settings-shell .settings-step-action.primary:hover:not(:disabled) { background: #000; }
+.settings-shell .settings-step-action:disabled { cursor: not-allowed; }
+
+.settings-shell .settings-avatar-card:has(#avatar-photo:focus-visible) .settings-step-action {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.settings-shell .settings-inline-actions { margin-top: 8px; gap: 8px; }
+.settings-shell .settings-inline-actions button { flex: 1; border: 0; background: var(--fill); font: 600 15px/1.2 var(--font-text); }
+.settings-shell .settings-inline-actions button.primary { background: var(--ink); color: #fff; }
+.settings-shell .settings-inline-actions .danger { color: var(--danger); }
+
+/* Delete photo sits apart from Replace, below a hairline. */
+.settings-shell .settings-danger-zone {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hairline);
+}
+
+.settings-shell .settings-danger-zone .ui-button { background: transparent; }
+
+.settings-shell .settings-step-footnote {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.settings-shell .settings-baseline-status {
+  min-height: 24px;
+  margin: 10px 0 0;
+  gap: 8px;
+  color: var(--ink-2);
+  font: 500 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.settings-shell .settings-status-square {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-2);
+}
+
+.settings-shell .settings-baseline-status.is-current { color: var(--ink); font-weight: 600; }
+.settings-shell .settings-baseline-status.is-current .settings-status-square { background: var(--ink); }
+.settings-shell .settings-baseline-status.is-pending .settings-status-square { animation: settings-pulse 1.4s var(--ease) infinite; }
+.settings-shell .settings-baseline-version { color: var(--ink-2); font-weight: 400; font-variant-numeric: tabular-nums; }
+
+@keyframes settings-pulse { 50% { opacity: .25; } }
+
+.settings-shell .settings-avatar-versions {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.settings-shell .settings-version-heading h4 { font: 600 var(--type-callout) var(--font-text); }
+.settings-shell .settings-version-heading span { color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); letter-spacing: 0; }
+
+.settings-shell .settings-version-strip { padding: 2px 2px 8px; }
+
+.settings-shell .settings-version-thumb {
+  padding: 3px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .55);
+  color: var(--ink-2);
+}
+
+.settings-shell .settings-version-thumb img { border-radius: 7px; background: rgba(255, 255, 255, .7); }
+.settings-shell .settings-version-thumb span { padding: 5px 2px 2px; font: 500 12px/1 var(--font-text); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+.settings-shell .settings-version-thumb.selected {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink) !important;
+  color: var(--ink);
+}
+
+.settings-shell .settings-version-empty { color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+
+/* SWITCH / REGENERATE / DELETE / STOP are test-locked capitals in source; shown in sentence case. */
+.settings-shell .settings-version-actions { margin-top: 10px; gap: 8px; }
+
+.settings-shell .settings-version-actions button {
+  min-height: var(--tap);
+  padding: 0 8px;
+  display: block;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  color: var(--ink);
+  font: 600 15px/var(--tap) var(--font-text);
+  letter-spacing: var(--tracking-body);
+  text-transform: lowercase;
+  text-align: center;
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.settings-shell .settings-version-actions button::first-letter { text-transform: uppercase; }
+.settings-shell .settings-version-actions button:first-child:not(:disabled) { background: var(--ink); color: #fff; }
+.settings-shell .settings-version-actions button:last-child:not(:disabled),
+.settings-shell .settings-version-actions button.stop { background: var(--fill); color: var(--danger); }
+.settings-shell .settings-version-actions button:active:not(:disabled) { transform: scale(.98); }
+.settings-shell .settings-version-actions button:disabled { opacity: .42; cursor: not-allowed; }
+
+.settings-shell .error-box {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: var(--r-card);
+  background: rgba(196, 38, 43, .08);
+  color: #8f1c20;
+  font: 500 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .settings-avatar-footer { margin-top: 10px; margin-bottom: 14px; }
+
+/* Activity library: one disclosure row in a glass card. */
+.settings-shell .settings-avatar-library { border: 1px solid var(--glass-edge); }
+
+.settings-shell .settings-avatar-library > summary .settings-library-title { font: 400 var(--type-body) var(--font-text); }
+
+.settings-shell .settings-avatar-library > summary {
+  min-height: 52px;
+  padding: 0 var(--row-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font: 400 var(--type-body) var(--font-text);
+  cursor: pointer;
+}
+
+.settings-shell .settings-avatar-library > summary .settings-library-hint {
+  display: inline-flex;
+  letter-spacing: 0;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .settings-library-content {
+  padding: 16px var(--row-pad);
+  border-top: 1px solid var(--hairline);
+}
+
+.settings-shell .settings-library-grid { gap: 12px; }
+
+.settings-shell .settings-library-card {
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, .5);
+}
+
+.settings-shell .settings-library-card-copy { padding: 12px; }
+.settings-shell .settings-library-card h4 { margin: 0 0 2px; font: 600 var(--type-headline) var(--font-text); }
+.settings-shell .settings-library-card p { margin: 0 0 10px; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+.settings-shell .settings-in-use { color: var(--ink); font-weight: 600; }
+
+.settings-shell .settings-library-actions { gap: 6px; }
+.settings-shell .settings-library-actions .ui-button { padding: 0 12px; border: 0; background: var(--fill); font-size: 15px; }
+
+.settings-shell .settings-avatar-delete {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.settings-shell .settings-avatar-delete p { color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+.settings-shell .settings-avatar-delete .ui-button { background: transparent; box-shadow: inset 0 0 0 1px var(--hairline) !important; }
+
+.settings-shell .schedule-empty { padding: 4px 0; }
+.settings-shell .schedule-empty h2 { margin: 0 0 4px; font: 600 var(--type-headline) var(--font-text); }
+.settings-shell .schedule-empty p { margin: 0; color: var(--ink-2); font: 400 var(--type-callout) var(--font-text); }
+
+/* ---------- Plug-ins ---------- */
+.settings-shell .settings-plugins,
+.settings-shell .settings-memory { padding-top: 0; }
+
+.settings-shell .settings-plugin-list { border: 1px solid var(--glass-edge); padding: 0 var(--row-pad); }
+.settings-shell .settings-plugin-entry { border-bottom: 0; }
+
+.settings-shell .settings-plugin-row {
+  min-height: 76px;
+  padding: 12px 0;
+  grid-template-columns: var(--tile) minmax(0, 1fr) auto;
+  gap: 12px;
+  cursor: pointer;
+}
+
+/* iOS-style icon tile. Calendar takes the Calendar meaning color; utility rows stay neutral grey. */
+.settings-shell .settings-tile {
+  width: var(--tile);
+  height: var(--tile);
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--ink-2);
+  color: #fff;
+}
+
+.settings-shell .settings-tile svg { width: 18px; height: 18px; display: block; }
+.settings-shell .settings-tile.is-calendar { background: var(--src-calendar); }
+.settings-shell .settings-tile.is-gmail { background: var(--src-gmail); }
+
+.settings-shell .settings-plugin-copy h3 { margin: 0; font: 400 var(--type-body) var(--font-text); }
+.settings-shell .settings-plugin-copy p { margin: 1px 0 0; color: var(--ink-2); font: 400 var(--type-callout) var(--font-text); }
+
+.settings-shell .settings-plugin-status {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font: 500 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.settings-shell .settings-plugin-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px currentColor !important;
+}
+
+.settings-shell .settings-plugin-status.is-on { color: var(--ink); }
+.settings-shell .settings-plugin-status.is-on::before { background: currentColor; }
+
+.settings-shell .settings-row-action {
+  min-height: var(--tap);
+  padding: 0 0 0 4px;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+}
+
+.settings-shell .settings-plugin-controls { padding: 0 0 16px calc(var(--tile) + 12px); }
+.settings-shell .settings-plugin-controls p { margin: 0 0 10px; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+.settings-shell .settings-plugin-controls .settings-plugin-error { color: #8f1c20; font-weight: 600; }
+
+.settings-shell .settings-calendar-picker {
+  margin: 4px 0 14px;
+  padding: 0 12px 12px;
+  display: block;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, .5);
+}
+
+.settings-shell .settings-calendar-picker legend {
+  float: left;
+  width: 100%;
+  padding: 12px 0 4px;
+  color: var(--ink-2);
+  font: 600 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.settings-shell .settings-calendar-picker label {
+  clear: both;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--hairline);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .settings-calendar-picker input { width: 20px; height: 20px; accent-color: var(--ink); }
+.settings-shell .settings-calendar-picker button { width: 100%; margin-top: 12px; border: 0; }
+.settings-shell .settings-plugin-actions { gap: 8px; }
+.settings-shell .settings-plugin-actions button { border: 0; background: var(--fill); font: 600 15px/1.2 var(--font-text); }
+
+/* ---------- Memory ---------- */
+.settings-shell .settings-memory h2 { margin: 0 0 10px; }
+.settings-shell .settings-memory-card { border: 1px solid var(--glass-edge); }
+
+.settings-shell .settings-memory-summary {
+  padding: 16px var(--row-pad) 18px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.settings-shell .settings-memory-label { color: var(--ink-2); font: 600 var(--type-footnote) var(--font-text); letter-spacing: 0; }
+.settings-shell .settings-memory-summary p { margin: 6px 0 0; font: 400 var(--type-body) var(--font-text); letter-spacing: var(--tracking-body); }
+
+.settings-shell .settings-memory-review { padding: 0 var(--row-pad); border-top: 1px solid var(--hairline); }
+
+.settings-shell .settings-memory-review > summary {
+  width: auto;
+  min-height: 50px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  font: 400 var(--type-body) var(--font-text);
+  cursor: pointer;
+}
+
+.settings-shell .settings-facts { margin: 0; border-top: 1px solid var(--hairline); }
+
+.settings-shell .settings-fact {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-shell .settings-fact:last-child { border-bottom: 0; }
+.settings-shell .settings-fact p { font: 400 var(--type-callout) var(--font-text); }
+.settings-shell .settings-fact small { margin-top: 4px; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+.settings-shell .settings-fact small .src-chip { display: inline-flex; font-weight: 600; }
+.settings-shell .settings-fact-actions { gap: 2px; }
+
+.settings-shell .settings-fact-actions button {
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.settings-shell .settings-fact-actions button svg { width: 20px; height: 20px; }
+.settings-shell .settings-fact-actions button.is-remove { color: var(--danger); }
+.settings-shell .settings-fact-actions button:active { background: var(--fill-pressed); transform: none; }
+.settings-shell .settings-facts .schedule-empty { padding: 12px 0; }
+
+/* ---------- Planner (the day rebuild form lives here) ---------- */
+.settings-shell .settings-planner { margin-top: 40px; padding: 0; border: 0; }
+.settings-shell .settings-planner-date { margin: -4px 0 10px; }
+.settings-shell .settings-planner-card { padding: 16px; border: 1px solid var(--glass-edge); }
+
+.settings-shell .schedule-rebuild { margin: 0; padding: 0; border: 0; background: transparent; }
+.settings-shell .schedule-rebuild-heading { grid-template-columns: 1fr; align-items: start; gap: 6px; }
+.settings-shell .schedule-rebuild-heading span { color: var(--ink-2); font: 600 var(--type-footnote) var(--font-text); letter-spacing: 0; }
+.settings-shell .schedule-rebuild-heading h2 { margin: 2px 0 0; font: 700 var(--type-title) var(--font-display); letter-spacing: -.018em; }
+.settings-shell .schedule-rebuild-heading p { color: var(--ink-2); font: 400 var(--type-callout) var(--font-text); }
+
+.settings-shell .schedule-rebuild-instruction { margin-top: 16px; }
+.settings-shell .schedule-rebuild-instruction > span { color: var(--ink); font: 600 var(--type-footnote) var(--font-text); letter-spacing: 0; }
+
+.settings-shell .schedule-rebuild-instruction textarea {
+  min-height: 88px;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, .86);
+  font: 400 16px/1.4 var(--font-text);
+}
+
+.settings-shell .schedule-rebuild-instruction textarea::placeholder { color: #767679; }
+.settings-shell .schedule-rebuild-instruction textarea:disabled { background: var(--fill); color: var(--ink-2); }
+.settings-shell .schedule-rebuild-instruction small { margin-top: 6px; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+.settings-shell .schedule-rebuild-actions { margin-top: 16px; justify-content: flex-start; }
+
+.settings-shell .schedule-rebuild-actions button,
+.settings-shell .schedule-rebuild-status button {
+  min-height: var(--tap);
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--ink);
+  color: #fff;
+  font: 600 15px/1.2 var(--font-text);
+  letter-spacing: var(--tracking-body);
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.settings-shell .schedule-rebuild-actions button:hover:not(:disabled) { background: #000; }
+.settings-shell .schedule-rebuild-actions button:active:not(:disabled) { transform: scale(.98); }
+.settings-shell .schedule-rebuild-status button { background: var(--fill); color: var(--ink); }
+
+.settings-shell .schedule-rebuild-status {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+  color: var(--ink);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .schedule-rebuild-status.success { background: rgba(47, 138, 70, .1); }
+.settings-shell .schedule-rebuild-status.error { background: rgba(196, 38, 43, .08); color: #8f1c20; }
+.settings-shell .schedule-rebuild-past { color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+
+/* ---------- More settings: grouped disclosure rows ---------- */
+.settings-shell .settings-more { margin-top: 40px; padding-top: 0; border: 0; }
+.settings-shell .settings-more > h2 { margin: 0 0 10px; }
+
+.settings-shell .settings-more-list {
+  padding: 0 var(--row-pad);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card) !important;
+}
+
+.settings-shell .settings-more-item,
+.settings-shell .settings-more-item:last-child { border-top: 0; border-bottom: 0; }
+.settings-shell .settings-more-item + .settings-more-item { border-top: 1px solid var(--hairline); }
+
+.settings-shell .settings-more-item > summary {
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: var(--tile) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  font: 400 var(--type-body) var(--font-text);
+  cursor: pointer;
+}
+
+.settings-shell .settings-more-item > summary span:last-child { color: var(--chevron-color); }
+.settings-shell .settings-more-item[open] > summary span:last-child { transform: rotate(90deg); }
+
+.settings-shell .settings-more-panel { padding: 0 0 18px; }
+.settings-shell .settings-more-panel > p { max-width: 520px; margin: 0 0 14px; color: var(--ink-2); font: 400 var(--type-callout) var(--font-text); }
+.settings-shell .settings-more-panel .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.settings-shell .settings-more-panel .field { display: block; }
+.settings-shell .settings-more-panel .field.full { grid-column: 1 / -1; }
+.settings-shell .settings-more-panel .field > span { display: block; margin-bottom: 6px; color: var(--ink); font: 600 var(--type-footnote) var(--font-text); letter-spacing: 0; text-transform: none; }
+.settings-shell .settings-more-panel .ui-input { min-height: var(--tap); border-color: var(--hairline); border-radius: var(--r-control); }
+.settings-shell .settings-more-panel .form-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.settings-shell .settings-more-panel .ui-button { min-height: var(--tap); border: 0; border-radius: var(--r-control); font: 600 15px/1.2 var(--font-text); }
+
+.settings-shell .secret-status {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--fill);
+}
+
+.settings-shell .secret-status .settings-plugin-status { margin: 0; }
+.settings-shell .secret-status strong { font: 500 var(--type-callout) var(--font-text); font-variant-numeric: tabular-nums; }
+
+.settings-shell .settings-more-panel .notice {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: rgba(178, 94, 0, .1);
+  color: var(--ink);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.settings-shell .settings-more-panel .small { margin: 14px 0 0; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+
+.settings-shell .settings-privacy-row {
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-shell .settings-privacy-row strong { display: block; font: 500 var(--type-callout) var(--font-text); }
+.settings-shell .settings-privacy-row span { margin-top: 2px; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+.settings-shell .settings-privacy-row .ui-button { flex: none; min-width: 96px; }
+
+/* Delete account sits apart from the everyday rows. */
+.settings-shell .settings-privacy-row.is-account {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: rgba(196, 38, 43, .06);
+}
+
+.settings-shell .settings-privacy-row.is-account .ui-button { background: rgba(255, 255, 255, .7); }
+
+/* ---------- Press and hover feedback ---------- */
+.settings-shell .settings-plugin-row:active,
+.settings-shell .settings-more-item > summary:active,
+.settings-shell .settings-memory-review > summary:active,
+.settings-shell .settings-avatar-library > summary:active { opacity: .6; }
+
+@media (hover: hover) {
+  .settings-shell .settings-back:hover { background: var(--fill); }
+  .settings-shell .settings-plugin-entry > summary:hover,
+  .settings-shell .settings-avatar-library > summary:hover,
+  .settings-shell .settings-memory-review > summary:hover,
+  .settings-shell .settings-more-item > summary:hover { color: inherit; }
+  .settings-shell .settings-fact-actions button:hover { background: var(--fill); }
+  .settings-shell .settings-version-actions button:not(:first-child):hover:not(:disabled) { background: var(--fill-pressed); }
+  .settings-shell .settings-version-actions button:first-child:hover:not(:disabled) { background: #000; }
+}
+
+/* ---------- Breakpoints (606, 440, 340 unchanged) ---------- */
+@media (max-width: 440px) {
+  .settings-shell .settings-page-header { min-height: 96px; padding: calc(12px + env(safe-area-inset-top)) var(--gutter) 8px; gap: 2px; }
+  .settings-shell .settings-back { width: auto; height: auto; font-size: 17px; }
+  .settings-shell .settings-page-header h1 { font-size: 34px; }
+  .settings-shell .settings-scroll { padding: 14px var(--gutter) calc(40px + env(safe-area-inset-bottom)); }
+  .settings-shell .settings-avatar { padding-top: 0; }
+  .settings-shell .settings-avatar-card { padding: 16px; }
+  .settings-shell .settings-avatar-card h3 { font-size: 22px; }
+  .settings-shell .settings-avatar-intro h2 { font-size: 22px; }
+  .settings-shell .settings-avatar-intro p { font-size: 15px; }
+  .settings-shell .settings-plugin-row { min-height: 76px; grid-template-columns: var(--tile) minmax(0, 1fr) auto; gap: 12px; }
+  .settings-shell .settings-plugin-copy h3 { font-size: 17px; }
+  .settings-shell .settings-plugin-copy p { font-size: 15px; }
+  .settings-shell .settings-plugin-controls { padding-left: 0; }
+  .settings-shell .settings-memory h2 { font-size: 22px; }
+  .settings-shell .settings-memory-summary { padding: 14px var(--row-pad) 16px; }
+  .settings-shell .settings-memory-summary p { font-size: 17px; }
+  .settings-shell .settings-more-panel .form-grid { grid-template-columns: 1fr; }
+  .settings-shell .settings-privacy-row { flex-direction: row; align-items: center; }
+  .settings-shell .settings-privacy-row .ui-button { width: auto; }
+  .settings-shell .settings-avatar-delete .settings-library-actions { width: 100%; }
+  .settings-shell .settings-avatar-delete .ui-button { flex: 1; }
+}
+
+@media (max-width: 340px) {
+  .settings-shell { --row-pad: 12px; }
+  .settings-shell .settings-plugin-row { grid-template-columns: var(--tile) minmax(0, 1fr) auto; }
+  .settings-shell .settings-row-action { grid-column: auto; }
+  .settings-shell .settings-privacy-row { flex-direction: column; align-items: stretch; }
+  .settings-shell .settings-privacy-row .ui-button { width: 100%; }
+  .settings-shell .settings-version-actions { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-shell .settings-chevron,
+  .settings-shell .settings-version-actions button,
+  .settings-shell .schedule-rebuild-actions button { transition: none; }
+  .settings-shell .settings-baseline-status.is-pending .settings-status-square { animation: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .settings-shell .settings-more-list { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

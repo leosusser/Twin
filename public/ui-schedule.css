@@ -1,1 +1,422 @@
 /* Schedule screen styles for the glass redesign. Scope every rule under .schedule-shell. Uses tokens from ui-foundation.css. */
+/* Overrides the poster-era rules in mockup-pages.css; sizes and order are kept. */
+
+.schedule-shell {
+  --sched-time-col: 74px;
+}
+
+/* ---------- Title ---------- */
+.schedule-shell .schedule-page-heading {
+  padding: 20px var(--gutter) 18px;
+}
+
+.schedule-shell .schedule-page-heading h1 {
+  margin: 0;
+  color: var(--ink);
+  font: 700 var(--type-large-title) var(--font-display);
+  letter-spacing: var(--tracking-large);
+}
+
+.schedule-shell .schedule-page-heading p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+  letter-spacing: 0;
+}
+
+/* ---------- Day stepper ---------- */
+.schedule-shell .schedule-day-picker {
+  min-height: 68px;
+  margin: 0 var(--gutter);
+  padding: 0 8px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card) !important;
+}
+
+.schedule-shell .schedule-selected-date {
+  gap: 1px;
+}
+
+.schedule-shell .schedule-day-name {
+  color: var(--ink);
+  font: 600 var(--type-headline) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+.schedule-shell .schedule-day-date {
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-shell .schedule-day-arrow {
+  width: var(--tap);
+  min-width: var(--tap);
+  height: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.schedule-shell .schedule-day-arrow svg { display: block; }
+.schedule-shell .schedule-day-arrow:active:not(:disabled) { background: var(--fill-pressed); transform: scale(.94); }
+.schedule-shell .schedule-day-arrow:disabled { opacity: .35; cursor: progress; }
+
+.schedule-shell .schedule-loading {
+  margin: 8px var(--gutter) 0;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* ---------- Calendar conflict: calm, but still a warning ---------- */
+.schedule-shell .schedule-conflicts {
+  margin: 14px var(--gutter) 0;
+  padding: 14px 16px 14px 14px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  border: 1px solid rgba(196, 38, 43, .22);
+  border-radius: var(--r-card);
+  background: linear-gradient(rgba(255, 236, 232, .55), rgba(255, 236, 232, .55)), var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card) !important;
+}
+
+.schedule-shell .schedule-conflicts-icon {
+  padding-top: 1px;
+  color: var(--danger);
+}
+
+.schedule-shell .schedule-conflicts-icon svg { display: block; }
+
+.schedule-shell .schedule-conflicts-label {
+  display: block;
+  color: var(--danger);
+  font: 600 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.schedule-shell .schedule-conflicts h2 {
+  margin: 2px 0 6px;
+  color: var(--ink);
+  font: 600 var(--type-headline) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+.schedule-shell .schedule-conflicts ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.schedule-shell .schedule-conflicts li + li { margin-top: 4px; }
+
+.schedule-shell .schedule-conflicts p {
+  margin: 8px 0 0;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+}
+
+/* ---------- Activities: inset grouped glass list ---------- */
+.schedule-shell .schedule-day {
+  padding: 14px var(--gutter) 4px;
+}
+
+.schedule-shell .schedule-day-scroll {
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card) !important;
+  scrollbar-color: var(--hairline-strong) transparent;
+}
+
+.schedule-shell .schedule-timeline { padding: 0 16px; }
+
+.schedule-shell .schedule-time-row {
+  grid-template-columns: var(--sched-time-col) minmax(0, 1fr);
+  gap: 8px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.schedule-shell .schedule-time-row:last-child { border-bottom: 0; }
+
+.schedule-shell .schedule-time-row > time {
+  padding-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: start;
+  color: var(--ink);
+  font: 600 var(--type-callout) var(--font-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-shell .schedule-event h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 var(--type-headline) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+.schedule-shell .schedule-event-heading {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.schedule-shell .schedule-event > p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+.schedule-shell .schedule-time-row.is-past { opacity: 1; }
+.schedule-shell .schedule-time-row.is-past > time,
+.schedule-shell .schedule-time-row.is-past .schedule-event h2 { color: var(--ink-2); }
+
+/* Current or next activity: a quiet highlight inside the list, not a separate card. */
+.schedule-shell .schedule-time-row.is-focus {
+  margin: 0 -10px;
+  padding: 14px 10px;
+  border-radius: var(--r-control);
+  background: rgba(255, 255, 255, .7);
+  box-shadow: 0 1px 3px rgba(30, 34, 48, .06) !important;
+}
+
+.schedule-shell .schedule-time-row.is-focus + .schedule-time-row { border-top: 0; }
+.schedule-shell .schedule-time-row:has(+ .is-focus) { border-bottom-color: transparent; }
+
+.schedule-shell .schedule-time-row.is-focus > time {
+  padding-top: 2px;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.schedule-shell .schedule-time-row.is-focus .schedule-event {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.schedule-shell .schedule-event-range {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--ink-2);
+  font: 600 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-shell .schedule-time-row.is-focus .schedule-event h2 {
+  margin-top: 0;
+  font: 700 var(--type-title) var(--font-display);
+  letter-spacing: -.018em;
+}
+
+.schedule-shell .schedule-time-row.is-focus .schedule-event > p {
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+/* Source tags: the dot next to the time carries the kind; the label is a quiet footnote. */
+.schedule-shell .schedule-source-list { gap: 4px 12px; }
+
+.schedule-shell .schedule-source {
+  padding: 0;
+  background: transparent;
+  letter-spacing: 0;
+  text-transform: none;
+  font: 500 var(--type-footnote) var(--font-text);
+}
+
+.schedule-shell .schedule-source.src-chip::before { display: none; }
+.schedule-shell .schedule-source.estimate { color: var(--ink-2); font-style: italic; }
+
+/* ---------- Disclosures: Details and About this plan ---------- */
+.schedule-shell .schedule-event-details,
+.schedule-shell .schedule-plan-details { color: var(--ink-2); }
+
+.schedule-shell .schedule-event-details { margin-top: 2px; }
+
+.schedule-shell :is(.schedule-event-details, .schedule-plan-details) > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.schedule-shell :is(.schedule-event-details, .schedule-plan-details) > summary::-webkit-details-marker { display: none; }
+
+.schedule-shell :is(.schedule-event-details, .schedule-plan-details) > summary::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.schedule-shell :is(.schedule-event-details, .schedule-plan-details)[open] > summary::after { transform: rotate(90deg); }
+
+.schedule-shell .schedule-event-details > summary {
+  min-height: 32px;
+  padding: 0;
+  color: var(--ink-2);
+  font: 500 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.schedule-shell .schedule-event-details > div {
+  margin-top: 2px;
+  padding: 10px 12px;
+  border-radius: var(--r-control);
+  background: var(--fill);
+}
+
+.schedule-shell .schedule-event-details p {
+  margin: 0;
+  color: var(--ink);
+  font: 400 var(--type-footnote) var(--font-text);
+}
+
+.schedule-shell .schedule-event-details p + p { margin-top: 6px; color: var(--ink-2); }
+
+/* Legend under the list */
+.schedule-shell .schedule-legend {
+  margin: 12px 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.schedule-shell .schedule-legend li { align-items: center; gap: 6px; }
+.schedule-shell .schedule-legend .src-dot { top: 0; }
+
+.schedule-shell .schedule-plan-details {
+  margin-top: 14px;
+  padding: 0 16px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card) !important;
+}
+
+.schedule-shell .schedule-plan-details > summary {
+  width: 100%;
+  min-height: var(--tap);
+  justify-content: space-between;
+  color: var(--ink);
+  font: 600 var(--type-callout) var(--font-text);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.schedule-shell .schedule-plan-details > summary::after { color: var(--ink-2); }
+
+.schedule-shell .schedule-plan-details > div {
+  padding: 2px 0 16px;
+  border-top: 1px solid var(--hairline);
+}
+
+.schedule-shell .schedule-plan-details p {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+}
+
+.schedule-shell .schedule-plan-details .schedule-legend-detailed { margin-top: 14px; }
+.schedule-shell .schedule-legend-detailed li > span:last-child { display: flex; flex-direction: column; gap: 1px; }
+
+.schedule-shell .schedule-plan-details h2 {
+  margin: 16px 0 0;
+  color: var(--ink);
+  font: 600 var(--type-callout) var(--font-text);
+}
+
+/* ---------- Empty state ---------- */
+.schedule-shell .schedule-empty { padding: 64px 16px; }
+
+.schedule-shell .schedule-empty h2 {
+  color: var(--ink);
+  font: 700 var(--type-title) var(--font-display);
+  letter-spacing: -.018em;
+}
+
+.schedule-shell .schedule-empty p {
+  margin-top: 6px;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+/* ---------- Hover only where hover exists ---------- */
+@media (hover: hover) {
+  .schedule-shell .schedule-day-arrow:hover:not(:disabled) { background: var(--fill); }
+  .schedule-shell :is(.schedule-event-details, .schedule-plan-details) > summary:hover { color: var(--ink); }
+}
+
+/* ---------- Breakpoints (606, 440, 340) ---------- */
+@media (max-width: 440px) {
+  .schedule-shell { --sched-time-col: 66px; }
+  .schedule-shell .schedule-page-heading { padding: 18px var(--gutter) 14px; }
+  .schedule-shell .schedule-page-heading h1 { font-size: 32px; }
+  .schedule-shell .schedule-day-picker { min-height: 64px; margin: 0 var(--gutter); }
+  .schedule-shell .schedule-day-name { font-size: 17px; }
+  .schedule-shell .schedule-conflicts { margin: 14px var(--gutter) 0; }
+  .schedule-shell .schedule-day { padding: 12px var(--gutter) 4px; }
+  .schedule-shell .schedule-time-row { grid-template-columns: var(--sched-time-col) minmax(0, 1fr); gap: 6px; }
+  .schedule-shell .schedule-time-row > time { font-size: 15px; }
+  .schedule-shell .schedule-event h2 { font-size: 17px; }
+  .schedule-shell .schedule-time-row.is-focus .schedule-event h2 { font-size: 20px; }
+}
+
+@media (max-width: 340px) {
+  .schedule-shell .schedule-page-heading,
+  .schedule-shell .schedule-day { padding-left: var(--gutter); padding-right: var(--gutter); }
+  .schedule-shell .schedule-day-picker { margin-left: var(--gutter); margin-right: var(--gutter); }
+  .schedule-shell .schedule-timeline { padding: 0 12px; }
+}
+
+/* ---------- Accessibility preferences and fallbacks ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .schedule-shell .schedule-day-arrow,
+  .schedule-shell :is(.schedule-event-details, .schedule-plan-details) > summary::after { transition: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .schedule-shell :is(.schedule-day-picker, .schedule-day-scroll, .schedule-plan-details, .schedule-conflicts) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .schedule-shell :is(.schedule-day-picker, .schedule-day-scroll, .schedule-plan-details) { background: #fff; }
+  .schedule-shell .schedule-conflicts { background: #fff3f1; }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .schedule-shell :is(.schedule-day-picker, .schedule-day-scroll, .schedule-plan-details) { background: var(--glass-strong); }
+}
+
+@media (prefers-contrast: more) {
+  .schedule-shell :is(.schedule-day-picker, .schedule-day-scroll, .schedule-plan-details) { border-color: var(--hairline-strong); background: #fff; }
+}

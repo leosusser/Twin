@@ -1,1 +1,158 @@
 /* Home screen styles for the glass redesign. Scope every rule under .home-shell. Uses tokens from ui-foundation.css. */
+
+/* The sky shows through: no white panels behind the content. */
+.home-shell .home-main,
+.home-shell .home-screen,
+.home-shell .home-avatar {
+  background: transparent;
+}
+
+/* ---------- Current activity: title, then time, then the imagined narrative ---------- */
+.home-shell .home-kicker {
+  margin: 0;
+  color: var(--ink-2);
+  font: 600 var(--type-callout) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+.home-shell .home-kicker span { display: none; }
+
+.home-shell .home-current h1 {
+  max-width: 18ch;
+  margin: 4px 0 10px;
+  color: var(--ink);
+  font: 700 40px/1.08 var(--font-display);
+  letter-spacing: -.026em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.home-shell .home-detail {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--ink-2);
+  font: 400 var(--type-body) var(--font-text);
+  letter-spacing: var(--tracking-body);
+  overflow-wrap: anywhere;
+}
+
+.home-shell .home-until {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Avatar scene ---------- */
+/* Multiply drops the image's white studio backdrop into the sky, so the twin stands in the scene, not in a box. */
+.home-shell .home-avatar .avatar-art {
+  mix-blend-mode: multiply;
+  filter: brightness(1.03);
+}
+
+.home-shell .home-generation-state {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--gutter));
+  margin: 0;
+  padding: 8px 14px;
+  transform: translateX(-50%);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-control);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-2);
+  font: 500 var(--type-footnote) var(--font-text);
+  text-align: center;
+}
+
+.home-shell .home-generation-state.error { color: #8f1c20; }
+
+.home-shell .home-generation-state .text-link {
+  min-height: var(--tap);
+  margin: -12px 0;
+  padding: 0 4px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Next activity: one glass card ---------- */
+.home-shell .home-next {
+  padding: 16px 20px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+}
+
+.home-shell .home-next > div { min-width: 0; }
+
+.home-shell .home-next-label {
+  margin: 0 0 2px;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+}
+
+.home-shell .home-next-action {
+  margin: 0;
+  color: var(--ink);
+  font: 600 var(--type-headline) var(--font-text);
+  letter-spacing: var(--tracking-body);
+  overflow-wrap: anywhere;
+}
+
+.home-shell .home-next-time {
+  flex: none;
+  padding: 0;
+  color: var(--ink);
+  font: 600 var(--type-title) var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.018em;
+  white-space: nowrap;
+}
+
+/* ---------- Empty day ---------- */
+.home-shell .home-empty .empty {
+  padding: 32px 24px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+
+.home-shell .home-empty .empty h3 {
+  margin: 0;
+  color: var(--ink);
+  font: 700 var(--type-title) var(--font-display);
+  letter-spacing: -.018em;
+  text-transform: none;
+}
+
+.home-shell .home-empty .empty p {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font: 400 var(--type-callout) var(--font-text);
+}
+
+@media (max-width: 440px) {
+  .home-shell .home-current h1 { font-size: 34px; }
+  .home-shell .home-detail { font-size: 15px; }
+  .home-shell .home-next { padding: 14px 16px; }
+  .home-shell .home-next-time { font-size: 20px; }
+}
+
+@media (max-width: 340px) {
+  .home-shell .home-current h1 { font-size: 30px; }
+}

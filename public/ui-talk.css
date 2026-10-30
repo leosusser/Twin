@@ -1,1 +1,309 @@
 /* Talk screen styles for the glass redesign. Scope every rule under .talk-layer. Uses tokens from ui-foundation.css. */
+
+/* The layer is the same time-of-day sky as the app; the sheet is a clear glass column on it. */
+.talk-layer.open {
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 46%, var(--sky-bottom) 100%);
+  color: var(--ink);
+}
+
+.talk-layer .talk-surface {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  border: 0;
+  border-left: 1px solid var(--glass-edge);
+  border-right: 1px solid var(--glass-edge);
+  background: rgba(255, 255, 255, .32);
+  color: var(--ink);
+  font-family: var(--font-text);
+}
+
+/* ---------- Nav bar: back chevron, centered title ---------- */
+.talk-layer .talk-page-header {
+  min-height: 0;
+  padding: 18px var(--gutter) 0;
+  grid-template-columns: var(--tap) 1fr var(--tap);
+  align-items: center;
+  gap: 8px;
+}
+
+.talk-layer .talk-back {
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--glass-edge);
+  border-radius: 50%;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+.talk-layer .talk-back svg { width: 22px; height: 22px; }
+.talk-layer .talk-back:active { transform: scale(.94); background: var(--glass-strong); }
+
+.talk-layer .talk-page-header h1 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 var(--type-headline) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+/* ---------- Invitation ---------- */
+.talk-layer .talk-invitation {
+  padding: 22px var(--gutter) 4px;
+}
+
+.talk-layer .talk-invitation h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font: 700 var(--type-large-title) var(--font-display);
+  letter-spacing: var(--tracking-large);
+}
+
+.talk-layer .talk-invitation p {
+  max-width: 40ch;
+  color: var(--ink-2);
+  font: 400 var(--type-body) var(--font-text);
+  letter-spacing: var(--tracking-body);
+}
+
+/* ---------- Stage: the orb sits above the conversation, never on top of it ---------- */
+.talk-layer .talk-conversation-stage {
+  margin: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  border: 0;
+}
+
+.talk-layer .talk-orb-control {
+  order: 0;
+  position: relative;
+  top: auto;
+  left: auto;
+  flex: none;
+  align-self: center;
+  width: 200px;
+  height: 200px;
+  margin: 18px 0 14px;
+  transform: none;
+  transition: width var(--t-sheet) var(--spring), height var(--t-sheet) var(--spring), transform var(--t-fast) var(--ease);
+}
+
+.talk-layer .talk-orb-control:active { transform: scale(.97); }
+
+.talk-layer .talk-surface.talking .talk-orb-control {
+  width: min(32dvh, 280px);
+  height: min(32dvh, 280px);
+}
+
+.talk-layer .talk-orb-halo {
+  inset: -10%;
+  background: radial-gradient(circle, rgba(229, 56, 59, .14) 50%, rgba(229, 56, 59, 0) 71%);
+}
+
+.talk-layer .talk-orb-art {
+  background: radial-gradient(circle at 36% 30%, #f47a7b 0%, var(--talk) 42%, #c42a2e 78%, #a11f24 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .28),
+    inset -14px -20px 36px rgba(110, 10, 16, .22),
+    0 14px 34px rgba(201, 42, 46, .26) !important;
+}
+
+.talk-layer .talk-orb-art::after { inset: 5%; border-color: rgba(255, 255, 255, .18); }
+.talk-layer .talk-orb-core { background: rgba(255, 228, 226, .38); }
+
+.talk-layer .talk-conversation-label {
+  order: 1;
+  position: static;
+  flex: none;
+  margin: 0 0 6px;
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.talk-layer .talk-message-window {
+  order: 2;
+  position: relative;
+  inset: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px, #000 calc(100% - 10px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 22px, #000 calc(100% - 10px), transparent 100%);
+}
+
+.talk-layer .talk-message-track,
+.talk-layer .talk-surface.talking .talk-message-track {
+  padding: 18px 0 14px;
+  gap: 14px;
+  transform: none;
+  transition: none;
+}
+
+/* ---------- Messages ---------- */
+.talk-layer .talk-message { max-width: 78%; }
+
+.talk-layer .talk-speaker,
+.talk-layer .talk-message.twin .talk-speaker {
+  margin: 0 4px 4px;
+  color: var(--ink-2);
+  font: 500 12px/1.2 var(--font-text);
+  letter-spacing: 0;
+}
+
+.talk-layer .talk-message p,
+.talk-layer .talk-empty-message {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font: 400 var(--type-callout) var(--font-text);
+  letter-spacing: -.005em;
+}
+
+.talk-layer .talk-message.you p {
+  border-bottom-right-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+}
+
+.talk-layer .talk-message.twin p,
+.talk-layer .talk-empty-message {
+  border: 1px solid var(--glass-edge);
+  border-bottom-left-radius: 6px;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+.talk-layer .talk-message small {
+  margin: 4px 4px 0;
+  color: var(--ink-2);
+  font: 400 12px/1.2 var(--font-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Dock: status line + glass composer ---------- */
+.talk-layer .talk-dock {
+  min-height: 0;
+  margin: 0;
+  padding: 10px var(--gutter) calc(18px + env(safe-area-inset-bottom));
+  border: 0;
+}
+
+.talk-layer .talk-status {
+  min-height: 0;
+  padding: 0 4px 8px;
+  gap: 8px;
+  border: 0;
+  color: var(--ink);
+  font: 600 var(--type-footnote) var(--font-text);
+}
+
+.talk-layer .talk-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--talk);
+}
+
+.talk-layer .talk-status small {
+  color: var(--ink-2);
+  font: 400 var(--type-footnote) var(--font-text);
+  letter-spacing: 0;
+}
+
+.talk-layer .talk-text-form {
+  margin: 0;
+  padding: 6px;
+  grid-template-columns: minmax(0, 1fr) var(--tap);
+  align-items: end;
+  gap: 6px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-sheet);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-float);
+}
+
+.talk-layer .talk-text-form textarea {
+  height: var(--tap);
+  min-height: var(--tap);
+  max-height: 92px;
+  padding: 11px 10px;
+  border: 0;
+  border-radius: calc(var(--r-sheet) - 6px);
+  background: transparent;
+  color: var(--ink);
+  font: 400 16px/1.35 var(--font-text);
+}
+
+@supports (field-sizing: content) {
+  .talk-layer .talk-text-form textarea { height: auto; field-sizing: content; }
+}
+
+.talk-layer .talk-text-form textarea::placeholder { color: var(--ink-2); }
+
+.talk-layer .talk-send {
+  width: var(--tap);
+  height: var(--tap);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--talk-pressed);
+  color: #fff;
+}
+
+.talk-layer .talk-send svg { width: 20px; height: 20px; }
+.talk-layer .talk-send:active:not(:disabled) { transform: scale(.94); }
+
+.talk-layer .talk-connect {
+  width: 100%;
+  min-height: var(--tap);
+  margin: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--ink);
+  color: #fff;
+  font: 600 var(--type-callout) var(--font-text);
+}
+
+@media (hover: hover) {
+  .talk-layer .talk-back:hover { background: var(--glass-strong); }
+  .talk-layer .talk-send:hover:not(:disabled) { background: #b0242a; }
+  .talk-layer .talk-connect:hover { background: #000; }
+}
+
+/* Focus: the foundation's blue ring, not the old salmon one. */
+.talk-layer .talk-surface :is(button, a, input, textarea, select, summary):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.talk-layer .talk-text-form:has(textarea:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.talk-layer .talk-text-form textarea:focus-visible { outline: 0; }
+
+@media (max-width: 606px) {
+  .talk-layer .talk-surface { border: 0; background: transparent; }
+}
+
+@media (max-width: 440px) {
+  .talk-layer .talk-page-header { padding-top: 12px; }
+  .talk-layer .talk-invitation { padding-top: 14px; }
+  .talk-layer .talk-invitation h2 { font-size: 30px; }
+  .talk-layer .talk-invitation p { font-size: 15px; }
+  .talk-layer .talk-orb-control { width: 155px; height: 155px; margin: 14px 0 10px; }
+  .talk-layer .talk-message { max-width: 82%; }
+}
+
+@media (max-height: 700px) {
+  .talk-layer .talk-orb-control { width: 120px; height: 120px; margin: 8px 0; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .talk-layer.open { background: var(--sky-bottom); }
+  .talk-layer .talk-surface { background: transparent; }
+}
