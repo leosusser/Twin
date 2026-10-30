@@ -1,6 +1,6 @@
-Redesign the Twin UI so it looks and feels like a clean Apple app with a glass look. Use the frontend-design skill for the overall direction. Work in two passes with two different agents: a builder, then a reviewer who uses the app as a real iPhone user.
+Redesign the Twin UI so it looks and feels like a clean Apple app with a glass look. Use the frontend-design skill for the overall direction. Work in two passes with two different agents: a builder, then a reviewer who uses the app as a real user.
 
-Also use the `interfaces` skills (jakubkrehel/skills):
+If the `interfaces` skills (jakubkrehel/skills) are installed, use them for the details. Skip this section if they aren't.
 - **Builder:** `better-ui` (surfaces, icons, motion), `better-typography`, `better-colors` (palette, tokens, contrast), `better-layout` (grouping, alignment, responsive), `better-writing` (labels, empty states, errors), and `better-accessibility` (keyboard, focus, ARIA, WCAG 2.2).
 - **Reviewer:** `better-interface` for the ranked review across all areas.
 - frontend-design sets the overall direction. The `better-*` skills set the exact details. If they disagree, follow frontend-design for the look and the `better-*` skills for accessibility and contrast.
@@ -19,17 +19,20 @@ Also use the `interfaces` skills (jakubkrehel/skills):
 - **Readable glass:** text on glass must meet WCAG contrast. Support `prefers-reduced-transparency` (switch to solid fills) and `prefers-reduced-motion`. Add a fallback for browsers without `backdrop-filter`.
 - **Motion:** subtle, quick, iOS-like springs and fades. Nothing bouncy or slow.
 
-## It will be an iPhone app
+## Web app now, iPhone app later
 
-- Design for iPhone first. Target 393×852 (iPhone 16/17), and check that it also works at 375×667 (SE) and 440×956 (Pro Max).
-- Respect the notch and home indicator: add `viewport-fit=cover` to the viewport meta and use `env(safe-area-inset-*)` padding on the top bar, the tab bar, and the Talk overlay.
-- Make tap targets at least 44×44 pt. Nothing may depend on hover. Use `100dvh`. Avoid layout jumps when the keyboard opens in Talk. Set font sizes to 16px or larger in inputs so iOS doesn't zoom.
-- Navigation should feel like iOS: a bottom tab bar for Home, Schedule, and Settings, and Talk as a sheet or overlay.
+- This stays a web app that runs in the browser. Don't add native wrappers, a PWA manifest, service workers, or iOS-only code.
+- Build it so it will be easy to move to an iPhone app later:
+  - It must work well in a phone-sized browser (393×852) and on desktop.
+  - It shouldn't need hover to work, and tap targets should be at least 44×44 px.
+  - Use the same component patterns iOS uses: a tab bar or nav bar, cards, lists, and sheets.
+  - Keep the design tokens (colors, radii, blur, spacing) in CSS custom properties so they map cleanly to SwiftUI later.
+- It's safe to add `viewport-fit=cover` and `env(safe-area-inset-*)` padding, because browsers without a notch ignore them.
 
 ## Keep the same size
 
 - Keep the current sizing: the same content widths (such as the 434px max on Home), the same breakpoints (606, 440, and 340px), full-height `100dvh` screens, and roughly the same size for the avatar, cards, and sections.
-- This is a restyle, not a re-layout. Nothing should get bigger, smaller, or rearranged beyond what the glass style and iPhone safe areas need. If something must change size, ask me first.
+- This is a restyle, not a re-layout. Nothing should get bigger, smaller, or rearranged beyond what the glass style needs. If something must change size, ask me first.
 
 ## Scope: what to change
 
@@ -47,15 +50,15 @@ Also use the `interfaces` skills (jakubkrehel/skills):
 
 ## How to run it
 
-1. **Plan (main thread).** Create the `ui-redesign` branch. Use `twin-plan`. Before writing the plan, take "before" screenshots of Home, Schedule, Settings, and Talk at 393×852. List every feature and control on each screen: this list is the "must still work" checklist. Write the plan to `docs/plans/ui-redesign.md` and commit it.
+1. **Plan (main thread).** Create the `ui-redesign` branch. Use `twin-plan`. Before writing the plan, take "before" screenshots of Home, Schedule, Settings, and Talk at desktop size and at phone size (393×852). List every feature and control on each screen: this list is the "must still work" checklist. Write the plan to `docs/plans/ui-redesign.md` and commit it.
 2. **Build (`twin-builder` agent).** Give it exclusive write ownership of the frontend files listed above, minus all the onboarding code. It implements the redesign, keeps every item on the checklist working, runs `npm run verify`, and commits.
-3. **User review (separate agent, after the build is done).** Start the app with `npm run dev` and open `http://127.0.0.1:4173` in the browser at iPhone size (393×852). Use the app as a normal person would: click through Home, Schedule, Settings, and Talk, and take screenshots. Skip onboarding. This agent does not edit code. Using `better-interface`, it reports:
+3. **User review (separate agent, after the build is done).** Start the app with `npm run dev` and open `http://127.0.0.1:4173` in the browser at desktop size and at phone size (393×852). Use the app as a normal person would: click through Home, Schedule, Settings, and Talk, and take screenshots. Skip onboarding. This agent does not edit code. Using `better-interface` if it's installed, it reports:
    - What it likes and what it doesn't, from a user's point of view
    - Whether the app feels like a clean, glassy Apple app
    - Anything confusing, hard to find, ugly, broken, or hard to read on glass
    - Any checklist item that is missing or doesn't work, or anything that changed size
    - The top 5 fixes, ranked
 4. **Fix pass.** The builder fixes the reviewer's top issues and commits. Anything that would remove a feature, change a size, or change the backend comes to me as a question instead.
-5. **Finish (main thread).** Run `twin-verify` and push the `ui-redesign` branch. Show me before and after screenshots of each screen at iPhone size, and tell me how to keep the redesign or go back. Don't merge into `main`.
+5. **Finish (main thread).** Run `twin-verify` and push the `ui-redesign` branch. Show me before and after screenshots of each screen at desktop and phone size, and tell me how to keep the redesign or go back. Don't merge into `main`.
 
-After it finishes, I'll run `/interface-review branch` myself to check the diff for regressions.
+After it finishes, if the interfaces skills are installed, I'll run `/interface-review branch` myself to check the diff for regressions.
