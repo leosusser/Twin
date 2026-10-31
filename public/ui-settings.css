@@ -744,3 +744,26 @@
 @media (prefers-reduced-transparency: reduce) {
   .settings-shell .settings-more-list { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+/* Outfits: one short text field per activity, in the Avatar group above the library. */
+.settings-shell .settings-outfits {
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-card);
+}
+.settings-shell .settings-outfits h3 { margin: 0 0 4px; font: 600 var(--type-headline) var(--font-text); }
+.settings-shell .settings-outfits .settings-step-description { min-height: 0; }
+.settings-shell .settings-outfit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+  margin-bottom: 16px;
+}
+.settings-shell .settings-outfit-field { display: grid; gap: 4px; min-width: 0; }
+.settings-shell .settings-outfit-field span { color: var(--ink-2); font: 500 var(--type-footnote) var(--font-text); }
+.settings-shell .settings-outfit-field .ui-input { width: 100%; min-height: var(--tap); box-sizing: border-box; }
+.settings-shell .settings-library-outfit { margin: 2px 0 0; color: var(--ink-2); font: 400 var(--type-footnote) var(--font-text); }
+@media (max-width: 440px) {
+  .settings-shell .settings-outfit-grid { grid-template-columns: minmax(0, 1fr); }
+}

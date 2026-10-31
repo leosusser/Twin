@@ -18,6 +18,7 @@ import {
   queueDueMorningPlans,
 } from "./services/day-planning.ts";
 import { registerAvatarRequest } from "./services/avatar-cancellation.ts";
+import { libraryScene } from "./services/avatar-library.ts";
 const avatarStyleReferencePath = fileURLToPath(
   new URL("../data/style-references/running-avatar.png", import.meta.url),
 );
@@ -308,14 +309,14 @@ async function executeAvatar(
   );
   if (!design) throw new Error("AVATAR_DESIGN_MISSING");
   const automatic = request.source === "automatic_scene" && request.purpose === "activity";
-  if (automatic) {
-    const hit = state.avatar_assets.find(
-      (item) =>
-        item.user_id === job.user_id &&
-        item.design_version === design.version &&
-        item.activity_key === request.requested_activity_key &&
-        item.status === "ready" &&
-        item.selected_at,
+  const outfit = (request.requested_outfit ?? "").trim();
+  if (automatic && request.requested_activity_key && request.reference_asset_ids[0]) {
+    const hit = libraryScene(
+      state,
+      job.user_id,
+      request.reference_asset_ids[0],
+      request.requested_activity_key,
+      outfit,
     );
     if (hit) {
       await targetStore.transaction((draft) => {
@@ -359,12 +360,14 @@ async function executeAvatar(
       false,
     );
   }
+  // A previous image only guides composition when it already wears this outfit.
   const priorActivity = state.avatar_assets.find(
     (item) =>
       item.id === supplementalAssetIds[0] &&
       item.user_id === job.user_id &&
       item.storage_key &&
-      item.status === "ready",
+      item.status === "ready" &&
+      (item.outfit ?? "").trim() === outfit,
   );
   if (priorActivity) {
     const mime = priorActivity.mime ?? "image/png";
@@ -394,7 +397,7 @@ async function executeAvatar(
       new Blob([Uint8Array.from(reference.bytes)], { type: reference.mime }),
       reference.name,
     );
-  form.set("prompt", avatarPrompt(request.purpose, request.requested_change));
+  form.set("prompt", avatarPrompt(request.purpose, request.requested_change, outfit));
   form.set("background", "transparent");
   form.set("size", "1024x1536");
   form.set("quality", "medium");
@@ -447,7 +450,7 @@ async function executeAvatar(
         .filter(
           (item) =>
             item.user_id === job.user_id &&
-            item.design_version === design.version &&
+            item.kind === "activity" &&
             item.activity_key === request.requested_activity_key,
         )
         .forEach((item) => {
@@ -465,6 +468,7 @@ async function executeAvatar(
             ? "activity"
             : "variant",
       activity_key: request.requested_activity_key,
+      ...(request.purpose === "activity" && outfit ? { outfit } : {}),
       prompt_version: avatarPromptVersion,
       model: process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1-mini",
       storage_key: path,
@@ -550,6 +554,7 @@ function markFailure(state: AppState, job: Job, code: string) {
 export function avatarPrompt(
   purpose: "baseline" | "activity" | "variant",
   requestedChange: string,
+  outfit = "",
 ) {
   const identityLabel =
     purpose === "baseline"
@@ -562,9 +567,11 @@ export function avatarPrompt(
   const purposeInstruction =
     purpose === "baseline"
       ? `For the baseline, use a relaxed standing pose and preserve the person's visible clothing unless the request specifies an outfit change. Requested baseline direction: ${requestedChange}`
-      : purpose === "activity"
-        ? `For this activity variation, preserve the approved character's face, hair, skin tone, apparent age, body proportions, and rendering style. Keep clothing consistent unless the activity or request calls for a change. Change pose, expression, clothing, and props only as needed to show this activity clearly and believably: ${requestedChange}`
-        : `Preserve the approved character's identity and rendering style. Apply only this requested variation, keeping clothing consistent unless a change is explicitly requested: ${requestedChange}`;
+      : purpose === "activity" && outfit
+        ? `For this activity variation, preserve the approved character's face, hair, skin tone, apparent age, body proportions, and rendering style. Dress the character in exactly this outfit for this activity, ignoring the clothing in the reference images: ${outfit}. Change pose, expression, and props only as needed to show this activity clearly and believably: ${requestedChange}`
+        : purpose === "activity"
+          ? `For this activity variation, preserve the approved character's face, hair, skin tone, apparent age, body proportions, and rendering style. Keep clothing consistent unless the activity or request calls for a change. Change pose, expression, clothing, and props only as needed to show this activity clearly and believably: ${requestedChange}`
+          : `Preserve the approved character's identity and rendering style. Apply only this requested variation, keeping clothing consistent unless a change is explicitly requested: ${requestedChange}`;
   const activityClarity =
     purpose === "activity" ? " The requested activity must be visually unmistakable." : "";
 

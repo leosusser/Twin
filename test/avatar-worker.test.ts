@@ -172,6 +172,48 @@ test("avatar image edits keep identity first and supply the bundled style refere
     assert.deepEqual(activity.parent_asset_ids, [baseline.id, "prior-activity"]);
     assert.match(calls[1].prompt, /light, natural-looking glamour retouching/);
     assert.equal(activity.prompt_version, 5);
+
+    // A set outfit goes into the prompt, is saved on the image, and drops a reference image
+    // that wears a different outfit.
+    await store.transaction((draft) => {
+      draft.avatar_requests.push({
+        id: "outfit-request",
+        user_id: DEMO_USER_ID,
+        source: "studio",
+        purpose: "activity",
+        requested_change: "running with a natural athletic stride",
+        requested_activity_key: "running",
+        requested_outfit: "red shorts and a white tee",
+        reference_design_version: 1,
+        reference_asset_ids: [baseline.id, "prior-activity"],
+        idempotency_key: "activity-outfit-test",
+        status: "queued",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      draft.jobs.push({
+        id: "outfit-job",
+        user_id: DEMO_USER_ID,
+        type: "avatar_generation",
+        dedupe_key: "avatar:activity-outfit-test",
+        status: "queued",
+        attempts: 0,
+        run_after: new Date(0).toISOString(),
+        payload: { request_id: "outfit-request" },
+      });
+    });
+    await processJobs(store);
+    state = await store.snapshot();
+    const dressed = state.avatar_assets.find(
+      (asset) => asset.outfit === "red shorts and a white tee",
+    );
+    assert.ok(dressed?.storage_key);
+    generatedPaths.push(dressed.storage_key);
+    assert.deepEqual(calls[2].names, ["identity-reference.png", "style-reference.png"]);
+    assert.match(
+      calls[2].prompt,
+      /exactly this outfit for this activity.*red shorts and a white tee/,
+    );
   } finally {
     globalThis.fetch = previousFetch;
     if (previousKey === undefined) delete process.env.TWIN_ENCRYPTION_KEY;

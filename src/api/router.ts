@@ -46,6 +46,7 @@ import {
 } from "../services/day-planning.ts";
 import { importPrototypeCalendarFeed } from "../services/prototype-calendar.ts";
 import { cancelAvatarRequest } from "../services/avatar-cancellation.ts";
+import { activityOutfit, libraryScene, outfitTag } from "../services/avatar-library.ts";
 import { DEMO_USER_ID, initializeLocalProfile, type Store } from "../storage/store.ts";
 import { selectTalkContext } from "../storage/context.ts";
 
@@ -914,6 +915,34 @@ export async function routeApi(
           .map(safeAsset),
       );
     }
+    if (url.pathname === "/api/character/outfits" && method === "PUT") {
+      const body = await readJson(req);
+      const input = body?.outfits;
+      if (!input || typeof input !== "object" || Array.isArray(input))
+        throw new HttpProblem(
+          422,
+          "INVALID_OUTFITS",
+          "Send outfits as an object keyed by activity.",
+        );
+      const outfits: Partial<Record<ActivityKey, string>> = {};
+      for (const [key, value] of Object.entries(input)) {
+        if (!validActivity(key))
+          throw new HttpProblem(422, "INVALID_ACTIVITY", "Choose a supported activity.");
+        if (typeof value !== "string")
+          throw new HttpProblem(422, "INVALID_OUTFIT", "Describe each outfit as text.");
+        const text = value.replace(/[\p{Cc}\s]+/gu, " ").trim();
+        if (text.length > 160)
+          throw new HttpProblem(422, "OUTFIT_TOO_LONG", "Keep each outfit under 160 characters.");
+        if (text) outfits[key] = text;
+      }
+      // Edited in place: outfits never bump the design version, so saved images stay reusable.
+      await store.transaction((draft) => {
+        const design = activeDesign(draft, userId);
+        design.outfits = outfits;
+        design.updated_at = new Date().toISOString();
+      });
+      return json(res, 200, characterRead(await store.snapshot(), userId));
+    }
     if (url.pathname === "/api/character/scenes/ensure" && method === "POST") {
       const body = await readJson(req);
       const key = body.activity_key as ActivityKey;
@@ -929,14 +958,9 @@ export async function routeApi(
           cache_hit: false,
           reason: "APPROVED_BASELINE_REQUIRED",
         });
-      const ready = state.avatar_assets.find(
-        (item) =>
-          item.user_id === userId &&
-          item.design_version === design.version &&
-          item.activity_key === key &&
-          item.status === "ready" &&
-          item.selected_at,
-      );
+      // Reuse any saved image with the same face, activity, and outfit before paying for a new one.
+      const outfit = activityOutfit(design, key);
+      const ready = libraryScene(state, userId, baseline.id, key, outfit);
       if (ready)
         return json(res, 200, { status: "ready", asset: safeAsset(ready), cache_hit: true });
       const model = ownModel(state, userId);
@@ -952,7 +976,10 @@ export async function routeApi(
         purpose: "activity",
         change: activityImageDirection(key),
         activityKey: key,
-        idempotency: String(req.headers["idempotency-key"] ?? `auto:${design.version}:${key}`),
+        outfit,
+        idempotency: String(
+          req.headers["idempotency-key"] ?? `auto:${baseline.id}:${key}:${outfitTag(outfit)}`,
+        ),
         references: [baseline.id],
       });
       return json(res, 202, {
@@ -987,8 +1014,13 @@ export async function routeApi(
           body.requested_change ?? activityImageDirection(asset.activity_key ?? "generic"),
         ),
         activityKey: asset.activity_key,
+        outfit: activityOutfit(design, asset.activity_key),
         idempotency: String(req.headers["idempotency-key"] ?? randomUUID()),
-        references: [baseline.id, asset.id],
+        // The old image guides composition only when it already wears the current outfit.
+        references:
+          (asset.outfit ?? "").trim() === activityOutfit(design, asset.activity_key)
+            ? [baseline.id, asset.id]
+            : [baseline.id],
       });
       return json(res, 202, request);
     }
@@ -1835,6 +1867,7 @@ async function queueAvatar(
     purpose: "baseline" | "activity" | "variant";
     change: string;
     activityKey?: ActivityKey;
+    outfit?: string;
     idempotency: string;
     references?: string[];
   },
@@ -1853,6 +1886,7 @@ async function queueAvatar(
       purpose: input.purpose,
       requested_change: input.change,
       requested_activity_key: input.activityKey,
+      ...(input.outfit ? { requested_outfit: input.outfit } : {}),
       reference_design_version: design.version,
       reference_asset_ids: input.references ?? [],
       idempotency_key: input.idempotency,
@@ -2210,17 +2244,8 @@ function resolveScene(
 ) {
   const baseline = approvedBaseline(state, userId, design);
   if (key) {
-    const activity = state.avatar_assets
-      .filter(
-        (item) =>
-          item.user_id === userId &&
-          item.design_version === design.version &&
-          item.activity_key === key &&
-          item.kind === "activity" &&
-          item.status === "ready" &&
-          item.selected_at,
-      )
-      .sort((a, b) => String(b.selected_at).localeCompare(String(a.selected_at)))[0];
+    const outfit = activityOutfit(design, key);
+    const activity = baseline ? libraryScene(state, userId, baseline.id, key, outfit) : undefined;
     if (activity)
       return {
         kind: "activity",
@@ -2236,7 +2261,8 @@ function resolveScene(
           item.user_id === userId &&
           item.reference_design_version === design.version &&
           item.purpose === "activity" &&
-          item.requested_activity_key === key,
+          item.requested_activity_key === key &&
+          (item.requested_outfit ?? "") === outfit,
       )
       .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
     if (baseline)

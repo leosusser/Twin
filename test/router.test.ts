@@ -1010,3 +1010,112 @@ test("private avatar photo and cached activity images survive reload without reg
     await unlink(path).catch(() => {});
   }
 });
+
+test("activity images are reused by face, activity, and outfit across design versions", async () => {
+  const path = `./data/router-outfits-${process.pid}.json`;
+  const store = await new MemoryStore(path).init();
+  const previousKey = process.env.TWIN_ENCRYPTION_KEY;
+  const files: string[] = [];
+  try {
+    process.env.TWIN_ENCRYPTION_KEY = "test-only-encryption-key-not-a-real-secret";
+    const png =
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2n2kAAAAASUVORK5CYII=";
+    const now = new Date().toISOString();
+    const baselineId = randomUUID();
+    const runId = randomUUID();
+    for (const id of [baselineId, runId]) files.push(`./data/assets/${id}.png`);
+    await mkdir("./data/assets", { recursive: true });
+    for (const file of files) await writeFile(file, Buffer.from(png, "base64"));
+    let startVersion = 0;
+    await store.transaction((draft) => {
+      draft.model_connections[0].encrypted_key = encryptSecret("test-provider-key");
+      const design = draft.avatar_designs.find(
+        (item) => item.user_id === "user_demo" && item.is_active,
+      )!;
+      startVersion = design.version;
+      design.baseline_asset_id = baselineId;
+      draft.avatar_assets.push(
+        {
+          id: baselineId,
+          user_id: "user_demo",
+          design_version: design.version,
+          parent_asset_ids: [],
+          kind: "base",
+          prompt_version: 5,
+          model: "test",
+          storage_key: files[0],
+          mime: "image/png",
+          status: "ready",
+          selected_at: now,
+          approved_at: now,
+          created_at: now,
+        },
+        {
+          // Made under an older design version with the default outfit.
+          id: runId,
+          user_id: "user_demo",
+          design_version: design.version - 1,
+          parent_asset_ids: [baselineId],
+          kind: "activity",
+          activity_key: "running",
+          prompt_version: 5,
+          model: "test",
+          storage_key: files[1],
+          mime: "image/png",
+          status: "ready",
+          created_at: now,
+        },
+      );
+    });
+    const ensure = (key: string) =>
+      call(store, "POST", "/api/character/scenes/ensure", JSON.stringify({ activity_key: key }));
+    const reused = await ensure("running");
+    assert.equal(reused.status, 200);
+    assert.equal(reused.payload.cache_hit, true);
+    assert.equal(reused.payload.asset.id, runId);
+
+    const invalid = await call(
+      store,
+      "PUT",
+      "/api/character/outfits",
+      JSON.stringify({ outfits: { swimming: "trunks" } }),
+    );
+    assert.equal(invalid.status, 422);
+    const tooLong = await call(
+      store,
+      "PUT",
+      "/api/character/outfits",
+      JSON.stringify({ outfits: { running: "x".repeat(161) } }),
+    );
+    assert.equal(tooLong.status, 422);
+    const saved = await call(
+      store,
+      "PUT",
+      "/api/character/outfits",
+      JSON.stringify({ outfits: { running: "  red shorts\nand a white tee ", studying: "" } }),
+    );
+    assert.equal(saved.status, 200);
+    assert.deepEqual(saved.payload.design.outfits, { running: "red shorts and a white tee" });
+    assert.equal(saved.payload.design.version, startVersion);
+
+    const changed = await ensure("running");
+    assert.equal(changed.status, 202);
+    assert.equal(changed.payload.generation_request.requested_outfit, "red shorts and a white tee");
+    const again = await ensure("running");
+    assert.equal(again.payload.generation_request.id, changed.payload.generation_request.id);
+
+    await call(store, "PUT", "/api/character/outfits", JSON.stringify({ outfits: {} }));
+    const back = await ensure("running");
+    assert.equal(back.status, 200);
+    assert.equal(back.payload.asset.id, runId);
+    assert.equal(
+      (await store.snapshot()).jobs.filter((job) => job.type === "avatar_generation").length,
+      1,
+    );
+  } finally {
+    for (const file of files) await unlink(file).catch(() => {});
+    await unlink(path).catch(() => {});
+    if (previousKey === undefined) delete process.env.TWIN_ENCRYPTION_KEY;
+    else process.env.TWIN_ENCRYPTION_KEY = previousKey;
+  }
+});

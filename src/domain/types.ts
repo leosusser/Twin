@@ -267,6 +267,8 @@ export interface AvatarDesign {
   style_version: number;
   source_photo_asset_id?: string;
   baseline_asset_id?: string;
+  /** Per-activity outfit text; missing or "" means Twin picks a fitting default. */
+  outfits?: Partial<Record<ActivityKey, string>>;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -278,6 +280,8 @@ export interface AvatarAsset {
   parent_asset_ids: string[];
   kind: "source_photo" | "base" | "activity" | "variant";
   activity_key?: ActivityKey;
+  /** Outfit text the image was generated with; missing means the default outfit. */
+  outfit?: string;
   prompt_version: number;
   model: string;
   storage_key?: string;
@@ -301,6 +305,7 @@ export interface AvatarGenerationRequest {
   source_message_id?: string;
   requested_change: string;
   requested_activity_key?: ActivityKey;
+  requested_outfit?: string;
   reference_design_version: number;
   reference_asset_ids: string[];
   idempotency_key: string;
