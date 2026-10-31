@@ -15,7 +15,7 @@ Status: built, user-reviewed and fixed on branch `ui-redesign` (66779cb). Not me
 
 ## Design tokens
 
-The subject is a private twin that lives an imagined version of your day. The one memorable element is **the backdrop following the time of day**. Behind the glass sits a soft, blurred sky field. Its tint comes from the local hour: pale cool morning, clear neutral midday, warm late afternoon, dusk violet-grey at night. It is computed client-side from the clock, with no new data. Everything else stays quiet.
+The subject is a private twin that lives an imagined version of your day. The one memorable element is **the backdrop**: a warm beige-white paper whose top picks up the avatar's shirt color, with a faint time-of-day warmth. The shirt color is sampled client-side from the avatar image's torso (`syncShirtTint()`), and the last color is kept in localStorage, so no new data is needed. Everything else stays quiet.
 
 | Token            | Value                                                 | Role                                              |
 | ---------------- | ----------------------------------------------------- | ------------------------------------------------- |
@@ -92,7 +92,7 @@ Taken from `public/app.js` on `main` at `c9bd88d`. Every hook, `id`, and `aria-*
   - tracking: `--tracking-large`, `--tracking-body`.
   - Inside the app, the old `--display` and `--body` now resolve to the system stack, and `--muted` and `--line` map to `--ink-2` and `--hairline`.
 - **Motion:** `--ease`, `--spring`, `--t-fast` 160ms, `--t-sheet` 420ms.
-- **Sky:** `--sky-top`, `--sky-mid`, `--sky-bottom`. They are set by the daypart and shared with the Talk layer through `:root:has(.shell.daypart-*)`.
+- **Sky:** `--sky-top`, `--sky-mid`, `--sky-bottom`. They mix `--shirt` (set by `syncShirtTint()`) into the daypart's `--paper-*` beige and are shared with the Talk layer through `:root:has(.shell.daypart-*)`.
 
 **Classes:**
 
