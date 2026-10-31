@@ -1354,7 +1354,47 @@ render = function () {
   app.ui.skipCapture = false;
   renderApplication();
   restoreUiState();
+  syncShirtTint();
 };
+
+// Tints the backdrop with the avatar's shirt: average the torso pixels of whichever avatar image is on screen.
+// The last color is kept so screens without an avatar (Schedule) still match.
+function syncShirtTint() {
+  const saved = localStorage.getItem("twin.shirtTint");
+  if (saved) document.documentElement.style.setProperty("--shirt", saved);
+  const image = document.querySelector(".home-avatar img, .settings-avatar-preview:not(.settings-photo-preview) img");
+  if (!image) return;
+  const sample = () => {
+    const color = shirtColor(image);
+    if (!color) return;
+    localStorage.setItem("twin.shirtTint", color);
+    document.documentElement.style.setProperty("--shirt", color);
+  };
+  if (image.complete && image.naturalWidth) sample();
+  else image.addEventListener("load", sample, { once: true });
+}
+function shirtColor(image) {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 48;
+    canvas.height = 96;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    context.drawImage(image, 0, 0, 48, 96);
+    // The torso of a standing full-body figure: the middle third across, roughly 34–52% down.
+    const { data } = context.getImageData(16, 33, 16, 17);
+    let r = 0, g = 0, b = 0, count = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const max = Math.max(data[i], data[i + 1], data[i + 2]);
+      const min = Math.min(data[i], data[i + 1], data[i + 2]);
+      if (data[i + 3] < 200 || (min > 235 && max - min < 12)) continue; // skip transparent and plain white backdrop
+      r += data[i]; g += data[i + 1]; b += data[i + 2]; count += 1;
+    }
+    if (count < 20) return null;
+    return `rgb(${Math.round(r / count)} ${Math.round(g / count)} ${Math.round(b / count)})`;
+  } catch {
+    return null;
+  }
+}
 
 refreshRoute = async function () {
   if (app.route === "home") app.home = await api("/api/home");

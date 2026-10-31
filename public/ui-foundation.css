@@ -65,19 +65,27 @@
   --t-fast: 160ms;
   --t-sheet: 420ms;
 
-  /* Sky: set per daypart below */
-  --sky-top: #b8d2ea;
-  --sky-mid: #dce8f3;
-  --sky-bottom: #f2f4f6;
+  /* Sky: derived from the paper and shirt tokens below */
 }
 
-/* ---------- Time-of-day backdrop (the one bold element) ---------- */
-/* render() puts daypart-{morning|midday|afternoon|evening|night} on .shell; :has() lets the Talk layer share it. */
-:root:has(.shell.daypart-morning) { --sky-top: #c9d8e6; --sky-mid: #e3e9ee; --sky-bottom: #f5ece1; }
-:root:has(.shell.daypart-midday) { --sky-top: #b8d2ea; --sky-mid: #dce8f3; --sky-bottom: #f2f4f6; }
-:root:has(.shell.daypart-afternoon) { --sky-top: #ecd2b4; --sky-mid: #f2e1cf; --sky-bottom: #f6eee6; }
-:root:has(.shell.daypart-evening) { --sky-top: #c6bccb; --sky-mid: #e0d3d5; --sky-bottom: #f1e3d9; }
-:root:has(.shell.daypart-night) { --sky-top: #bcc3d6; --sky-mid: #d2d6e2; --sky-bottom: #e6e6ec; }
+/* ---------- Backdrop: warm paper, tinted by the avatar's shirt ---------- */
+/* A beige-white base. render() puts daypart-* on .shell for a faint time-of-day warmth, and
+ * syncShirtTint() sets --shirt from the avatar image's torso so the top of the page picks up its color.
+ * :has() lets the Talk layer share it. */
+:root:has(.shell.daypart-morning) { --paper-top: #f3eee6; --paper-mid: #f7f3ec; --paper-bottom: #fbf8f3; }
+:root:has(.shell.daypart-midday) { --paper-top: #f1ece4; --paper-mid: #f6f2eb; --paper-bottom: #fbf9f5; }
+:root:has(.shell.daypart-afternoon) { --paper-top: #f0e6d8; --paper-mid: #f5eee4; --paper-bottom: #faf6f0; }
+:root:has(.shell.daypart-evening) { --paper-top: #efe5da; --paper-mid: #f4ede4; --paper-bottom: #faf6f0; }
+:root:has(.shell.daypart-night) { --paper-top: #ece5dc; --paper-mid: #f3eee7; --paper-bottom: #f9f6f1; }
+:root {
+  --paper-top: #f1ece4;
+  --paper-mid: #f6f2eb;
+  --paper-bottom: #fbf9f5;
+  --shirt: var(--paper-top);
+  --sky-top: color-mix(in oklab, var(--shirt) 30%, var(--paper-top));
+  --sky-mid: color-mix(in oklab, var(--shirt) 12%, var(--paper-mid));
+  --sky-bottom: var(--paper-bottom);
+}
 
 body:has(.shell) {
   background: var(--sky-bottom);
