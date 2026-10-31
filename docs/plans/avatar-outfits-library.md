@@ -1,6 +1,6 @@
 # Avatar outfits and library reuse
 
-Status: built on branch `ui-redesign`. Not merged into main.
+Status: built and verified on branch `ui-redesign` (7a7ab6a; `npm run verify` 93/93). Not merged into main.
 
 ## Goal, context, constraints, done
 
