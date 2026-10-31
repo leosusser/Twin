@@ -15,7 +15,7 @@ Status: built, user-reviewed and fixed on branch `ui-redesign` (66779cb). Not me
 
 ## Design tokens
 
-The subject is a private twin that lives an imagined version of your day. The one memorable element is **the backdrop**: a warm beige-white paper whose top picks up the avatar's shirt color, with a faint time-of-day warmth. The shirt color is sampled client-side from the avatar image's torso (`syncShirtTint()`), and the last color is kept in localStorage, so no new data is needed. Everything else stays quiet.
+The subject is a private twin that lives an imagined version of your day. The backdrop is **paper**: a near-white with a faint warmth (`#f4f3f0` to `#fbfbfa`), the same at every hour, so the avatar and the red Talk orb carry the color. Leo picked it over stone, sage and fog after a shirt-tinted beige was tried and rejected. Everything else stays quiet.
 
 | Token            | Value                                                 | Role                                              |
 | ---------------- | ----------------------------------------------------- | ------------------------------------------------- |
@@ -72,7 +72,7 @@ Taken from `public/app.js` on `main` at `c9bd88d`. Every hook, `id`, and `aria-*
 
 **Markup the foundation owns (`public/app.js`):**
 
-- `render()` adds `daypart-{morning|midday|afternoon|evening|night}` to `.shell`. `twinDaypart()` works it out from the clock in the saved time zone.
+- `render()` adds `daypart-{morning|midday|afternoon|evening|night}` to `.shell` (currently unused by CSS). `twinDaypart()` works it out from the clock in the saved time zone.
 - `topbar()` renders the "Twin" wordmark and the Talk orb: `.talk-trigger` plus `.home-talk-button` or `.schedule-talk-button`, with `talkGlyph()` inside.
 - `bottomNav()` renders the tab bar in sentence case. Home keeps Schedule on the left and Settings on the right.
 
@@ -92,7 +92,7 @@ Taken from `public/app.js` on `main` at `c9bd88d`. Every hook, `id`, and `aria-*
   - tracking: `--tracking-large`, `--tracking-body`.
   - Inside the app, the old `--display` and `--body` now resolve to the system stack, and `--muted` and `--line` map to `--ink-2` and `--hairline`.
 - **Motion:** `--ease`, `--spring`, `--t-fast` 160ms, `--t-sheet` 420ms.
-- **Sky:** `--sky-top`, `--sky-mid`, `--sky-bottom`. They mix `--shirt` (set by `syncShirtTint()`) into the daypart's `--paper-*` beige and are shared with the Talk layer through `:root:has(.shell.daypart-*)`.
+- **Sky:** `--sky-top`, `--sky-mid`, `--sky-bottom` hold the paper backdrop on `:root`, so the Talk layer shares it. `render()` still adds `daypart-*` to `.shell`, but no CSS reads it now.
 
 **Classes:**
 

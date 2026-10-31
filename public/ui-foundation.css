@@ -65,26 +65,15 @@
   --t-fast: 160ms;
   --t-sheet: 420ms;
 
-  /* Sky: derived from the paper and shirt tokens below */
+  /* Sky: the paper backdrop below */
 }
 
-/* ---------- Backdrop: warm paper, tinted by the avatar's shirt ---------- */
-/* A beige-white base. render() puts daypart-* on .shell for a faint time-of-day warmth, and
- * syncShirtTint() sets --shirt from the avatar image's torso so the top of the page picks up its color.
- * :has() lets the Talk layer share it. */
-:root:has(.shell.daypart-morning) { --paper-top: #f3eee6; --paper-mid: #f7f3ec; --paper-bottom: #fbf8f3; }
-:root:has(.shell.daypart-midday) { --paper-top: #f1ece4; --paper-mid: #f6f2eb; --paper-bottom: #fbf9f5; }
-:root:has(.shell.daypart-afternoon) { --paper-top: #f0e6d8; --paper-mid: #f5eee4; --paper-bottom: #faf6f0; }
-:root:has(.shell.daypart-evening) { --paper-top: #efe5da; --paper-mid: #f4ede4; --paper-bottom: #faf6f0; }
-:root:has(.shell.daypart-night) { --paper-top: #ece5dc; --paper-mid: #f3eee7; --paper-bottom: #f9f6f1; }
+/* ---------- Backdrop: paper ---------- */
+/* Near-white with a faint warmth, the same at every hour. :root keeps it shared with the Talk layer. */
 :root {
-  --paper-top: #f1ece4;
-  --paper-mid: #f6f2eb;
-  --paper-bottom: #fbf9f5;
-  --shirt: var(--paper-top);
-  --sky-top: color-mix(in oklab, var(--shirt) 30%, var(--paper-top));
-  --sky-mid: color-mix(in oklab, var(--shirt) 12%, var(--paper-mid));
-  --sky-bottom: var(--paper-bottom);
+  --sky-top: #f4f3f0;
+  --sky-mid: #f7f6f4;
+  --sky-bottom: #fbfbfa;
 }
 
 body:has(.shell) {
