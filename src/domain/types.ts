@@ -202,8 +202,10 @@ export interface Settings {
   hide_bathroom_scene: boolean;
   talk_retention_days: number;
   onboarding_complete: boolean;
+  talk_personality_mode: TalkPersonalityMode;
   version: number;
 }
+export type TalkPersonalityMode = "collaborative" | "direct_coach" | "aspirational_self";
 export interface ModelConnection {
   user_id: string;
   provider: "openai";
@@ -231,6 +233,22 @@ export interface Message {
   status: "saved" | "failed";
   created_at: string;
   provider_request_id?: string;
+}
+export interface VoiceSession {
+  id: string;
+  user_id: string;
+  conversation_id: string;
+  provider_session_id?: string;
+  model: string;
+  voice: string;
+  personality_mode: TalkPersonalityMode;
+  credential_version: number;
+  status: "connecting" | "active" | "finalizing" | "complete" | "failed" | "expired";
+  created_at: string;
+  expires_at: string;
+  completed_at?: string;
+  failure_code?: string;
+  finalized_item_ids?: string[];
 }
 export interface AvatarDesign {
   id: string;
@@ -323,6 +341,7 @@ export interface AppState {
   model_connections: ModelConnection[];
   conversations: Conversation[];
   messages: Message[];
+  voice_sessions: VoiceSession[];
   avatar_designs: AvatarDesign[];
   avatar_assets: AvatarAsset[];
   avatar_requests: AvatarGenerationRequest[];

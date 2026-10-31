@@ -85,20 +85,19 @@
   width: 200px;
   height: 200px;
   margin: 18px 0 14px;
-  transform: none;
+  transform: scale(calc(1 + max(var(--talk-input-level, 0), var(--talk-output-level, 0)) * .16));
   transition: width var(--t-sheet) var(--spring), height var(--t-sheet) var(--spring), transform var(--t-fast) var(--ease);
 }
 
-.talk-layer .talk-orb-control:active { transform: scale(.97); }
-
-.talk-layer .talk-surface.talking .talk-orb-control {
-  width: min(32dvh, 280px);
-  height: min(32dvh, 280px);
-}
+.talk-layer .talk-surface.voice-permission .talk-orb-control,
+.talk-layer .talk-surface.voice-connecting .talk-orb-control { animation: talk-connect-pulse 1.8s ease-in-out infinite; }
 
 .talk-layer .talk-orb-halo {
   inset: -10%;
   background: radial-gradient(circle, rgba(229, 56, 59, .14) 50%, rgba(229, 56, 59, 0) 71%);
+  opacity: calc(.28 + var(--talk-output-level, 0) * .72);
+  transform: scale(calc(1 + var(--talk-output-level, 0) * .25));
+  transition: opacity 90ms linear, transform 90ms linear;
 }
 
 .talk-layer .talk-orb-art {
@@ -107,6 +106,15 @@
     inset 0 2px 0 rgba(255, 255, 255, .28),
     inset -14px -20px 36px rgba(110, 10, 16, .22),
     0 14px 34px rgba(201, 42, 46, .26) !important;
+}
+
+.talk-layer .talk-surface.voice-listening .talk-orb-art { filter: saturate(.92); }
+.talk-layer .talk-surface.voice-user_speaking .talk-orb-art { filter: brightness(calc(1 + var(--talk-input-level, 0) * .12)); }
+.talk-layer .talk-surface.voice-twin_speaking .talk-orb-art { filter: brightness(calc(1.02 + var(--talk-output-level, 0) * .36)); }
+.talk-layer .talk-surface:is(.voice-muted, .voice-ended, .voice-error) .talk-orb-art { filter: saturate(.3); }
+
+@keyframes talk-connect-pulse {
+  50% { transform: scale(1.04); opacity: .82; }
 }
 
 .talk-layer .talk-orb-art::after { inset: 5%; border-color: rgba(255, 255, 255, .18); }
@@ -183,6 +191,9 @@
   font-variant-numeric: tabular-nums;
 }
 
+.talk-layer .talk-message.pending { opacity: .72; }
+.talk-layer .talk-message.pending small { font-style: italic; }
+
 /* ---------- Dock: status line + glass composer ---------- */
 .talk-layer .talk-dock {
   min-height: 0;
@@ -212,6 +223,30 @@
   font: 400 var(--type-footnote) var(--font-text);
   letter-spacing: 0;
 }
+
+.talk-layer .talk-surface.voice-error .talk-status-dot { background: var(--danger); }
+.talk-layer .talk-surface.voice-muted .talk-status-dot,
+.talk-layer .talk-surface.voice-ended .talk-status-dot { background: var(--ink-2); }
+
+.talk-layer .talk-voice-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.talk-layer .talk-voice-controls button {
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-control);
+  background: var(--glass-strong);
+  color: var(--ink);
+  font: 600 var(--type-footnote) var(--font-text);
+}
+
+.talk-layer .talk-voice-controls button:disabled { opacity: .45; cursor: not-allowed; }
+.talk-layer .talk-voice-controls button[data-voice-end] { color: var(--danger); }
 
 .talk-layer .talk-text-form {
   margin: 0;
@@ -297,6 +332,11 @@
   .talk-layer .talk-invitation p { font-size: 15px; }
   .talk-layer .talk-orb-control { width: 155px; height: 155px; margin: 14px 0 10px; }
   .talk-layer .talk-message { max-width: 82%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talk-layer .talk-orb-control,
+  .talk-layer .talk-orb-halo { animation: none !important; transform: none !important; transition: none !important; }
 }
 
 @media (max-height: 700px) {

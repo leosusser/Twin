@@ -497,6 +497,26 @@ async function executeCleanup(targetStore: Store = store) {
           new Date(cutoff.getTime() - settings.talk_retention_days * 86_400_000)
       );
     });
+    const removedVoiceSessionIds = new Set<string>();
+    draft.voice_sessions = draft.voice_sessions.filter((session) => {
+      const settings = draft.settings.find((item) => item.user_id === session.user_id);
+      const retentionCutoff = settings
+        ? new Date(cutoff.getTime() - settings.talk_retention_days * 86_400_000)
+        : cutoff;
+      const retain = new Date(session.created_at) > retentionCutoff;
+      if (!retain) removedVoiceSessionIds.add(session.id);
+      return retain;
+    });
+    for (const key of Object.keys(draft.idempotency)) {
+      const value = draft.idempotency[key] as { voice_session_id?: unknown } | undefined;
+      if (
+        [...removedVoiceSessionIds].some(
+          (id) =>
+            key.includes(`:${id}:`) || key.endsWith(`:${id}`) || value?.voice_session_id === id,
+        )
+      )
+        delete draft.idempotency[key];
+    }
   });
 }
 function maxJobAttempts(job: Job) {

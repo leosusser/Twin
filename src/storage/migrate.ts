@@ -10,6 +10,14 @@ export async function migrate(pool: any) {
       await client.query(
         await readFile(new URL("../../db/migrations/001_records.sql", import.meta.url), "utf8"),
       );
+    const versionTwo = await client.query("SELECT 1 FROM twin.schema_migrations WHERE version=2");
+    if (!versionTwo.rowCount)
+      await client.query(
+        await readFile(
+          new URL("../../db/migrations/002_voice_sessions.sql", import.meta.url),
+          "utf8",
+        ),
+      );
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");

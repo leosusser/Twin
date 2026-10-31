@@ -22,6 +22,7 @@ const settings: Settings = {
   hide_bathroom_scene: false,
   talk_retention_days: 30,
   onboarding_complete: false,
+  talk_personality_mode: "collaborative",
   version: 1,
 };
 function state(): AppState {
@@ -40,6 +41,7 @@ function state(): AppState {
     model_connections: [],
     conversations: [],
     messages: [],
+    voice_sessions: [],
     avatar_designs: [],
     avatar_assets: [],
     avatar_requests: [],

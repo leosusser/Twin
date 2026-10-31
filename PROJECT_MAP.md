@@ -83,6 +83,7 @@ The only private image bytes stored as ordinary files are under `data/assets/`. 
 | File                                     | Purpose                                                                                   |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `src/integrations/openai.ts`             | Server-only OpenAI text/planner calls, contracts, validation, and provider-error mapping. |
+| `src/integrations/openai-realtime.ts`    | Bounded voice context, Realtime prompt/config, and server-brokered WebRTC provider call.  |
 | `src/integrations/google.ts`             | Google OAuth, Calendar/Gmail discovery and sync requests, pagination, and errors.         |
 | `src/integrations/prototype-calendar.ts` | Fetches and parses the prototype iCalendar feed.                                          |
 | `src/integrations/calendar-event.ts`     | Normalizes provider Calendar data into Twin's Calendar-event contract.                    |
@@ -109,29 +110,31 @@ The only private image bytes stored as ordinary files are under `data/assets/`. 
 
 ## Browser interface
 
-| File                           | Purpose                                                                          |
-| ------------------------------ | -------------------------------------------------------------------------------- |
-| `public/index.html`            | Browser entry document and stylesheet/script loading order.                      |
-| `public/app.js`                | Home, Schedule, Settings, onboarding, Talk, browser state, and API interactions. |
-| `public/styles.css`            | Shared legacy/global component styles.                                           |
-| `public/home.css`              | Home and Schedule visual layout.                                                 |
-| `public/mockup-pages.css`      | Current Settings, Schedule, Talk, and responsive product-surface styling.        |
-| `public/avatar.css`            | Avatar artwork and scene presentation styles.                                    |
-| `public/onboarding.css`        | Pre-app onboarding layout and responsive behavior.                               |
-| `public/onboarding-prompt.txt` | Copyable ChatGPT onboarding prompt shown to the user.                            |
+| File                           | Purpose                                                                             |
+| ------------------------------ | ----------------------------------------------------------------------------------- |
+| `public/index.html`            | Browser entry document and stylesheet/script loading order.                         |
+| `public/app.js`                | Home, Schedule, Settings, onboarding, Talk, browser state, and API interactions.    |
+| `public/talk-voice.js`         | Native WebRTC lifecycle, completed transcripts, mute/end/retry, and audio analysis. |
+| `public/styles.css`            | Shared legacy/global component styles.                                              |
+| `public/home.css`              | Home and Schedule visual layout.                                                    |
+| `public/mockup-pages.css`      | Current Settings, Schedule, Talk, and responsive product-surface styling.           |
+| `public/avatar.css`            | Avatar artwork and scene presentation styles.                                       |
+| `public/onboarding.css`        | Pre-app onboarding layout and responsive behavior.                                  |
+| `public/onboarding-prompt.txt` | Copyable ChatGPT onboarding prompt shown to the user.                               |
 
 The browser never calls OpenAI or Google directly and never receives raw API keys, refresh tokens, encrypted credential blobs, or private filesystem paths.
 
 ## Database and private runtime data
 
-| Path                            | Purpose                                                                                                                                 |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `db/README.md`                  | PostgreSQL setup, migration, import, backup, testing, and safety instructions.                                                          |
-| `db/schema.sql`                 | Convenience SQL entry point that includes the tracked migration.                                                                        |
-| `db/migrations/001_records.sql` | Creates the `twin` schema, record tables, owner constraints, and indexes. This defines structure; it is not the live database contents. |
-| `data/twin.json`                | Legacy ignored import/backup source. The running app no longer reads or writes it.                                                      |
-| `data/assets/`                  | Private uploaded and generated avatar image bytes. Metadata remains in PostgreSQL.                                                      |
-| `data/style-references/`        | Server-only avatar style reference images used during generation.                                                                       |
+| Path                                   | Purpose                                                                                                                                 |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `db/README.md`                         | PostgreSQL setup, migration, import, backup, testing, and safety instructions.                                                          |
+| `db/schema.sql`                        | Convenience SQL entry point that includes the tracked migration.                                                                        |
+| `db/migrations/001_records.sql`        | Creates the `twin` schema, record tables, owner constraints, and indexes. This defines structure; it is not the live database contents. |
+| `db/migrations/002_voice_sessions.sql` | Adds owner-scoped durable voice-session lifecycle records.                                                                              |
+| `data/twin.json`                       | Legacy ignored import/backup source. The running app no longer reads or writes it.                                                      |
+| `data/assets/`                         | Private uploaded and generated avatar image bytes. Metadata remains in PostgreSQL.                                                      |
+| `data/style-references/`               | Server-only avatar style reference images used during generation.                                                                       |
 
 If PostgreSQL runs in Docker, its live database files are managed by Docker's named volume rather than appearing as a `.sql` file in this repository.
 
@@ -151,6 +154,7 @@ If PostgreSQL runs in Docker, its live database files are managed by Docker's na
 | `test/context.test.ts`            | Talk/planning context selection, bounds, source separation, and owner scoping.                    |
 | `test/planning.test.ts`           | AI planning orchestration, validation, retries, protected history, Calendar, and revisions.       |
 | `test/router.test.ts`             | HTTP contracts, ownership, imports, Settings, Talk, Calendar, avatars, and deletion behavior.     |
+| `test/realtime-voice.test.ts`     | Realtime configuration, bounded context, SDP broker, finalization, and audio helpers.             |
 | `test/postgres.test.ts`           | Opt-in disposable PostgreSQL migration/import/transaction integration suite.                      |
 | `test/calendar.test.ts`           | Calendar normalization and date/time behavior.                                                    |
 | `test/google.test.ts`             | Google Calendar/Gmail pagination, credentials, reconnect, and stale-sync protection.              |

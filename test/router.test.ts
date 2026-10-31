@@ -48,7 +48,11 @@ async function call(
   return {
     status: response.status,
     headers: response.headers,
-    payload: response.body ? JSON.parse(response.body) : null,
+    payload: response.body
+      ? String(response.headers["content-type"] ?? "").includes("json")
+        ? JSON.parse(response.body)
+        : response.body
+      : null,
   };
 }
 
@@ -82,13 +86,17 @@ test("Home and Schedule expose only the active ready day version", async () => {
   assert.equal(schedule.payload.id, "active-lower-version");
 });
 
+const sharedPrototypeDate = new Date(Date.now() + 86_400_000)
+  .toISOString()
+  .slice(0, 10)
+  .replaceAll("-", "");
 const sharedPrototypeCalendar = [
   "BEGIN:VCALENDAR",
   "VERSION:2.0",
   "BEGIN:VEVENT",
   "UID:shared-profile-event",
-  "DTSTART:20261027T130000Z",
-  "DTEND:20261027T140000Z",
+  `DTSTART:${sharedPrototypeDate}T130000Z`,
+  `DTEND:${sharedPrototypeDate}T140000Z`,
   "SUMMARY:Shared prototype event",
   "END:VEVENT",
   "END:VCALENDAR",

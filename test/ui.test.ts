@@ -100,3 +100,29 @@ test("onboarding connects OpenAI and builds today before the optional avatar ste
   assert.match(appSource, /api\("\/api\/onboarding\/complete"/);
   assert.doesNotMatch(appSource, /localStorage\.setItem\([^)]*(?:api.?key|openai.?key)/i);
 });
+
+test("Talk uses native WebRTC controls and real analyser-driven orb state", () => {
+  const appSource = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  const voiceSource = readFileSync(new URL("../public/talk-voice.js", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../public/ui-talk.css", import.meta.url), "utf8");
+
+  assert.match(appSource, /data-voice-mute/);
+  assert.match(appSource, /data-voice-end/);
+  assert.match(appSource, /data-voice-retry/);
+  assert.match(appSource, /retryButton = document\.createElement\("button"\)/);
+  assert.match(appSource, /retryButton\.dataset\.voiceRetry = ""/);
+  assert.match(appSource, /Voice personality/);
+  assert.doesNotMatch(appSource, /talkPreview/);
+  assert.match(voiceSource, /new RTCPeerConnection/);
+  assert.match(voiceSource, /getUserMedia/);
+  assert.match(voiceSource, /createAnalyser/);
+  assert.match(voiceSource, /input_audio_buffer\.commit/);
+  assert.match(voiceSource, /voice-calls\/\$\{encodeURIComponent\(voiceSessionId\)\}\/abandon/);
+  assert.match(voiceSource, /cancelPrepared/);
+  assert.match(appSource, /Twin could not open a conversation/);
+  assert.match(voiceSource, /input_audio_transcription\.completed/);
+  assert.match(voiceSource, /output_audio_transcript\.done/);
+  assert.match(styles, /--talk-input-level/);
+  assert.match(styles, /--talk-output-level/);
+  assert.match(styles, /prefers-reduced-motion/);
+});

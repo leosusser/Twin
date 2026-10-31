@@ -1,3 +1,5 @@
+/* global VoiceTalkController */
+
 const ONBOARDING_PROMPT = `You are helping me create a private Personal Twin profile for a digital twin app. Talk with me naturally, one question at a time. Be warm, curious, and concise. Do not make assumptions when a follow-up question would help. I can skip any question.
 
 Learn about my ordinary weekdays and weekends; wake and sleep times; work, school, caregiving, meals, travel, movement, and recurring commitments; when I tend to have energy or feel drained; what helps me feel better; what distracts me; people and activities that matter to me; habits I want to build; and limits the app must respect. Ask for my time zone and clarify approximate versus fixed times. Do not ask for passwords, API keys, medical diagnoses, or a full email history. Do not diagnose me or present yourself as a therapist.
@@ -82,6 +84,11 @@ const app = {
   scheduleRequest: 0,
   talkDraft: "",
   talkSending: false,
+  voiceState: "idle",
+  voiceMessage: "",
+  voiceMuted: false,
+  voicePending: [],
+  voiceLevels: { input: 0, output: 0 },
   ui: { scroll: {}, openDetails: {}, fields: {}, focusKey: null },
   scheduleRebuild: {
     busy: false,
@@ -95,6 +102,36 @@ const app = {
 const root = document.querySelector("#app");
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
 const uuid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+const voiceTalk = new VoiceTalkController({
+  onState({ state, message, muted }) {
+    app.voiceState = state;
+    app.voiceMessage = message;
+    app.voiceMuted = muted;
+    syncTalkVoiceDom();
+  },
+  onLevels(levels) {
+    app.voiceLevels = levels;
+    syncTalkVoiceDom();
+  },
+  onTranscript(items) {
+    app.voicePending = items;
+    render();
+    requestAnimationFrame(() => {
+      const stream = document.querySelector("[data-talk-stream]");
+      if (stream) stream.scrollTop = stream.scrollHeight;
+    });
+  },
+  onFinalized(result) {
+    const conversation = app.conversations.find((item) => item.id === app.conversationId);
+    if (conversation) {
+      const ids = new Set(conversation.messages.map((item) => item.id));
+      conversation.messages.push(...result.messages.filter((item) => !ids.has(item.id)));
+    }
+    if (result.reports?.length) app.reports.push(...result.reports);
+    app.voicePending = [];
+    render();
+  },
+});
 async function api(path, options = {}) {
   const response = await fetch(path, {
     ...options,
@@ -333,7 +370,10 @@ document.addEventListener("click", async (event) => {
     if (target.dataset.route) {
       event.preventDefault();
       const nextRoute = target.dataset.route;
-      if (target.hasAttribute("data-talk-toggle")) app.talkOpen = false;
+      if (target.hasAttribute("data-talk-toggle")) {
+        app.talkOpen = false;
+        voiceTalk.end().catch((error) => toast(error.message, true));
+      }
       if (location.hash !== `#${nextRoute}`) history.pushState(null, "", `#${nextRoute}`);
       await navigateRoute(nextRoute);
       return;
@@ -341,14 +381,35 @@ document.addEventListener("click", async (event) => {
     if (target.matches("[data-talk-toggle]")) {
       const opening = !app.talkOpen;
       app.talkOpen = opening;
-      if (opening && !app.conversationId && app.settings?.openai?.status === "connected") {
-        const conversation = await api("/api/talk/conversations", { method: "POST", body: "{}" });
-        app.conversationId = conversation.id;
-        app.conversations.unshift({ ...conversation, messages: [] });
+      const microphone =
+        opening && app.settings?.openai?.status === "connected"
+          ? voiceTalk.prepareMicrophone()
+          : null;
+      microphone?.catch(() => {});
+      try {
+        if (opening && !app.conversationId && app.settings?.openai?.status === "connected") {
+          const conversation = await api("/api/talk/conversations", { method: "POST", body: "{}" });
+          app.conversationId = conversation.id;
+          app.conversations.unshift({ ...conversation, messages: [] });
+        }
+        render();
+        if (opening) {
+          setTimeout(() => document.querySelector("[data-voice-mute], #talk-form textarea, .talk-connect, .talk-back")?.focus(), 20);
+          if (microphone)
+            microphone
+              .then(() => voiceTalk.start(app.conversationId))
+              .catch((error) => toast(error.message, true));
+        } else {
+          voiceTalk.end().catch((error) => toast(error.message, true));
+          setTimeout(() => document.querySelector("[data-talk-toggle]")?.focus(), 20);
+        }
+      } catch (error) {
+        voiceTalk.cancelPrepared(
+          `Twin could not open a conversation. ${error?.payload?.message ?? error.message}`,
+        );
+        render();
+        throw error;
       }
-      render();
-      if (opening) setTimeout(() => document.querySelector("#talk-form textarea, .talk-connect, .talk-back")?.focus(), 20);
-      else setTimeout(() => document.querySelector("[data-talk-toggle]")?.focus(), 20);
       return;
     }
     if (target.matches("[data-copy-prompt]")) {
@@ -824,6 +885,7 @@ document.addEventListener("submit", async (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && app.talkOpen) {
     app.talkOpen = false;
+    voiceTalk.end().catch((error) => toast(error.message, true));
     render();
     document.querySelector("[data-talk-toggle]")?.focus();
   }
@@ -1259,12 +1321,12 @@ memorySection = function () {
 
 timingSection = function () {
   const settings = app.settings;
-  return `<details id="timing" class="settings-more-item"><summary><span class="settings-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span><span class="settings-more-label">Twin timing</span><span class="settings-chevron" aria-hidden="true"></span></summary><div class="settings-more-panel"><p>Twin schedules one AI morning run at your wake time in your saved time zone. Changes affect later runs; the timeline remains illustrative.</p><form id="settings-form"><div class="form-grid"><label class="field full"><span>Time zone</span><input class="input ui-input" name="timezone" value="${escapeHtml(settings.timezone)}"></label><label class="field"><span>Morning plan / wake time</span><input class="input ui-input" type="time" name="wake_time" value="${settings.wake_time}"></label><label class="field"><span>Sleep time</span><input class="input ui-input" type="time" name="sleep_time" value="${settings.sleep_time}"></label><label class="field"><span>Talk retention days</span><input class="input ui-input" type="number" min="1" max="365" name="talk_retention_days" value="${settings.talk_retention_days}"></label></div><div class="form-actions"><button class="ui-button primary" type="submit">Save timing</button></div></form></div></details>`;
+  return `<details id="timing" class="settings-more-item"><summary><span class="settings-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span><span class="settings-more-label">Twin timing &amp; voice</span><span class="settings-chevron" aria-hidden="true"></span></summary><div class="settings-more-panel"><p>Twin schedules one AI morning run at your wake time. Voice personality changes conversational style, not the sound of the selected voice.</p><form id="settings-form"><div class="form-grid"><label class="field full"><span>Time zone</span><input class="input ui-input" name="timezone" value="${escapeHtml(settings.timezone)}"></label><label class="field"><span>Morning plan / wake time</span><input class="input ui-input" type="time" name="wake_time" value="${settings.wake_time}"></label><label class="field"><span>Sleep time</span><input class="input ui-input" type="time" name="sleep_time" value="${settings.sleep_time}"></label><label class="field"><span>Talk retention days</span><input class="input ui-input" type="number" min="1" max="365" name="talk_retention_days" value="${settings.talk_retention_days}"></label><label class="field full"><span>Voice personality</span><select class="input ui-input" name="talk_personality_mode"><option value="collaborative" ${settings.talk_personality_mode === "collaborative" ? "selected" : ""}>Collaborative Twin</option><option value="direct_coach" ${settings.talk_personality_mode === "direct_coach" ? "selected" : ""}>Direct coach</option><option value="aspirational_self" ${settings.talk_personality_mode === "aspirational_self" ? "selected" : ""}>Aspirational self</option></select><small>All modes remain honest about uncertainty and never claim to literally be you.</small></label></div><div class="form-actions"><button class="ui-button primary" type="submit">Save timing &amp; voice</button></div></form></div></details>`;
 };
 openAISection = function () {
   const connection = app.settings.openai;
   const statusText = connection.status.replaceAll("_", " ").toLowerCase();
-  return `<details id="openai" class="settings-more-item"><summary><span class="settings-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2.5 2.5M18.5 4.5 21 7"/></svg></span><span class="settings-more-label">OpenAI connection</span><span class="settings-chevron" aria-hidden="true"></span></summary><div class="settings-more-panel"><p>Your key powers live text Talk, AI day planning, and optional character images. It is encrypted by the server and never shown again.</p><div class="secret-status"><span class="settings-plugin-status${connection.status === "connected" ? " is-on" : ""}">${escapeHtml(statusText.charAt(0).toUpperCase() + statusText.slice(1))}</span><strong>${escapeHtml(connection.key_masked ?? "No key saved")}</strong></div>${!connection.encryption_ready ? `<div class="notice">Set <code>TWIN_ENCRYPTION_KEY</code> in the server environment before saving a key.</div>` : ""}<form id="key-form"><label class="field"><span>OpenAI API key</span><input class="input ui-input" type="password" name="api_key" autocomplete="off" placeholder="sk-…" required></label><div class="form-actions"><button class="ui-button primary" type="submit">${connection.key_masked ? "Replace key" : "Save key"}</button><button class="ui-button" type="button" data-test-key ${!connection.key_masked ? "disabled" : ""}>Test connection</button><button class="ui-button destructive" type="button" data-remove-key ${!connection.key_masked ? "disabled" : ""}>Remove</button></div></form><p class="small">Text: ${connection.text_capability} · Planner: ${escapeHtml(connection.planner_model ?? "configured server-side")} · Image: ${connection.image_capability}${connection.tested_at ? ` · tested ${relativeTime(connection.tested_at)}` : ""}</p></div></details>`;
+  return `<details id="openai" class="settings-more-item"><summary><span class="settings-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2.5 2.5M18.5 4.5 21 7"/></svg></span><span class="settings-more-label">OpenAI connection</span><span class="settings-chevron" aria-hidden="true"></span></summary><div class="settings-more-panel"><p>Your one saved key powers text and voice Talk, AI day planning, and optional character images. It is encrypted by the server and never sent to this browser.</p><div class="secret-status"><span class="settings-plugin-status${connection.status === "connected" ? " is-on" : ""}">${escapeHtml(statusText.charAt(0).toUpperCase() + statusText.slice(1))}</span><strong>${escapeHtml(connection.key_masked ?? "No key saved")}</strong></div>${!connection.encryption_ready ? `<div class="notice">Set <code>TWIN_ENCRYPTION_KEY</code> in the server environment before saving a key.</div>` : ""}<form id="key-form"><label class="field"><span>OpenAI API key</span><input class="input ui-input" type="password" name="api_key" autocomplete="off" placeholder="sk-…" required></label><div class="form-actions"><button class="ui-button primary" type="submit">${connection.key_masked ? "Replace key" : "Save key"}</button><button class="ui-button" type="button" data-test-key ${!connection.key_masked ? "disabled" : ""}>Test connection</button><button class="ui-button destructive" type="button" data-remove-key ${!connection.key_masked ? "disabled" : ""}>Remove</button></div></form><p class="small">Text: ${connection.text_capability} · Planner: ${escapeHtml(connection.planner_model ?? "configured server-side")} · Voice: ${escapeHtml(connection.realtime_model ?? "configured server-side")} / ${escapeHtml(connection.realtime_voice ?? "configured server-side")} · Image: ${connection.image_capability}${connection.tested_at ? ` · tested ${relativeTime(connection.tested_at)}` : ""}</p></div></details>`;
 };
 privacySection = function () {
   return `<details id="privacy" class="settings-more-item"><summary><span class="settings-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></span><span class="settings-more-label">Privacy &amp; data</span><span class="settings-chevron" aria-hidden="true"></span></summary><div class="settings-more-panel"><p>Export or remove user-owned data. Destructive actions require explicit confirmation.</p><div class="settings-privacy-list"><div class="settings-privacy-row"><div><strong>Export my data</strong><span>JSON without provider secrets.</span></div><a class="ui-button" href="/api/account/export" download>Export</a></div><div class="settings-privacy-row"><div><strong>Delete Talk history</strong><span>Remove saved conversations and messages.</span></div><button class="ui-button destructive" data-delete-history>Delete</button></div><div class="settings-privacy-row"><div><strong>Restart onboarding</strong><span>Reopen the prompt without erasing memory.</span></div><button class="ui-button" data-restart-onboarding>Restart</button></div></div><div class="settings-privacy-row is-account"><div><strong>Delete account</strong><span>Remove all owned records and queued jobs.</span></div><button class="ui-button destructive" data-delete-account>Delete account</button></div></div></details>`;
@@ -1276,10 +1338,49 @@ talkLayer = function () {
   const connected = connection?.status === "connected";
   const conversation = app.conversations.find((item) => item.id === app.conversationId) ?? app.conversations[0];
   const messages = conversation?.messages ?? [];
-  const transcript = messages.length ? messages.map((message) => `<li class="talk-message ${message.role === "user" ? "you" : "twin"}"><span class="talk-speaker">${message.role === "user" ? "You" : "Twin"}</span><p>${escapeHtml(message.content)}</p><small><time datetime="${escapeHtml(message.created_at)}">${new Date(message.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time></small></li>`).join("") : `<li class="talk-empty-message">${connected ? "Tell your twin what actually happened today, or ask about the day ahead." : "Connect an OpenAI key in Settings to start a live text conversation."}</li>`;
-  const orbAttributes = connected ? `data-talk-orb aria-label="Toggle the Talk orb animation"` : `data-route="settings" data-talk-toggle aria-label="Open Settings to connect Talk"`;
-  return `<div class="talk-layer open" data-talk-backdrop><section class="talk-surface ${app.talkPreview ? "talking" : ""}" role="dialog" aria-modal="true" aria-labelledby="talk-title"><header class="talk-page-header"><button class="talk-back" data-talk-toggle aria-label="Back">${talkBackIcon()}</button><h1 id="talk-title">Talk</h1><span aria-hidden="true"></span></header><section class="talk-invitation" aria-labelledby="talk-invitation-title"><h2 id="talk-invitation-title">Explain your day.</h2></section><section class="talk-conversation-stage" aria-label="Conversation around the Twin orb"><p class="talk-conversation-label">${messages.length ? "Your conversation" : "Start a conversation"}</p><div class="talk-message-window" tabindex="-1" data-talk-stream><ol class="talk-message-track" aria-label="Conversation transcript">${transcript}</ol></div><button class="talk-orb-control" type="button" ${orbAttributes} aria-pressed="${Boolean(app.talkPreview)}"><span class="talk-orb-halo" aria-hidden="true"></span><span class="talk-orb-art" aria-hidden="true"><span class="talk-orb-core"></span></span></button></section><footer class="talk-dock"><div class="talk-status"><span class="talk-status-dot" aria-hidden="true"></span><span aria-live="polite">${connected ? (app.talkPreview ? "Orb in motion" : "Type to talk") : "Connection needed"}</span><small>${connected ? "Live text" : "Open Settings"}</small></div>${connected ? `<form class="talk-text-form" id="talk-form"><textarea name="message" aria-label="Message" placeholder="I actually studied at the library…" required ${app.talkSending ? "disabled" : ""}>${escapeHtml(app.talkDraft)}</textarea><button class="talk-send" aria-label="Send message" ${app.talkSending ? 'disabled aria-busy="true"' : ""}>${app.talkSending ? "…" : talkSendIcon()}</button></form>` : `<button class="talk-connect" data-route="settings" data-talk-toggle>Open Settings</button>`}</footer></section></div>`;
+  const pending = app.voicePending.map((item) => ({ ...item, content: item.transcript, created_at: item.completed_at, pending: true }));
+  const allMessages = [...messages, ...pending];
+  const transcript = allMessages.length ? allMessages.map((message) => `<li class="talk-message ${message.role === "user" ? "you" : "twin"}${message.pending ? " pending" : ""}"><span class="talk-speaker">${message.role === "user" ? "You" : "Twin"}</span><p>${escapeHtml(message.content)}</p><small><time datetime="${escapeHtml(message.created_at)}">${new Date(message.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>${message.pending ? " · saving when you end" : ""}</small></li>`).join("") : `<li class="talk-empty-message">${connected ? "Speak naturally, or type below. Completed speech appears here and saves when the call ends." : "Connect an OpenAI key in Settings to start Talk."}</li>`;
+  const voiceLabel = talkVoiceLabel();
+  const voiceActive = ["permission", "connecting", "listening", "user_speaking", "twin_speaking", "muted"].includes(app.voiceState);
+  const controls = connected ? `<div class="talk-voice-controls" role="group" aria-label="Voice controls"><button type="button" data-voice-mute ${voiceActive ? "" : "disabled"} aria-pressed="${app.voiceMuted}">${app.voiceMuted ? "Unmute" : "Mute"}</button><button type="button" data-voice-end ${voiceActive ? "" : "disabled"}>End</button>${["error", "ended"].includes(app.voiceState) ? `<button type="button" data-voice-retry>Retry voice</button>` : ""}</div>` : "";
+  return `<div class="talk-layer open" data-talk-backdrop><section class="talk-surface voice-${app.voiceState}" role="dialog" aria-modal="true" aria-labelledby="talk-title" style="--talk-input-level:${app.voiceLevels.input};--talk-output-level:${app.voiceLevels.output}"><header class="talk-page-header"><button class="talk-back" data-talk-toggle aria-label="Back">${talkBackIcon()}</button><h1 id="talk-title">Talk</h1><span aria-hidden="true"></span></header><section class="talk-invitation" aria-labelledby="talk-invitation-title"><h2 id="talk-invitation-title">Explain your day.</h2></section><section class="talk-conversation-stage" aria-label="Conversation around the Twin orb"><p class="talk-conversation-label">${allMessages.length ? "Your conversation" : "Start a conversation"}</p><div class="talk-message-window" tabindex="-1" data-talk-stream><ol class="talk-message-track" aria-label="Conversation transcript">${transcript}</ol></div><div class="talk-orb-control" role="img" aria-label="Voice activity"><span class="talk-orb-halo" aria-hidden="true"></span><span class="talk-orb-art" aria-hidden="true"><span class="talk-orb-core"></span></span></div></section><footer class="talk-dock"><div class="talk-status"><span class="talk-status-dot" aria-hidden="true"></span><span data-voice-status aria-live="polite">${escapeHtml(voiceLabel)}</span><small data-voice-detail>${escapeHtml(app.voiceMessage || (connected ? "Voice and text are available" : "Open Settings"))}</small></div>${controls}${connected ? `<form class="talk-text-form" id="talk-form"><textarea name="message" aria-label="Message" placeholder="Type instead…" required ${app.talkSending ? "disabled" : ""}>${escapeHtml(app.talkDraft)}</textarea><button class="talk-send" aria-label="Send message" ${app.talkSending ? 'disabled aria-busy="true"' : ""}>${app.talkSending ? "…" : talkSendIcon()}</button></form>` : `<button class="talk-connect" data-route="settings" data-talk-toggle>Open Settings</button>`}</footer></section></div>`;
 };
+function talkVoiceLabel() {
+  return ({ idle: "Voice ready", permission: "Microphone permission", connecting: "Connecting…", listening: "Listening", user_speaking: "You’re speaking", twin_speaking: "Twin is speaking", muted: "Muted", ended: "Voice ended", error: "Connection problem" })[app.voiceState] ?? "Voice ready";
+}
+function syncTalkVoiceDom() {
+  const surface = document.querySelector(".talk-surface");
+  if (!surface) return;
+  for (const name of ["idle", "permission", "connecting", "listening", "user_speaking", "twin_speaking", "muted", "ended", "error"])
+    surface.classList.toggle(`voice-${name}`, app.voiceState === name);
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  surface.style.setProperty("--talk-input-level", reducedMotion ? 0 : app.voiceLevels.input);
+  surface.style.setProperty("--talk-output-level", reducedMotion ? 0 : app.voiceLevels.output);
+  const status = surface.querySelector("[data-voice-status]");
+  if (status) status.textContent = talkVoiceLabel();
+  const detail = surface.querySelector("[data-voice-detail]");
+  if (detail) detail.textContent = app.voiceMessage || "Voice and text are available";
+  const voiceActive = ["permission", "connecting", "listening", "user_speaking", "twin_speaking", "muted"].includes(app.voiceState);
+  const muteButton = surface.querySelector("[data-voice-mute]");
+  if (muteButton) {
+    muteButton.disabled = !voiceActive;
+    muteButton.setAttribute("aria-pressed", String(app.voiceMuted));
+    muteButton.textContent = app.voiceMuted ? "Unmute" : "Mute";
+  }
+  const endButton = surface.querySelector("[data-voice-end]");
+  if (endButton) endButton.disabled = !voiceActive;
+  const controls = surface.querySelector(".talk-voice-controls");
+  let retryButton = controls?.querySelector("[data-voice-retry]");
+  const retryAvailable = ["error", "ended"].includes(app.voiceState);
+  if (controls && retryAvailable && !retryButton) {
+    retryButton = document.createElement("button");
+    retryButton.type = "button";
+    retryButton.dataset.voiceRetry = "";
+    retryButton.textContent = "Retry voice";
+    controls.append(retryButton);
+  } else if (!retryAvailable) retryButton?.remove();
+}
 function talkBackIcon() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>`;
 }
@@ -1388,6 +1489,26 @@ async function navigateRoute(route) {
 }
 
 document.addEventListener("click", async (event) => {
+  const voiceControl = event.target.closest("[data-voice-mute],[data-voice-end],[data-voice-retry]");
+  if (voiceControl) {
+    event.preventDefault();
+    if (voiceControl.hasAttribute("data-voice-mute")) voiceTalk.toggleMute();
+    if (voiceControl.hasAttribute("data-voice-end"))
+      voiceTalk.end().catch((error) => toast(error.message, true));
+    if (voiceControl.hasAttribute("data-voice-retry")) {
+      if (voiceTalk.needsCloseRetry && voiceTalk.voiceSessionId)
+        voiceTalk.end().catch((error) => toast(error.message, true));
+      else {
+        voiceTalk.resetForRetry();
+        voiceTalk
+          .prepareMicrophone()
+          .then(() => voiceTalk.start(app.conversationId))
+          .catch((error) => toast(error.message, true));
+      }
+    }
+    syncTalkVoiceDom();
+    return;
+  }
   const dayButton = event.target.closest("[data-day-step]");
   if (dayButton) {
     event.preventDefault();
@@ -1415,13 +1536,6 @@ document.addEventListener("click", async (event) => {
     }
     return;
   }
-  const orb = event.target.closest("[data-talk-orb]");
-  if (orb) {
-    event.preventDefault();
-    app.talkPreview = !app.talkPreview;
-    render();
-    setTimeout(() => document.querySelector("[data-talk-orb]")?.focus(), 20);
-  }
 });
 document.addEventListener("click", (event) => {
   const candidate = event.target.closest("[data-avatar-candidate]");
@@ -1448,11 +1562,15 @@ document.addEventListener("input", (event) => {
   }
   if (event.target.matches("#talk-form textarea")) app.talkDraft = event.target.value;
 });
-document.addEventListener("click", (event) => {
-  if (event.target.closest("[data-talk-toggle]") && !app.talkOpen) app.talkPreview = false;
-});
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !app.talkOpen) app.talkPreview = false;
+window.addEventListener("pagehide", () => {
+  if (voiceTalk.voiceSessionId)
+    void voiceTalk
+      .abandon("Voice ended when this page closed.", {
+        keepalive: true,
+        skipDrain: true,
+      })
+      .catch(() => {});
+  else voiceTalk.cancelPrepared("Voice ended when this page closed.");
 });
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Tab" || !app.talkOpen) return;

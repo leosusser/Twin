@@ -18,6 +18,7 @@ export const collections = [
   "model_connections",
   "conversations",
   "messages",
+  "voice_sessions",
   "avatar_designs",
   "avatar_assets",
   "avatar_requests",
@@ -125,7 +126,7 @@ export class PostgresStore {
     this.pool = pool;
   }
   async init() {
-    await this.pool.query("SELECT version FROM twin.schema_migrations WHERE version=1");
+    await this.pool.query("SELECT version FROM twin.schema_migrations WHERE version=2");
     return this;
   }
   async snapshot(): Promise<AppState> {

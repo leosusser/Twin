@@ -65,6 +65,9 @@ adapter still loads full state for many routes and should use scoped queries bef
 | `TWIN_ENCRYPTION_KEY`                       | Server-held secret, at least 24 characters, used for AES-256-GCM credential encryption |
 | `OPENAI_TEXT_MODEL`                         | Talk Responses API model; default `gpt-5.6-luna`                                       |
 | `OPENAI_PLANNER_MODEL`                      | Optional planner override; otherwise reuses `OPENAI_TEXT_MODEL`, then `gpt-5.6-luna`   |
+| `OPENAI_REALTIME_MODEL`                     | Voice Talk Realtime model; default `gpt-realtime-2.1-mini`                             |
+| `OPENAI_REALTIME_VOICE`                     | Voice Talk sound; default `marin`                                                      |
+| `OPENAI_REALTIME_TRANSCRIPTION_MODEL`       | Voice input transcription; default `gpt-4o-mini-transcribe`                            |
 | `OPENAI_IMAGE_MODEL`                        | Image edit model; default `gpt-image-1-mini`                                           |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth app credentials                                                           |
 | `GOOGLE_CALENDAR_REDIRECT_URI`              | Calendar callback, e.g. `http://127.0.0.1:4173/api/integrations/calendar/callback`     |
@@ -163,12 +166,25 @@ shared source in the local configuration file; the adapter remains replaceable b
 sync and the prototype snapshot share the same downstream Calendar event contract and planning
 context.
 
-Talk and day planning both use `POST /v1/responses` through the backend. Talk selects
+Typed Talk and day planning use `POST /v1/responses` through the backend. Typed Talk selects
 `OPENAI_TEXT_MODEL` when it is defined, otherwise `gpt-5.6-luna`. The planner selects the first
 non-empty value in this order: `OPENAI_PLANNER_MODEL`, `OPENAI_TEXT_MODEL`, then
 `gpt-5.6-luna`. This gives planning an explicit override while reusing the existing text-model
-setting by default; it does not alter Talk's model. There is no embedded voice-session model or
-ephemeral voice token in this repository—the onboarding voice conversation happens in ChatGPT.
+setting by default; it does not alter typed Talk's model.
+
+Voice Talk uses native browser WebRTC and Twin's server-brokered `POST /v1/realtime/calls` flow.
+The backend decrypts the same Settings OpenAI key, adds bounded memory, recent reports, selected
+Calendar context, today's illustrative day, recent messages, and the saved personality mode, then
+returns only the SDP answer. The browser never receives the API key or private prompt. Realtime
+selection is independent: `OPENAI_REALTIME_MODEL` then `gpt-realtime-2.1-mini`; voice uses
+`OPENAI_REALTIME_VOICE` then `marin`; input transcription uses
+`OPENAI_REALTIME_TRANSCRIPTION_MODEL` then `gpt-4o-mini-transcribe`. Completed transcripts are
+saved when the call ends, raw audio is never stored, and one existing after-conversation planning
+job is queued after persistence. Browser-relayed voice transcripts remain untrusted conversation
+text and are not automatically promoted to factual activity reports. Voice requires microphone
+permission and WebRTC support; typed Talk remains available on permission or provider failure.
+Rejected Realtime calls show a bounded, sanitized model-access or field-level reason from OpenAI;
+raw provider bodies, credentials, SDP, private instructions, and personal context are never returned.
 
 Both paths decrypt the same OpenAI API key saved in Settings only on the server. The browser
 receives masked connection metadata and the configured planner model, never the credential or

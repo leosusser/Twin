@@ -38,6 +38,7 @@ export function initializeLocalProfile(state: AppState, userId = DEMO_USER_ID, t
       hide_bathroom_scene: false,
       talk_retention_days: 30,
       onboarding_complete: false,
+      talk_personality_mode: "collaborative",
       version: 1,
     });
     changed = true;
@@ -117,6 +118,7 @@ export function initializeLocalProfile(state: AppState, userId = DEMO_USER_ID, t
 }
 export function migrateState(value: AppState) {
   const state = structuredClone(value);
+  state.voice_sessions ??= [];
   state.avatar_assets ??= [];
   state.avatar_requests ??= [];
   state.avatar_designs ??= [];
@@ -125,6 +127,9 @@ export function migrateState(value: AppState) {
   });
   state.model_connections.forEach((connection) => {
     connection.credential_version ??= 0;
+  });
+  state.settings.forEach((settings) => {
+    settings.talk_personality_mode ??= "collaborative";
   });
   state.calendar_events.forEach((event) => {
     event.availability ??= "busy";
@@ -152,6 +157,7 @@ export function seedState(): AppState {
     hide_bathroom_scene: false,
     talk_retention_days: 30,
     onboarding_complete: false,
+    talk_personality_mode: "collaborative",
     version: 1,
   };
   const facts: ProfileFact[] = [
@@ -340,6 +346,7 @@ export function seedState(): AppState {
         created_at: now,
       },
     ],
+    voice_sessions: [],
     avatar_designs: [design],
     avatar_assets: [],
     avatar_requests: [],

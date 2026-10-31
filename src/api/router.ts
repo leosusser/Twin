@@ -16,6 +16,7 @@ import type {
   AvatarGenerationRequest,
   IntegrationConnection,
   ModelConnection,
+  TalkPersonalityMode,
 } from "../domain/types.ts";
 import { decryptSecret, encryptSecret, encryptionReady } from "../integrations/secrets.ts";
 import {
@@ -32,6 +33,12 @@ import {
   testOpenAIKey,
 } from "../integrations/openai.ts";
 import {
+  createRealtimeCall,
+  realtimeSessionConfig,
+  resolveRealtimeConfig,
+  selectVoiceContext,
+} from "../integrations/openai-realtime.ts";
+import {
   planTwinDay,
   planningTargetDateFromConversation,
   queueDayPlanningJob,
@@ -45,6 +52,7 @@ import { selectTalkContext } from "../storage/context.ts";
 export interface RouterDependencies {
   prototypeCalendarSourceUrl?: string;
   prototypeCalendarFetch?: typeof fetch;
+  realtimeFetch?: typeof fetch;
 }
 export class HttpProblem extends Error {
   status: number;
@@ -261,6 +269,20 @@ export async function routeApi(
           body.talk_retention_days <= 365
         )
           item.talk_retention_days = body.talk_retention_days;
+        if (body.talk_personality_mode !== undefined) {
+          if (!validTalkPersonality(body.talk_personality_mode))
+            throw new HttpProblem(
+              422,
+              "INVALID_TALK_PERSONALITY",
+              "Choose collaborative, direct coach, or aspirational self.",
+              {
+                field_errors: {
+                  talk_personality_mode: "Choose one of the available personality modes.",
+                },
+              },
+            );
+          item.talk_personality_mode = body.talk_personality_mode;
+        }
         if (typeof body.timezone === "string") {
           try {
             new Intl.DateTimeFormat("en", { timeZone: body.timezone }).format();
@@ -431,10 +453,54 @@ export async function routeApi(
     }
     if (messagesMatch && method === "POST")
       return await sendTalk(req, res, store, userId, messagesMatch[1]);
+    const voiceStartMatch = url.pathname.match(
+      /^\/api\/talk\/conversations\/([^/]+)\/voice-calls$/,
+    );
+    if (voiceStartMatch && method === "POST")
+      return await startVoiceCall(
+        req,
+        res,
+        store,
+        userId,
+        voiceStartMatch[1],
+        dependencies.realtimeFetch,
+      );
+    const voiceCompleteMatch = url.pathname.match(
+      /^\/api\/talk\/conversations\/([^/]+)\/voice-calls\/([^/]+)\/complete$/,
+    );
+    if (voiceCompleteMatch && method === "POST")
+      return await completeVoiceCall(
+        req,
+        res,
+        store,
+        userId,
+        voiceCompleteMatch[1],
+        voiceCompleteMatch[2],
+      );
+    const voiceAbandonMatch = url.pathname.match(
+      /^\/api\/talk\/conversations\/([^/]+)\/voice-calls\/([^/]+)\/abandon$/,
+    );
+    if (voiceAbandonMatch && method === "POST")
+      return await abandonVoiceCall(
+        req,
+        res,
+        store,
+        userId,
+        voiceAbandonMatch[1],
+        voiceAbandonMatch[2],
+      );
     if (url.pathname === "/api/talk/history" && method === "DELETE") {
       await store.transaction((draft) => {
         draft.messages = draft.messages.filter((item) => item.user_id !== userId);
         draft.conversations = draft.conversations.filter((item) => item.user_id !== userId);
+        draft.voice_sessions = draft.voice_sessions.filter((item) => item.user_id !== userId);
+        for (const key of Object.keys(draft.idempotency))
+          if (
+            key.startsWith(`voice-start:${userId}:`) ||
+            key.startsWith(`voice-complete:${userId}:`) ||
+            key.startsWith(`voice-abandon:${userId}:`)
+          )
+            delete draft.idempotency[key];
       });
       return json(res, 200, { deleted: true });
     }
@@ -1150,6 +1216,326 @@ async function sendTalk(
   });
   return json(res, 201, result);
 }
+
+async function startVoiceCall(
+  req: IncomingMessage,
+  res: ServerResponse,
+  store: Store,
+  userId: string,
+  conversationId: string,
+  fetchImpl?: typeof fetch,
+) {
+  const contentType = String(req.headers["content-type"] ?? "")
+    .split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  if (contentType !== "application/sdp")
+    throw new HttpProblem(415, "VOICE_SDP_REQUIRED", "Send a WebRTC offer as application/sdp.");
+  const key = requestIdempotencyKey(req);
+  const sdp = await readBody(req, 65_536);
+  if (!validSdpOffer(sdp))
+    throw new HttpProblem(422, "INVALID_VOICE_SDP", "The browser voice offer was invalid.");
+  const replayKey = `voice-start:${userId}:${conversationId}:${key}`;
+  const now = new Date();
+  const config = resolveRealtimeConfig();
+  const claim = await store.transaction((draft) => {
+    ownConversation(draft, userId, conversationId);
+    const replay = draft.idempotency[replayKey] as { voice_session_id?: string } | undefined;
+    if (replay?.voice_session_id)
+      return { outcome: "replay" as const, voiceSessionId: replay.voice_session_id };
+    for (const candidate of draft.voice_sessions)
+      if (
+        candidate.user_id === userId &&
+        candidate.conversation_id === conversationId &&
+        ["connecting", "active", "finalizing"].includes(candidate.status) &&
+        new Date(candidate.expires_at) <= now
+      )
+        candidate.status = "expired";
+    const existing = draft.voice_sessions.find(
+      (item) =>
+        item.user_id === userId &&
+        item.conversation_id === conversationId &&
+        ["connecting", "active", "finalizing"].includes(item.status) &&
+        new Date(item.expires_at) > now,
+    );
+    if (existing) return { outcome: "active" as const, voiceSessionId: existing.id };
+    const connection = ownModel(draft, userId);
+    if (!connection.encrypted_key)
+      throw new HttpProblem(
+        409,
+        "OPENAI_KEY_MISSING",
+        "Add an OpenAI API key in Settings to use voice Talk.",
+      );
+    const settings = ownSettings(draft, userId);
+    const session = {
+      id: randomUUID(),
+      user_id: userId,
+      conversation_id: conversationId,
+      model: config.model,
+      voice: config.voice,
+      personality_mode: settings.talk_personality_mode,
+      credential_version: connection.credential_version ?? 0,
+      status: "connecting" as const,
+      created_at: now.toISOString(),
+      expires_at: new Date(now.getTime() + 30 * 60_000).toISOString(),
+      finalized_item_ids: [],
+    };
+    draft.voice_sessions.push(session);
+    draft.idempotency[replayKey] = { voice_session_id: session.id };
+    return {
+      outcome: "claimed" as const,
+      session,
+      encryptedKey: connection.encrypted_key,
+      personalityMode: settings.talk_personality_mode,
+      context: selectVoiceContext(draft, userId, conversationId, now),
+    };
+  });
+  if (claim.outcome === "replay")
+    throw new HttpProblem(
+      409,
+      "VOICE_CALL_ALREADY_STARTED",
+      "That voice connection was already started. Continue it or press Retry.",
+      { voice_session_id: claim.voiceSessionId },
+    );
+  if (claim.outcome === "active")
+    throw new HttpProblem(409, "VOICE_CALL_ACTIVE", "A voice conversation is already active.", {
+      voice_session_id: claim.voiceSessionId,
+    });
+  const voiceSession = claim.session;
+  try {
+    const answer = await createRealtimeCall({
+      apiKey: decryptSecret(claim.encryptedKey),
+      sdp,
+      session: realtimeSessionConfig(claim.personalityMode, claim.context),
+      safetyIdentifier: createHash("sha256").update(`twin:${userId}`).digest("hex"),
+      fetchImpl,
+    });
+    const activated = await store.transaction((draft) => {
+      const item = draft.voice_sessions.find(
+        (candidate) => candidate.id === voiceSession.id && candidate.user_id === userId,
+      );
+      if (!item) throw new Error("VOICE_SESSION_MISSING");
+      const model = ownModel(draft, userId);
+      if ((model.credential_version ?? 0) !== voiceSession.credential_version) {
+        item.status = "failed";
+        item.failure_code = "VOICE_CREDENTIAL_CHANGED";
+        return false;
+      }
+      if (item.status !== "connecting") return false;
+      item.status = "active";
+      item.provider_session_id = answer.providerSessionId;
+      return true;
+    });
+    if (!activated)
+      throw new HttpProblem(
+        409,
+        "VOICE_CREDENTIAL_CHANGED",
+        "The OpenAI connection changed while voice was starting. Retry Talk.",
+      );
+    res.writeHead(201, {
+      "content-type": "application/sdp",
+      "cache-control": "no-store",
+      "x-twin-voice-session": voiceSession.id,
+      "x-twin-voice-expires-at": voiceSession.expires_at,
+    });
+    return res.end(answer.sdp);
+  } catch (error) {
+    await store.transaction((draft) => {
+      const item = draft.voice_sessions.find(
+        (candidate) => candidate.id === voiceSession.id && candidate.user_id === userId,
+      );
+      if (item) {
+        item.status = "failed";
+        item.failure_code = error instanceof ProviderProblem ? error.code : "VOICE_START_FAILED";
+      }
+      const model = ownModel(draft, userId);
+      if (
+        error instanceof ProviderProblem &&
+        (model.credential_version ?? 0) === voiceSession.credential_version
+      ) {
+        if (error.code === "OPENAI_AUTH_ERROR") model.status = "invalid";
+        else if (error.code === "OPENAI_QUOTA") model.status = "quota";
+        else if (error.code === "OPENAI_NETWORK_ERROR") model.status = "network_error";
+      }
+      delete draft.idempotency[replayKey];
+    });
+    throw error;
+  }
+}
+
+async function abandonVoiceCall(
+  req: IncomingMessage,
+  res: ServerResponse,
+  store: Store,
+  userId: string,
+  conversationId: string,
+  voiceSessionId: string,
+) {
+  const body = await readJson(req, 1_000);
+  if (Object.keys(body).some((key) => key !== "idempotency_key"))
+    throw new HttpProblem(422, "INVALID_VOICE_ABANDON", "No voice transcript is accepted here.");
+  const key = idempotencyKey(req, body);
+  const replayKey = `voice-abandon:${userId}:${voiceSessionId}:${key}`;
+  const result = await store.transaction((draft) => {
+    ownConversation(draft, userId, conversationId);
+    const session = draft.voice_sessions.find(
+      (item) => item.id === voiceSessionId && item.user_id === userId,
+    );
+    if (!session || session.conversation_id !== conversationId)
+      throw new HttpProblem(
+        404,
+        "VOICE_SESSION_NOT_FOUND",
+        "That voice conversation could not be found.",
+      );
+    const replay = draft.idempotency[replayKey];
+    if (replay) return replay;
+    if (session.status === "complete")
+      throw new HttpProblem(
+        409,
+        "VOICE_SESSION_ALREADY_COMPLETE",
+        "That voice conversation was already saved.",
+      );
+    const now = new Date().toISOString();
+    session.status = "failed";
+    session.failure_code = "VOICE_CLIENT_ABANDONED";
+    session.completed_at ??= now;
+    const response = {
+      voice_session: {
+        id: session.id,
+        status: session.status,
+        completed_at: session.completed_at,
+      },
+      planningStatus: "not_queued",
+    };
+    draft.idempotency[replayKey] = response;
+    return response;
+  });
+  return json(res, 200, result);
+}
+
+async function completeVoiceCall(
+  req: IncomingMessage,
+  res: ServerResponse,
+  store: Store,
+  userId: string,
+  conversationId: string,
+  voiceSessionId: string,
+) {
+  const body = await readJson(req, 40_000);
+  const key = idempotencyKey(req, body);
+  const { items, disposition } = validateVoiceTranscriptItems(body);
+  const replayKey = `voice-complete:${userId}:${voiceSessionId}:${key}`;
+  const result = await store.transaction((draft) => {
+    ownConversation(draft, userId, conversationId);
+    const session = draft.voice_sessions.find(
+      (item) => item.id === voiceSessionId && item.user_id === userId,
+    );
+    if (!session || session.conversation_id !== conversationId)
+      throw new HttpProblem(
+        404,
+        "VOICE_SESSION_NOT_FOUND",
+        "That voice conversation could not be found.",
+      );
+    const replay = draft.idempotency[replayKey];
+    if (replay) return replay;
+    if (new Date(session.expires_at) < new Date() && session.status !== "complete") {
+      session.status = "expired";
+      throw new HttpProblem(
+        409,
+        "VOICE_SESSION_EXPIRED",
+        "That voice session expired. Retry Talk.",
+      );
+    }
+    if (!["active", "finalizing", "complete"].includes(session.status))
+      throw new HttpProblem(
+        409,
+        "VOICE_SESSION_NOT_ACTIVE",
+        "That voice session cannot be completed.",
+      );
+    const finalized = new Set(session.finalized_item_ids ?? []);
+    if (session.status === "complete")
+      throw new HttpProblem(
+        409,
+        "VOICE_SESSION_ALREADY_COMPLETE",
+        "That voice session is already complete.",
+      );
+    session.status = "finalizing";
+    const savedMessages = [];
+    const now = new Date().toISOString();
+    const settings = ownSettings(draft, userId);
+    const today = localDateInZone(new Date(), settings.timezone);
+    for (const item of items) {
+      const completedAt = new Date(item.completed_at).getTime();
+      if (
+        completedAt < new Date(session.created_at).getTime() - 5 * 60_000 ||
+        completedAt > Date.now() + 5 * 60_000
+      )
+        throw new HttpProblem(
+          422,
+          "INVALID_VOICE_TRANSCRIPT_TIME",
+          "A completed transcript timestamp was outside this voice session.",
+        );
+      const providerRequestId = `voice:${voiceSessionId}:${item.provider_item_id}`;
+      let message = draft.messages.find(
+        (candidate) =>
+          candidate.user_id === userId &&
+          candidate.conversation_id === conversationId &&
+          candidate.provider_request_id === providerRequestId,
+      );
+      if (!message) {
+        message = {
+          id: randomUUID(),
+          user_id: userId,
+          conversation_id: conversationId,
+          role: item.role,
+          content: item.transcript,
+          status: "saved",
+          created_at: item.completed_at,
+          provider_request_id: providerRequestId,
+        };
+        draft.messages.push(message);
+      }
+      savedMessages.push(message);
+      finalized.add(item.provider_item_id);
+    }
+    const conversation = ownConversation(draft, userId, conversationId);
+    conversation.updated_at = now;
+    session.finalized_item_ids = [...finalized];
+    session.status = disposition === "abandoned" ? "failed" : "complete";
+    session.completed_at = now;
+    if (disposition === "abandoned") session.failure_code = "VOICE_CLIENT_ABANDONED";
+    const userText = items
+      .filter((item) => item.role === "user")
+      .map((item) => item.transcript)
+      .join(" ");
+    const source = savedMessages.at(-1);
+    const planningJob = source
+      ? queueDayPlanningJob(draft, {
+          userId,
+          trigger: "after_conversation",
+          targetLocalDate: planningTargetDateFromConversation(userText, today),
+          sourceId: `voice-session:${voiceSessionId}`,
+          conversationId,
+        })
+      : null;
+    const response = {
+      messages: savedMessages,
+      reports: [],
+      reportStatus: "none",
+      memoryStatus: "unchanged",
+      planningStatus: planningJob?.status ?? "not_queued",
+      planning_job_id: planningJob?.id,
+      voice_session: {
+        id: session.id,
+        status: session.status,
+        completed_at: session.completed_at,
+      },
+    };
+    draft.idempotency[replayKey] = response;
+    return response;
+  });
+  return json(res, 200, result);
+}
 async function integrationRoute(
   req: IncomingMessage,
   res: ServerResponse,
@@ -1620,6 +2006,7 @@ function json(
 function ownSettings(state: AppState, userId: string) {
   const item = state.settings.find((candidate) => candidate.user_id === userId);
   if (!item) throw new HttpProblem(404, "SETTINGS_NOT_FOUND", "Settings were not found.");
+  item.talk_personality_mode ??= "collaborative";
   return item;
 }
 function ownModel(state: AppState, userId: string) {
@@ -1659,9 +2046,13 @@ function latestDay(state: AppState, userId: string, date: string) {
 }
 function safeModel(item: ModelConnection) {
   const { encrypted_key: _encryptedKey, ...safe } = item;
+  const realtime = resolveRealtimeConfig();
   return {
     ...safe,
     planner_model: configuredModels().plannerModel,
+    realtime_model: realtime.model,
+    realtime_voice: realtime.voice,
+    realtime_transcription_model: realtime.transcriptionModel,
     key_masked: item.key_suffix ? `••••${item.key_suffix}` : undefined,
     encryption_ready: encryptionReady(),
   };
@@ -1689,6 +2080,96 @@ function idempotencyKey(req: IncomingMessage, body: Record<string, any>) {
   if (typeof value !== "string" || !value.trim())
     throw new HttpProblem(400, "IDEMPOTENCY_KEY_REQUIRED", "Include an Idempotency-Key header.");
   return value.slice(0, 160);
+}
+function requestIdempotencyKey(req: IncomingMessage) {
+  const value = req.headers["idempotency-key"];
+  if (typeof value !== "string" || !value.trim())
+    throw new HttpProblem(400, "IDEMPOTENCY_KEY_REQUIRED", "Include an Idempotency-Key header.");
+  return value.trim().slice(0, 160);
+}
+function validTalkPersonality(value: unknown): value is TalkPersonalityMode {
+  return ["collaborative", "direct_coach", "aspirational_self"].includes(String(value));
+}
+function validSdpOffer(value: string) {
+  return (
+    value.length >= 20 &&
+    value.length <= 65_536 &&
+    value.startsWith("v=0") &&
+    /(?:^|\r?\n)m=audio\s/i.test(value) &&
+    !value.includes(String.fromCharCode(0))
+  );
+}
+interface CompletedVoiceTranscriptItem {
+  provider_item_id: string;
+  role: "user" | "assistant";
+  transcript: string;
+  completed_at: string;
+}
+function validateVoiceTranscriptItems(body: Record<string, any>): {
+  items: CompletedVoiceTranscriptItem[];
+  disposition: "complete" | "abandoned";
+} {
+  const disposition = body.disposition ?? "complete";
+  if (
+    Object.keys(body).some((key) => !["items", "disposition", "idempotency_key"].includes(key)) ||
+    (disposition !== "complete" && disposition !== "abandoned") ||
+    !Array.isArray(body.items) ||
+    body.items.length > 32
+  )
+    throw new HttpProblem(
+      422,
+      "INVALID_VOICE_TRANSCRIPT",
+      "Send up to 32 completed transcript items and a valid close disposition.",
+    );
+  const ids = new Set<string>();
+  let total = 0;
+  const items = body.items.map((raw: unknown) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw))
+      throw new HttpProblem(422, "INVALID_VOICE_TRANSCRIPT", "A transcript item was invalid.");
+    const item = raw as Record<string, unknown>;
+    if (
+      Object.keys(item).some(
+        (key) => !["provider_item_id", "role", "transcript", "completed_at"].includes(key),
+      ) ||
+      typeof item.provider_item_id !== "string" ||
+      !item.provider_item_id.trim() ||
+      item.provider_item_id.length > 200 ||
+      (item.role !== "user" && item.role !== "assistant") ||
+      typeof item.transcript !== "string" ||
+      !item.transcript.trim() ||
+      item.transcript.trim().length > 3000 ||
+      typeof item.completed_at !== "string" ||
+      !Number.isFinite(new Date(item.completed_at).getTime())
+    )
+      throw new HttpProblem(
+        422,
+        "INVALID_VOICE_TRANSCRIPT",
+        "Only completed, bounded voice transcript items can be saved.",
+      );
+    const id = item.provider_item_id.trim();
+    if (ids.has(id))
+      throw new HttpProblem(
+        422,
+        "DUPLICATE_VOICE_ITEM",
+        "Each completed transcript item must be unique.",
+      );
+    ids.add(id);
+    const transcript = item.transcript.trim();
+    total += transcript.length;
+    if (total > 24_000)
+      throw new HttpProblem(
+        413,
+        "VOICE_TRANSCRIPT_TOO_LARGE",
+        "That voice transcript is too large to save at once.",
+      );
+    return {
+      provider_item_id: id,
+      role: item.role as "user" | "assistant",
+      transcript,
+      completed_at: new Date(item.completed_at).toISOString(),
+    };
+  });
+  return { items, disposition };
 }
 function validActivity(value: unknown): value is ActivityKey {
   return [
