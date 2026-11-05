@@ -18,6 +18,11 @@ export async function migrate(pool: any) {
           "utf8",
         ),
       );
+    const versionThree = await client.query("SELECT 1 FROM twin.schema_migrations WHERE version=3");
+    if (!versionThree.rowCount)
+      await client.query(
+        await readFile(new URL("../../db/migrations/003_user_scoped.sql", import.meta.url), "utf8"),
+      );
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");

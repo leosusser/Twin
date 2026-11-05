@@ -70,12 +70,14 @@ export class HttpProblem extends Error {
 export async function routeApi(
   req: IncomingMessage,
   res: ServerResponse,
-  store: Store,
+  rootStore: Store,
   dependencies: RouterDependencies = {},
 ) {
   const url = new URL(req.url ?? "/", "http://localhost");
   const method = req.method ?? "GET";
   const userId = DEMO_USER_ID;
+  // Every route reads and writes only this user's records.
+  const store = rootStore.forUser(userId);
   try {
     if (method === "GET" && url.pathname === "/api/bootstrap") {
       const state = await store.snapshot();

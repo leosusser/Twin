@@ -19,6 +19,7 @@ import {
   queueDueMorningPlans,
 } from "./services/day-planning.ts";
 import { registerAvatarRequest } from "./services/avatar-cancellation.ts";
+import { localDateInZone, localTimeInZone } from "./domain/time.ts";
 import { libraryScene } from "./services/avatar-library.ts";
 const avatarStyleReferencePath = fileURLToPath(
   new URL("../data/style-references/running-avatar.png", import.meta.url),
@@ -43,11 +44,15 @@ export async function stopWorker(limitMs = 20_000) {
   const deadline = Date.now() + limitMs;
   while (processing && Date.now() < deadline) await new Promise((done) => setTimeout(done, 100));
 }
+let lastMorningCheck = 0;
 async function pollJobs() {
   if (processing) return;
   processing = true;
   try {
-    await processJobs();
+    // Morning plans need minute precision, not the 5-second job cadence.
+    const queueMorning = Date.now() - lastMorningCheck >= 60_000;
+    if (queueMorning) lastMorningCheck = Date.now();
+    await processJobs(store, {}, { queueMorning });
   } catch {
     console.error("WORKER_POLL_FAILED");
   } finally {
@@ -56,13 +61,54 @@ async function pollJobs() {
 }
 if (resolve(process.argv[1] ?? "") === fileURLToPath(import.meta.url))
   await startWorker(await new PostgresStore().init());
+// Finds users with work using small cross-user queries, then runs each user's
+// jobs on that user's own store, so no job ever loads another user's records.
 export async function processJobs(
   targetStore: Store = store,
   dependencies: WorkerDependencies = {},
+  options: { queueMorning?: boolean } = {},
 ) {
   const now = new Date();
+  if (options.queueMorning !== false) await queueMorningPlans(targetStore, now);
+  for (const userId of await targetStore.dueJobUserIds(now)) {
+    try {
+      await processUserJobs(targetStore.forUser(userId), dependencies, now);
+    } catch {
+      console.error("WORKER_USER_FAILED");
+    }
+  }
+}
+// Reads only the small settings table, skips users who already have today's
+// morning job, and opens a one-user transaction only for the rest.
+async function queueMorningPlans(targetStore: Store, now: Date) {
+  // One user's bad time zone must not stop everyone else's plans.
+  const due = (await targetStore.allSettings()).filter((settings) => {
+    try {
+      return (
+        settings.onboarding_complete &&
+        localTimeInZone(now, settings.timezone) >= settings.wake_time &&
+        Boolean(localDateInZone(now, settings.timezone))
+      );
+    } catch {
+      return false;
+    }
+  });
+  const morningKey = (settings: (typeof due)[number]) =>
+    `plan:${settings.user_id}:morning:${localDateInZone(now, settings.timezone)}`;
+  const existing = await targetStore.existingJobKeys(due.map(morningKey));
+  for (const settings of due) {
+    if (existing.has(morningKey(settings))) continue;
+    try {
+      await targetStore.forUser(settings.user_id).transaction((draft) => {
+        queueDueMorningPlans(draft, now);
+      });
+    } catch {
+      console.error("WORKER_MORNING_QUEUE_FAILED");
+    }
+  }
+}
+async function processUserJobs(targetStore: Store, dependencies: WorkerDependencies, now: Date) {
   await targetStore.transaction((draft) => {
-    queueDueMorningPlans(draft, now);
     for (const job of draft.jobs) {
       if (
         job.status === "running" &&

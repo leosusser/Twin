@@ -105,11 +105,16 @@ export async function importSharedPrototypeCalendarForAllUsers(
   sourceUrl: string,
   dependencies: { now?: Date; fetchImpl?: typeof fetch } = {},
 ): Promise<SharedPrototypeCalendarResult[]> {
-  const userIds = (await store.snapshot()).users.map((user) => user.id);
+  const userIds = await store.userIds();
   const results: SharedPrototypeCalendarResult[] = [];
   for (const userId of userIds) {
     try {
-      const result = await importPrototypeCalendarFeed(store, userId, sourceUrl, dependencies);
+      const result = await importPrototypeCalendarFeed(
+        store.forUser(userId),
+        userId,
+        sourceUrl,
+        dependencies,
+      );
       results.push({ user_id: userId, ...result });
     } catch (error) {
       if (error instanceof Error && error.message === "LIVE_CALENDAR_ALREADY_CONNECTED") {

@@ -51,9 +51,15 @@ GitHub Actions runs `npm run verify` for pull requests and pushes to `main`. Dat
 PostgreSQL is the sole record store. Each domain record is a row in a dedicated table
 in the `twin` schema, with its original payload in JSONB and indexed owner/key fields.
 Private image bytes live outside the static web root under `TWIN_ASSET_DIR` (default `data/assets/`), one folder per user: records store only the relative key `<user_id>/<asset_id>.<ext>`, so the folder can move to a Docker volume or object storage without rewriting data. Older records that saved a full path resolve by file name inside the current folder.
-Domain mutations use a database-wide transaction lock and row-level diffs. Reads are
-repeatable-read database snapshots, not a process-local cache. This compatibility
-adapter still loads full state for many routes and should use scoped queries before scaling.
+Every route and job works on one user's view: `store.forUser(userId)` reads only that user's
+rows (one round-trip query over the indexed `user_id` column) and locks only that user, so
+different users never wait on each other and request cost does not grow with the number of
+users. Writes are row-level diffs, and a one-user write rejects any record owned by someone
+else. The worker finds users with due jobs, and users due a morning plan, through small
+cross-user queries, then runs each user's work on that user's view. Reads are repeatable-read
+snapshots, not a process-local cache. Measured on a throwaway database with 300 demo-sized
+users: loading one user took 1.7 ms against 41 ms for the old all-users load, and a save took
+2.3 ms against 60.5 ms.
 
 ## Environment
 

@@ -10,9 +10,17 @@ import { generateDemoTwinDay } from "../domain/planner.ts";
 import { localDateInZone, localDateTimeToUtc } from "../domain/time.ts";
 export const DEMO_USER_ID = "user_demo";
 export { PostgresStore } from "./postgres.ts";
+// A store is either the all-users root or one user's view from forUser(). Routes
+// and jobs only ever see a one-user view; the cross-user methods below exist so
+// the worker can find work without loading everyone's records.
 export interface Store {
   snapshot(): Promise<AppState>;
   transaction<T>(mutation: (draft: AppState) => T | Promise<T>): Promise<T>;
+  forUser(userId: string): Store;
+  userIds(): Promise<string[]>;
+  dueJobUserIds(now: Date): Promise<string[]>;
+  allSettings(): Promise<AppState["settings"]>;
+  existingJobKeys(dedupeKeys: string[]): Promise<Set<string>>;
   talkContext?(
     userId: string,
     conversationId: string,

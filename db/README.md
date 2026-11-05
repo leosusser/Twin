@@ -91,15 +91,13 @@ and reads after reconnection. Never use your application database for this test.
 
 This remains a loopback-only, single-user app (`user_demo`), not a hosted service.
 Before hosting: add authentication/session security, replace the fixed user identity,
-enforce authorization for every route and asset, tenant-scope idempotency keys,
-apply row-level security and cross-record ownership constraints, use a least-privilege
+enforce authorization for every route and asset, apply row-level security and cross-record ownership constraints, use a least-privilege
 application role separate from migrations, and enable transport security.
 Add CSRF protection/rate limits, backup/restore drills, secret rotation and key
 management, private per-user object storage, retention/deletion guarantees, and
 operational monitoring that never logs payloads or credentials.
 
-Replace full-state reads/global write serialization with scoped repositories for
-scale. Domain relationships are preserved in JSONB; except for owner foreign keys,
+Reads, writes, locks, and idempotency keys are already per user (migration 003). Domain relationships are preserved in JSONB; except for owner foreign keys,
 they are not yet enforced by relational foreign keys (some historical references
 outlive chat retention). Worker claims are atomic, but robust crash recovery and
 exactly-once paid image effects require a leased, fenced job runner and provider
