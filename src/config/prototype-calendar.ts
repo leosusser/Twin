@@ -10,9 +10,14 @@ export interface PrototypeCalendarConfig {
   sourceUrl: string;
 }
 
+// The shared default calendar for every profile. TWIN_DEFAULT_CALENDAR_URL (server
+// env, e.g. Docker) wins; otherwise the gitignored local JSON file is read.
 export async function loadPrototypeCalendarConfig(
   path = defaultPath,
+  environment: NodeJS.ProcessEnv = process.env,
 ): Promise<PrototypeCalendarConfig | undefined> {
+  const fromEnvironment = environment.TWIN_DEFAULT_CALENDAR_URL?.trim();
+  if (fromEnvironment) return { enabled: true, sourceUrl: fromEnvironment };
   let text: string;
   try {
     text = await readFile(path, "utf8");

@@ -7,8 +7,27 @@ import { normalizeCalendarEvent } from "./calendar-event.ts";
 const maxFeedBytes = 1_000_000;
 const maxComponents = 5_000;
 const maxOccurrences = 5_000;
-const allowedHost = "mywharton2.wharton.upenn.edu";
-const allowedPath = /^\/api\/v2\/events\/calendars\/ical\/[A-Za-z0-9-]+\/$/;
+// Server-configured feeds only: a private Wharton feed, or a Google Calendar
+// "secret address in iCal format". Add a host here to allow another provider.
+const allowedFeeds: Array<{ host: string; path: RegExp; name: string }> = [
+  {
+    host: "mywharton2.wharton.upenn.edu",
+    path: /^\/api\/v2\/events\/calendars\/ical\/[A-Za-z0-9-]+\/$/,
+    name: "Wharton",
+  },
+  {
+    host: "calendar.google.com",
+    path: /^\/calendar\/ical\/[A-Za-z0-9._%-]+\/private-[A-Za-z0-9]+\/basic\.ics$/,
+    name: "Google Calendar",
+  },
+];
+export function prototypeCalendarSourceName(sourceUrl: string) {
+  try {
+    return allowedFeeds.find((feed) => feed.host === new URL(sourceUrl).hostname)?.name;
+  } catch {
+    return undefined;
+  }
+}
 
 export class PrototypeCalendarProblem extends Error {
   code: string;
@@ -208,13 +227,12 @@ function validatePrototypeCalendarUrl(value: string) {
   } catch {
     throw new PrototypeCalendarProblem(
       "PROTOTYPE_CALENDAR_URL_INVALID",
-      "Use a valid Wharton iCalendar feed URL.",
+      "Use a valid private iCalendar feed URL.",
     );
   }
   if (
     url.protocol !== "https:" ||
-    url.hostname !== allowedHost ||
-    !allowedPath.test(url.pathname) ||
+    !allowedFeeds.some((feed) => feed.host === url.hostname && feed.path.test(url.pathname)) ||
     url.username ||
     url.password ||
     url.search ||
@@ -222,7 +240,7 @@ function validatePrototypeCalendarUrl(value: string) {
   )
     throw new PrototypeCalendarProblem(
       "PROTOTYPE_CALENDAR_URL_INVALID",
-      "Use the private Wharton iCalendar feed URL for this prototype.",
+      "Use a private Wharton or Google Calendar iCal address for this prototype.",
     );
   return url;
 }

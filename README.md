@@ -143,16 +143,19 @@ create, edit, or delete Google events.
 
 ### Prototype Calendar snapshot without OAuth
 
-For this loopback prototype only, one private Wharton iCalendar feed is configured as a shared
-server source. Copy `config/prototype-calendar.example.json` to the gitignored
-`config/prototype-calendar.local.json` and put the private feed URL there. Then refresh every
+One private iCalendar feed is configured as a shared server source: the default calendar for
+every profile. It may be a private Wharton feed or a Google Calendar "Secret address in iCal
+format" (Google Calendar › Settings › your calendar › Integrate calendar); other hosts are
+rejected. Set `TWIN_DEFAULT_CALENDAR_URL` in the server environment (used by Docker), or copy
+`config/prototype-calendar.example.json` to the gitignored `config/prototype-calendar.local.json`
+and put the private feed URL there. The environment value wins when both exist. Then refresh every
 existing profile with:
 
 ```bash
 npm run calendar:prototype
 ```
 
-The private URL stays only in that ignored server file. It is not stored on a user, written to
+The private URL stays only in server configuration. It is not stored on a user, written to
 PostgreSQL, logged, or returned to the browser. At server startup, and whenever a new profile is
 initialized, Twin applies the shared source to that profile. Normalized Calendar events remain
 separate owner-scoped PostgreSQL records so one user's context can never satisfy another user's
@@ -375,5 +378,6 @@ a self-signed certificate). Then run `docker compose up -d --build`.
 - Google redirect URIs are set to `https://$TWIN_SITE_ADDRESS/api/integrations/{calendar,gmail}/callback`;
   add both to the Google OAuth client. Google requires a real domain, not an IP address.
 - The image excludes `.env`, `node_modules`, `data/assets/`, `data/twin.json`, and
-  `config/*.local.json`, so the prototype Calendar feed is off inside Docker.
+  `config/*.local.json`. Set `TWIN_DEFAULT_CALENDAR_URL` in `.env` to give every profile the
+  shared default calendar inside Docker.
 - There is still no login: anyone who can reach the address acts as the single user.

@@ -14,6 +14,8 @@ import { initializeLocalProfile } from "../src/storage/store.ts";
 import { MemoryStore } from "./memory-store.ts";
 
 const feedUrl = "https://mywharton2.wharton.upenn.edu/api/v2/events/calendars/ical/test-feed-id/";
+const googleFeedUrl =
+  "https://calendar.google.com/calendar/ical/someone%40gmail.com/private-0123abcd/basic.ics";
 
 function calendar(summary = "Class planning") {
   return [
@@ -153,6 +155,28 @@ test("prototype feed URL is restricted and live Google credentials cannot be rep
     }),
     (error: any) => error?.code === "PROTOTYPE_CALENDAR_URL_INVALID",
   );
+  for (const rejected of [
+    "http://calendar.google.com/calendar/ical/someone%40gmail.com/private-0123abcd/basic.ics",
+    "https://calendar.google.com/calendar/ical/someone%40gmail.com/public/basic.ics",
+    "https://calendar.google.com.evil.example/calendar/ical/a/private-0123abcd/basic.ics",
+  ])
+    await assert.rejects(
+      importPrototypeCalendarFeed(store, "user_demo", rejected, {
+        now: new Date("2026-10-26T12:00:00Z"),
+        fetchImpl: async () => new Response(calendar()),
+      }),
+      (error: any) => error?.code === "PROTOTYPE_CALENDAR_URL_INVALID",
+    );
+  const google = await importPrototypeCalendarFeed(store, "user_demo", googleFeedUrl, {
+    now: new Date("2026-10-26T12:00:00Z"),
+    fetchImpl: async () => new Response(calendar()),
+  });
+  assert.equal(google.status, "imported");
+  assert.equal(
+    (await store.snapshot()).integrations.find((item) => item.provider === "google_calendar")!
+      .selected_calendars![0].name,
+    "Google Calendar prototype snapshot",
+  );
   await store.transaction((draft) => {
     const connection = draft.integrations.find((item) => item.provider === "google_calendar")!;
     connection.mode = "live";
@@ -190,12 +214,22 @@ test("shared prototype config stays server-side and can be disabled", async () =
   const path = join(directory, "calendar.json");
   try {
     await writeFile(path, JSON.stringify({ enabled: true, source_url: feedUrl }));
-    assert.deepEqual(await loadPrototypeCalendarConfig(path), {
+    assert.deepEqual(await loadPrototypeCalendarConfig(path, {}), {
       enabled: true,
       sourceUrl: feedUrl,
     });
     await writeFile(path, JSON.stringify({ enabled: false, source_url: feedUrl }));
-    assert.equal(await loadPrototypeCalendarConfig(path), undefined);
+    assert.equal(await loadPrototypeCalendarConfig(path, {}), undefined);
+    assert.deepEqual(
+      await loadPrototypeCalendarConfig(path, { TWIN_DEFAULT_CALENDAR_URL: ` ${googleFeedUrl} ` }),
+      { enabled: true, sourceUrl: googleFeedUrl },
+    );
+    assert.equal(
+      await loadPrototypeCalendarConfig(join(directory, "missing.json"), {
+        TWIN_DEFAULT_CALENDAR_URL: "",
+      }),
+      undefined,
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

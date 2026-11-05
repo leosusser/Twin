@@ -1,5 +1,8 @@
 import type { Store } from "../storage/store.ts";
-import { fetchPrototypeCalendar } from "../integrations/prototype-calendar.ts";
+import {
+  fetchPrototypeCalendar,
+  prototypeCalendarSourceName,
+} from "../integrations/prototype-calendar.ts";
 
 export interface SharedPrototypeCalendarResult {
   user_id: string;
@@ -78,7 +81,11 @@ export async function importPrototypeCalendarFeed(
       feed_sha256: snapshot.feedHash,
     });
     connection.selected_calendars = [
-      { id: snapshot.calendarId, name: "Wharton prototype snapshot", selected: true },
+      {
+        id: snapshot.calendarId,
+        name: `${prototypeCalendarSourceName(sourceUrl) ?? "Shared"} prototype snapshot`,
+        selected: true,
+      },
     ];
     delete connection.source_url_hash;
     connection.source_window_start_date = snapshot.windowStart;
