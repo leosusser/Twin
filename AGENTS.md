@@ -35,7 +35,15 @@
 - Use `twin_explorer` for read-only investigation, `twin_builder` for one resolved implementation slice, and `twin_reviewer` for read-only review. Give every subagent a bounded brief with its goal, context, exact read scope, exclusive write scope (or none), dependencies, constraints, done criteria, checks, and required return format. Subagents must not re-delegate or broaden their authority; only the main thread may spawn agents or request broader access.
 - Run parallel `twin_builder` agents only when their path ownership is explicit and non-overlapping and their interfaces are already resolved. Serialize edits to shared files, plans, schemas, contracts, generated artifacts, and coordination documents.
 - Use no more than three concurrent subagents. The main thread waits for relevant results, reconciles conflicting evidence, inspects and integrates the combined changes, runs final `$twin-verify`, and owns the user-facing handoff.
-- Implement the smallest coherent vertical slice; avoid speculative services and unrelated cleanup.
+
+## Working style
+
+These habits are adapted from the community `andrej-karpathy-skills` guidelines. Product, trust, safety, and authorization rules in this file always win. Use judgment on trivial tasks.
+
+- **Think before coding.** State assumptions and proceed. Stop to ask only when a wrong guess would be costly or hard to undo. If interpretations differ materially, name them instead of picking silently, and say so when a simpler approach exists.
+- **Simplicity first.** Implement the smallest coherent vertical slice. Add no features, services, abstractions, or configurability beyond the request, and no handling for impossible scenarios. If it could be much shorter, rewrite it.
+- **Surgical changes.** Every changed line should trace to the request. Match existing style. Mention unrelated dead code or problems instead of fixing them, and remove only what your own change orphaned.
+- **Goal-driven execution.** Turn tasks into checks: reproduce a bug with a failing test before fixing it, and keep tests passing before and after a refactor. For multi-step work, state a brief plan with a verification for each step, then loop until the checks pass.
 
 ## Commands
 

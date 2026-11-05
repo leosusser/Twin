@@ -144,6 +144,11 @@ export interface PlanningContext {
     created_at: string;
     correction_of_id?: string;
   }>;
+  morning_checkin_answers: Array<{
+    id: string;
+    content: string;
+    created_at: string;
+  }>;
 }
 
 export function selectPlanningContext(
@@ -336,6 +341,32 @@ export function selectPlanningContext(
             created_at: message.created_at,
           }))
       : [];
+  const checkinConversations = new Map(
+    state.conversations
+      .filter(
+        (item) =>
+          item.user_id === userId && item.morning_checkin?.local_date === input.targetLocalDate,
+      )
+      .map((item) => [item.id, item.morning_checkin?.completed_at]),
+  );
+  const morningCheckinAnswers = state.messages
+    .filter(
+      (message) =>
+        message.user_id === userId &&
+        message.role === "user" &&
+        message.status === "saved" &&
+        checkinConversations.has(message.conversation_id) &&
+        // Later Talk in the same conversation is not part of the check-in.
+        message.created_at <=
+          (checkinConversations.get(message.conversation_id) ?? message.created_at),
+    )
+    .sort((left, right) => left.created_at.localeCompare(right.created_at))
+    .slice(-12)
+    .map((message) => ({
+      id: message.id,
+      content: message.content.slice(0, 600),
+      created_at: message.created_at,
+    }));
   // A catch-up report is the only direct evidence authorized to reconstruct this
   // run's elapsed time. Older reports remain stored (and prior report-backed
   // activities remain protected), but exposing their IDs here would contradict
@@ -377,7 +408,9 @@ export function selectPlanningContext(
       fact_ids: memory.map((item) => item.id),
       calendar_event_ids: relevantEvents.map((item) => item.id),
       activity_report_ids: actualActivityReports.map((item) => item.id),
-      conversation_message_ids: recentConversation.map((item) => item.id),
+      conversation_message_ids: [
+        ...new Set([...recentConversation, ...morningCheckinAnswers].map((item) => item.id)),
+      ],
       existing_activity_ids: existingSchedule?.activities.map((item) => item.id) ?? [],
     },
     revision_window: {
@@ -438,5 +471,6 @@ export function selectPlanningContext(
         recorded_at: change.recorded_at,
       })),
     actual_activity_reports: actualActivityReports,
+    morning_checkin_answers: morningCheckinAnswers,
   };
 }

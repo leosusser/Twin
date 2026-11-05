@@ -126,3 +126,20 @@ test("Talk uses native WebRTC controls and real analyser-driven orb state", () =
   assert.match(styles, /--talk-output-level/);
   assert.match(styles, /prefers-reduced-motion/);
 });
+
+test("Talk opens the morning check-in, lets Twin speak first, and finishes on leaving", () => {
+  const appSource = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  const voiceSource = readFileSync(new URL("../public/talk-voice.js", import.meta.url), "utf8");
+  assert.match(appSource, /purpose: "morning_checkin"/);
+  assert.equal(
+    appSource.match(/voiceTalk\.start\(app\.conversationId, \{ speakFirst \}\)/g)?.length,
+    2,
+  );
+  assert.equal(appSource.match(/\.finally\(finishMorningCheckin\)/g)?.length, 3);
+  assert.match(appSource, /morning-checkin\/complete`, \{ method: "POST", keepalive: true \}/);
+  assert.match(appSource, /if \(opening && !app\.talkOpen\) \{/);
+  assert.match(
+    voiceSource,
+    /if \(speakFirst\) channel\.send\(JSON\.stringify\(\{ type: "response\.create" \}\)\)/,
+  );
+});

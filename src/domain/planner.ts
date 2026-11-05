@@ -256,6 +256,15 @@ export function validatePlannerOutput(
       if (supportedByCurrentCatchUpReport) confidence = "grounded";
       else if (!fixedSourceEvents.length) confidence = "possible";
     }
+    // A stated plan cannot prove that elapsed time happened that way.
+    if (
+      !catchUp &&
+      new Date(startAt) < input.now &&
+      sourceMessageIds.length &&
+      !supportingReportIds.length &&
+      !fixedSourceEvents.length
+    )
+      confidence = "possible";
     if (typeof proposal.is_experiment !== "boolean")
       throw invalid("Activity is_experiment must be a boolean.");
     const sourceTypes: TwinActivity["source_types"] = [];

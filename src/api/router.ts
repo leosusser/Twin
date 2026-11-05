@@ -43,12 +43,14 @@ import {
   planningTargetDateFromConversation,
   queueDayPlanningJob,
   queueDueMorningPlans,
+  finishMorningCheckin,
 } from "../services/day-planning.ts";
 import { importPrototypeCalendarFeed } from "../services/prototype-calendar.ts";
 import { cancelAvatarRequest } from "../services/avatar-cancellation.ts";
 import { activityOutfit, libraryScene, outfitTag } from "../services/avatar-library.ts";
 import { DEMO_USER_ID, initializeLocalProfile, type Store } from "../storage/store.ts";
 import { selectTalkContext } from "../storage/context.ts";
+import { activeCheckinBrief, morningCheckinStatus } from "../domain/morning-checkin.ts";
 
 export interface RouterDependencies {
   prototypeCalendarSourceUrl?: string;
@@ -426,19 +428,64 @@ export async function routeApi(
       );
     }
     if (url.pathname === "/api/talk/conversations" && method === "POST") {
-      const conversation = await store.transaction((draft) => {
-        const now = new Date().toISOString();
+      const body = await readJson(req);
+      if (body.purpose !== undefined && body.purpose !== "morning_checkin")
+        throw new HttpProblem(422, "INVALID_CONVERSATION_PURPOSE", "Choose a valid purpose.");
+      const created = await store.transaction((draft) => {
+        const now = new Date();
+        const timestamp = now.toISOString();
+        const checkin = body.purpose ? morningCheckinStatus(draft, userId, now) : null;
+        if (checkin && !checkin.available)
+          throw new HttpProblem(
+            409,
+            "MORNING_CHECKIN_UNAVAILABLE",
+            "There is nothing to check in about right now.",
+          );
+        if (checkin?.conversation_id)
+          return {
+            status: 200,
+            item: ownConversation(draft, userId, checkin.conversation_id),
+          };
         const item = {
           id: randomUUID(),
           user_id: userId,
-          title: "A new conversation",
-          created_at: now,
-          updated_at: now,
+          title: checkin ? "Morning check-in" : "A new conversation",
+          created_at: timestamp,
+          updated_at: timestamp,
+          ...(checkin
+            ? {
+                morning_checkin: {
+                  local_date: localDateInZone(now, ownSettings(draft, userId).timezone),
+                  status: "active" as const,
+                },
+              }
+            : {}),
         };
         draft.conversations.push(item);
-        return item;
+        return { status: 201, item };
       });
-      return json(res, 201, conversation);
+      return json(res, created.status, created.item);
+    }
+    const checkinCompleteMatch = url.pathname.match(
+      /^\/api\/talk\/conversations\/([^/]+)\/morning-checkin\/complete$/,
+    );
+    if (checkinCompleteMatch && method === "POST") {
+      const result = await store.transaction((draft) => {
+        const conversation = ownConversation(draft, userId, checkinCompleteMatch[1]);
+        if (!conversation.morning_checkin)
+          throw new HttpProblem(
+            409,
+            "NOT_A_MORNING_CHECKIN",
+            "That conversation is not a morning check-in.",
+          );
+        const job = finishMorningCheckin(draft, conversation);
+        return {
+          status: conversation.morning_checkin.status,
+          planningStatus: job?.status ?? "not_queued",
+          planning_job_id: job?.id,
+        };
+      });
+      return json(res, 200, result);
     }
     const messagesMatch = url.pathname.match(/^\/api\/talk\/conversations\/([^/]+)\/messages$/);
     if (messagesMatch && method === "GET") {
@@ -1158,14 +1205,17 @@ async function sendTalk(
     );
   const settings = ownSettings(state, userId);
   const today = localDateInZone(new Date(), settings.timezone);
+  const morningCheckin = activeCheckinBrief(state, userId, conversationId);
   const reply = await createTalkReply(decryptSecret(connection.encrypted_key), {
     message: text,
+    morningCheckin,
     ...(store.talkContext
       ? await store.talkContext(userId, conversationId, text)
       : selectTalkContext(state, userId, conversationId, text)),
     day: latestDay(state, userId, today),
   });
-  const report = extractDirectReport(text);
+  // Check-in answers are stated plans, never actual activity reports.
+  const report = morningCheckin ? null : extractDirectReport(text);
   const avatarCommand = extractAvatarCommand(text);
   const result = await store.transaction((draft) => {
     const assistant = {
@@ -1224,13 +1274,16 @@ async function sendTalk(
         payload: { request_id: avatarRequest.id },
       });
     }
-    const planningJob = queueDayPlanningJob(draft, {
-      userId,
-      trigger: "after_conversation",
-      targetLocalDate: planningTargetDateFromConversation(text, today),
-      sourceId: assistant.id,
-      conversationId,
-    });
+    // A check-in builds the day once, when it ends, instead of after every answer.
+    const planningJob = morningCheckin
+      ? null
+      : queueDayPlanningJob(draft, {
+          userId,
+          trigger: "after_conversation",
+          targetLocalDate: planningTargetDateFromConversation(text, today),
+          sourceId: assistant.id,
+          conversationId,
+        });
     const response = {
       user_message: prepared.userMessage,
       assistant_message: assistant,
@@ -1238,8 +1291,8 @@ async function sendTalk(
       reportStatus: reportRecord ? "saved_as_actual_activity" : "none",
       memoryStatus: "unchanged",
       avatarRequestStatus: avatarRequest ? "queued" : "none",
-      planningStatus: planningJob.status,
-      planning_job_id: planningJob.id,
+      planningStatus: planningJob?.status ?? "waiting_for_checkin",
+      planning_job_id: planningJob?.id,
       report: reportRecord,
       avatar_request: avatarRequest,
     };
@@ -1541,15 +1594,20 @@ async function completeVoiceCall(
       .map((item) => item.transcript)
       .join(" ");
     const source = savedMessages.at(-1);
-    const planningJob = source
-      ? queueDayPlanningJob(draft, {
-          userId,
-          trigger: "after_conversation",
-          targetLocalDate: planningTargetDateFromConversation(userText, today),
-          sourceId: `voice-session:${voiceSessionId}`,
-          conversationId,
-        })
-      : null;
+    const planningJob = activeCheckinBrief(draft, userId, conversationId)
+      ? // A dropped call keeps the check-in open so Retry voice can continue it.
+        disposition === "abandoned"
+        ? null
+        : finishMorningCheckin(draft, conversation)
+      : source
+        ? queueDayPlanningJob(draft, {
+            userId,
+            trigger: "after_conversation",
+            targetLocalDate: planningTargetDateFromConversation(userText, today),
+            sourceId: `voice-session:${voiceSessionId}`,
+            conversationId,
+          })
+        : null;
     const response = {
       messages: savedMessages,
       reports: [],
@@ -1956,6 +2014,7 @@ function homeRead(state: AppState, userId: string) {
     ).length,
     sourceLimitations: day?.limited_context ?? ["No twin day has been generated yet."],
     talkConnectionStatus: safeModel(ownModel(state, userId)).status,
+    morningCheckin: morningCheckinStatus(state, userId),
   };
 }
 function characterRead(state: AppState, userId: string) {

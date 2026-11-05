@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import type {
   ActivityReport,
   AppState,
+  Conversation,
   Job,
   PlanningTrigger,
   TwinDayVersion,
@@ -162,7 +163,7 @@ export async function planTwinDay(
     const sourceFactIds = new Set(context.memory.map((item) => item.id));
     const sourceEventIds = new Set(context.calendar.events.map((item) => item.id));
     const sourceReportIds = new Set(context.actual_activity_reports.map((item) => item.id));
-    const sourceMessageIds = new Set(context.recent_conversation.map((item) => item.id));
+    const sourceMessageIds = new Set(context.citation_id_allowlist.conversation_message_ids);
     const validationInput = {
       userId: request.userId,
       targetLocalDate: request.targetLocalDate,
@@ -446,6 +447,34 @@ export function queueDayPlanningJob(
   return job;
 }
 
+export function finishMorningCheckin(
+  state: AppState,
+  conversation: Conversation,
+  now = new Date(),
+) {
+  const checkin = conversation.morning_checkin;
+  if (checkin?.status !== "active") return null;
+  const answered = state.messages.some(
+    (item) =>
+      item.user_id === conversation.user_id &&
+      item.conversation_id === conversation.id &&
+      item.role === "user" &&
+      item.status === "saved",
+  );
+  if (!answered) return null;
+  checkin.status = "complete";
+  checkin.completed_at = now.toISOString();
+  const settings = state.settings.find((item) => item.user_id === conversation.user_id);
+  if (!settings || checkin.local_date !== localDateInZone(now, settings.timezone)) return null;
+  return queueDayPlanningJob(state, {
+    userId: conversation.user_id,
+    trigger: "after_conversation",
+    targetLocalDate: checkin.local_date,
+    sourceId: `morning-checkin:${conversation.id}`,
+    conversationId: conversation.id,
+  });
+}
+
 export function queueDueMorningPlans(state: AppState, now = new Date()) {
   const queued: Job[] = [];
   for (const settings of state.settings) {
@@ -454,6 +483,23 @@ export function queueDueMorningPlans(state: AppState, now = new Date()) {
     if (!model?.encrypted_key) continue;
     const localDate = localDateInZone(now, settings.timezone);
     if (localTimeInZone(now, settings.timezone) < settings.wake_time) continue;
+    // A finished check-in replaces this run, unless its own build failed.
+    const finishedCheckin = state.conversations.find(
+      (item) =>
+        item.user_id === settings.user_id &&
+        item.morning_checkin?.local_date === localDate &&
+        item.morning_checkin.status === "complete",
+    );
+    if (
+      finishedCheckin &&
+      state.jobs.find(
+        (job) =>
+          job.user_id === settings.user_id &&
+          job.dedupe_key ===
+            `plan:${settings.user_id}:after_conversation:morning-checkin:${finishedCheckin.id}`,
+      )?.status !== "failed"
+    )
+      continue;
     const dedupeKey = `plan:${settings.user_id}:morning:${localDate}`;
     if (state.jobs.some((job) => job.user_id === settings.user_id && job.dedupe_key === dedupeKey))
       continue;

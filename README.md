@@ -216,6 +216,16 @@ All planning uses one server-side service and the explicit trigger values `morni
   and any supported actual-activity report have committed. The model can return `no_change`; an
   accepted revision can alter only unprotected future activities. Only the triggering Talk
   conversation is included as transcript context.
+- **Morning check-in:** from 04:00 to 14:00 local time, opening Talk starts one check-in per day
+  when Twin has unknown time left today. Unknown time is anything from now until `sleep_time`
+  that is not a busy Calendar event or a locked, edited, reported, conversation-backed, or
+  `grounded` non-experiment activity; windows under 30 minutes are ignored and at most five are
+  used. Twin speaks first in voice and asks at most five questions, one at a time. Answers do not
+  rebuild the day until the person leaves Talk, then one `after_conversation` job plans today even
+  if an answer mentions another day. Every later planning run for that date, including manual
+  rebuilds, sees the answers as `morning_checkin_answers`. They are stated plans, never activity
+  reports or memory. The automatic morning run still builds a fallback day, and is skipped only if
+  today's check-in already finished.
 - **Manual:** Settings → **Rebuild my day** immediately runs the same service for the current
   local date. For today, **What actually happened so far** is a comprehensive replacement for the
   elapsed backlog and is saved as a direct activity report only after a replacement day validates.
@@ -240,7 +250,7 @@ All planning uses one server-side service and the explicit trigger values `morni
   If no text is supplied and no schedule exists yet, the initial build covers the full local day,
   labels earlier entries as imagined Twin activity, includes an activity covering the captured
   current time, and does not allow an activity to cross into the next local day. Manual planning
-  does not include Talk transcripts.
+  does not include Talk transcripts, except the morning check-in answers described below.
   Before saving, it fits flexible imagined activities into open time, clips their target-day
   overflow at local midnight, and omits a flexible block when fewer than five safe minutes remain.
   If the first plan still leaves the captured current instant open, Twin adds a neutral, explicitly

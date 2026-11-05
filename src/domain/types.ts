@@ -223,6 +223,11 @@ export interface Conversation {
   title: string;
   created_at: string;
   updated_at: string;
+  morning_checkin?: {
+    local_date: string;
+    status: "active" | "complete";
+    completed_at?: string;
+  };
 }
 export interface Message {
   id: string;

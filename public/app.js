@@ -372,7 +372,7 @@ document.addEventListener("click", async (event) => {
       const nextRoute = target.dataset.route;
       if (target.hasAttribute("data-talk-toggle")) {
         app.talkOpen = false;
-        voiceTalk.end().catch((error) => toast(error.message, true));
+        voiceTalk.end().catch((error) => toast(error.message, true)).finally(finishMorningCheckin);
       }
       if (location.hash !== `#${nextRoute}`) history.pushState(null, "", `#${nextRoute}`);
       await navigateRoute(nextRoute);
@@ -387,6 +387,11 @@ document.addEventListener("click", async (event) => {
           : null;
       microphone?.catch(() => {});
       try {
+        const speakFirst = opening && app.settings?.openai?.status === "connected" ? await openMorningCheckin() : false;
+        if (opening && !app.talkOpen) {
+          voiceTalk.cancelPrepared("Voice ended.");
+          return;
+        }
         if (opening && !app.conversationId && app.settings?.openai?.status === "connected") {
           const conversation = await api("/api/talk/conversations", { method: "POST", body: "{}" });
           app.conversationId = conversation.id;
@@ -397,10 +402,10 @@ document.addEventListener("click", async (event) => {
           setTimeout(() => document.querySelector("[data-voice-mute], #talk-form textarea, .talk-connect, .talk-back")?.focus(), 20);
           if (microphone)
             microphone
-              .then(() => voiceTalk.start(app.conversationId))
+              .then(() => (app.talkOpen ? voiceTalk.start(app.conversationId, { speakFirst }) : undefined))
               .catch((error) => toast(error.message, true));
         } else {
-          voiceTalk.end().catch((error) => toast(error.message, true));
+          voiceTalk.end().catch((error) => toast(error.message, true)).finally(finishMorningCheckin);
           setTimeout(() => document.querySelector("[data-talk-toggle]")?.focus(), 20);
         }
       } catch (error) {
@@ -892,7 +897,7 @@ document.addEventListener("submit", async (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && app.talkOpen) {
     app.talkOpen = false;
-    voiceTalk.end().catch((error) => toast(error.message, true));
+    voiceTalk.end().catch((error) => toast(error.message, true)).finally(finishMorningCheckin);
     render();
     document.querySelector("[data-talk-toggle]")?.focus();
   }
@@ -1358,8 +1363,42 @@ talkLayer = function () {
   const voiceLabel = talkVoiceLabel();
   const voiceActive = ["permission", "connecting", "listening", "user_speaking", "twin_speaking", "muted"].includes(app.voiceState);
   const controls = connected ? `<div class="talk-voice-controls" role="group" aria-label="Voice controls"><button type="button" data-voice-mute ${voiceActive ? "" : "disabled"} aria-pressed="${app.voiceMuted}">${app.voiceMuted ? "Unmute" : "Mute"}</button><button type="button" data-voice-end ${voiceActive ? "" : "disabled"}>End</button>${["error", "ended"].includes(app.voiceState) ? `<button type="button" data-voice-retry>Retry voice</button>` : ""}</div>` : "";
-  return `<div class="talk-layer open" data-talk-backdrop><section class="talk-surface voice-${app.voiceState}" role="dialog" aria-modal="true" aria-labelledby="talk-title" style="--talk-input-level:${app.voiceLevels.input};--talk-output-level:${app.voiceLevels.output}"><header class="talk-page-header"><button class="talk-back" data-talk-toggle aria-label="Back">${talkBackIcon()}</button><h1 id="talk-title">Talk</h1><span aria-hidden="true"></span></header><section class="talk-invitation" aria-labelledby="talk-invitation-title"><h2 id="talk-invitation-title">Explain your day.</h2></section><section class="talk-conversation-stage" aria-label="Conversation around the Twin orb"><p class="talk-conversation-label">${allMessages.length ? "Your conversation" : "Start a conversation"}</p><div class="talk-message-window" tabindex="-1" data-talk-stream><ol class="talk-message-track" aria-label="Conversation transcript">${transcript}</ol></div><div class="talk-orb-control" role="img" aria-label="Voice activity"><span class="talk-orb-halo" aria-hidden="true"></span><span class="talk-orb-art" aria-hidden="true"><span class="talk-orb-core"></span></span></div></section><footer class="talk-dock"><div class="talk-status"><span class="talk-status-dot" aria-hidden="true"></span><span data-voice-status aria-live="polite">${escapeHtml(voiceLabel)}</span><small data-voice-detail>${escapeHtml(app.voiceMessage || (connected ? "Voice and text are available" : "Open Settings"))}</small></div>${controls}${connected ? `<form class="talk-text-form" id="talk-form"><textarea name="message" aria-label="Message" placeholder="Type instead…" required ${app.talkSending ? "disabled" : ""}>${escapeHtml(app.talkDraft)}</textarea><button class="talk-send" aria-label="Send message" ${app.talkSending ? 'disabled aria-busy="true"' : ""}>${app.talkSending ? "…" : talkSendIcon()}</button></form>` : `<button class="talk-connect" data-route="settings" data-talk-toggle>Open Settings</button>`}</footer></section></div>`;
+  return `<div class="talk-layer open" data-talk-backdrop><section class="talk-surface voice-${app.voiceState}" role="dialog" aria-modal="true" aria-labelledby="talk-title" style="--talk-input-level:${app.voiceLevels.input};--talk-output-level:${app.voiceLevels.output}"><header class="talk-page-header"><button class="talk-back" data-talk-toggle aria-label="Back">${talkBackIcon()}</button><h1 id="talk-title">Talk</h1><span aria-hidden="true"></span></header><section class="talk-invitation" aria-labelledby="talk-invitation-title"><h2 id="talk-invitation-title">${app.checkinConversationId ? "Let’s fill in your day." : "Explain your day."}</h2></section><section class="talk-conversation-stage" aria-label="Conversation around the Twin orb"><p class="talk-conversation-label">${allMessages.length ? "Your conversation" : "Start a conversation"}</p><div class="talk-message-window" tabindex="-1" data-talk-stream><ol class="talk-message-track" aria-label="Conversation transcript">${transcript}</ol></div><div class="talk-orb-control" role="img" aria-label="Voice activity"><span class="talk-orb-halo" aria-hidden="true"></span><span class="talk-orb-art" aria-hidden="true"><span class="talk-orb-core"></span></span></div></section><footer class="talk-dock"><div class="talk-status"><span class="talk-status-dot" aria-hidden="true"></span><span data-voice-status aria-live="polite">${escapeHtml(voiceLabel)}</span><small data-voice-detail>${escapeHtml(app.voiceMessage || (connected ? "Voice and text are available" : "Open Settings"))}</small></div>${controls}${connected ? `<form class="talk-text-form" id="talk-form"><textarea name="message" aria-label="Message" placeholder="Type instead…" required ${app.talkSending ? "disabled" : ""}>${escapeHtml(app.talkDraft)}</textarea><button class="talk-send" aria-label="Send message" ${app.talkSending ? 'disabled aria-busy="true"' : ""}>${app.talkSending ? "…" : talkSendIcon()}</button></form>` : `<button class="talk-connect" data-route="settings" data-talk-toggle>Open Settings</button>`}</footer></section></div>`;
 };
+async function openMorningCheckin() {
+  try {
+    app.home = await api("/api/home");
+    if (!app.home.morningCheckin?.available) return false;
+    const checkin = await api("/api/talk/conversations", { method: "POST", body: JSON.stringify({ purpose: "morning_checkin" }) });
+    if (!app.conversations.some((item) => item.id === checkin.id)) app.conversations.unshift({ ...checkin, messages: [] });
+    app.conversationId = checkin.id;
+    app.checkinConversationId = checkin.id;
+    return !app.conversations.find((item) => item.id === checkin.id).messages.length;
+  } catch {
+    return false;
+  }
+}
+async function finishMorningCheckin() {
+  const id = app.checkinConversationId;
+  if (!id) return;
+  app.checkinConversationId = null;
+  try {
+    const previousDayId = app.home?.twinDayVersion?.id;
+    const result = await api(`/api/talk/conversations/${id}/morning-checkin/complete`, { method: "POST", body: "{}" });
+    if (result.status !== "complete") return;
+    toast("Twin is building your day from what you said.");
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await refreshRoute();
+      if (app.home?.twinDayVersion?.id !== previousDayId) {
+        if (!app.talkOpen) render();
+        return;
+      }
+    }
+  } catch (error) {
+    toast(error?.payload?.message ?? error.message, true);
+  }
+}
 function talkVoiceLabel() {
   return ({ idle: "Voice ready", permission: "Microphone permission", connecting: "Connecting…", listening: "Listening", user_speaking: "You’re speaking", twin_speaking: "Twin is speaking", muted: "Muted", ended: "Voice ended", error: "Connection problem" })[app.voiceState] ?? "Voice ready";
 }
@@ -1514,9 +1553,10 @@ document.addEventListener("click", async (event) => {
         voiceTalk.end().catch((error) => toast(error.message, true));
       else {
         voiceTalk.resetForRetry();
+        const speakFirst = app.checkinConversationId === app.conversationId && !app.conversations.find((item) => item.id === app.conversationId)?.messages.length;
         voiceTalk
           .prepareMicrophone()
-          .then(() => voiceTalk.start(app.conversationId))
+          .then(() => voiceTalk.start(app.conversationId, { speakFirst }))
           .catch((error) => toast(error.message, true));
       }
     }
@@ -1585,6 +1625,8 @@ window.addEventListener("pagehide", () => {
       })
       .catch(() => {});
   else voiceTalk.cancelPrepared("Voice ended when this page closed.");
+  if (app.checkinConversationId)
+    void fetch(`/api/talk/conversations/${app.checkinConversationId}/morning-checkin/complete`, { method: "POST", keepalive: true }).catch(() => {});
 });
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Tab" || !app.talkOpen) return;

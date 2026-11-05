@@ -86,7 +86,7 @@ class VoiceTalkController {
     return this.microphonePromise;
   }
 
-  async start(conversationId) {
+  async start(conversationId, { speakFirst = false } = {}) {
     if (["connecting", "listening", "user_speaking", "twin_speaking", "muted"].includes(this.state))
       return;
     this.conversationId = conversationId;
@@ -111,7 +111,10 @@ class VoiceTalkController {
       const channel = peer.createDataChannel("oai-events");
       this.channel = channel;
       channel.addEventListener("message", (event) => this.handleProviderEvent(event.data));
-      channel.addEventListener("open", () => this.setState(this.muted ? "muted" : "listening"));
+      channel.addEventListener("open", () => {
+        this.setState(this.muted ? "muted" : "listening");
+        if (speakFirst) channel.send(JSON.stringify({ type: "response.create" }));
+      });
       channel.addEventListener("error", () => this.fail("The voice event connection failed."));
       peer.addEventListener("connectionstatechange", () => {
         if (["failed", "disconnected"].includes(peer.connectionState))
