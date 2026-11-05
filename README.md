@@ -50,7 +50,7 @@ GitHub Actions runs `npm run verify` for pull requests and pushes to `main`. Dat
 
 PostgreSQL is the sole record store. Each domain record is a row in a dedicated table
 in the `twin` schema, with its original payload in JSONB and indexed owner/key fields.
-Private image bytes remain in `data/assets/`, outside the static web root.
+Private image bytes live outside the static web root under `TWIN_ASSET_DIR` (default `data/assets/`), one folder per user: records store only the relative key `<user_id>/<asset_id>.<ext>`, so the folder can move to a Docker volume or object storage without rewriting data. Older records that saved a full path resolve by file name inside the current folder.
 Domain mutations use a database-wide transaction lock and row-level diffs. Reads are
 repeatable-read database snapshots, not a process-local cache. This compatibility
 adapter still loads full state for many routes and should use scoped queries before scaling.
@@ -190,7 +190,7 @@ Both paths decrypt the same OpenAI API key saved in Settings only on the server.
 receives masked connection metadata and the configured planner model, never the credential or
 provider context. Character generation uses the image edit endpoint and the configured
 `OPENAI_IMAGE_MODEL` (default `gpt-image-1-mini`). Generated avatars are requested as transparent
-PNG cutouts so the Home screen's `#ffffff` background shows through instead of becoming part of
+WebP cutouts (`OPENAI_IMAGE_COMPRESSION`, default 75, roughly a tenth of the PNG size) so the Home screen's `#ffffff` background shows through instead of becoming part of
 the image. A baseline sends the user's private photo
 first as the identity reference and the bundled running character second as the style reference.
 Later activities send the approved baseline first as the identity authority and the same bundled
@@ -267,7 +267,7 @@ stale responses never supersede the last valid schedule.
 
 ### Photo-based avatar flow
 
-Character Studio accepts a private PNG, JPEG, or WebP identity photo up to 8 MB. The server stores it under `data/assets/`, never exposes its storage path, and sends it to the configured image model only when the user requests a baseline. The style anchor is the tracked server-only `data/style-references/running-avatar.png`; it is not a user asset, public URL, or conversation attachment. The prompt tells the model to take rendering and stylization from that image without copying its face, hair, skin tone, body, or clothing. Baseline candidates must be approved before activity art can generate. Each activity request uses that approved baseline as its primary identity reference, saves the result privately, and reuses a saved image on later occurrences. The library key is the approved baseline (the face), the activity, and that activity's outfit; the design version is ignored, so palette edits and switching back to an earlier baseline reuse saved images. Each activity has one outfit, editable under **Settings › Avatar › Outfits** (`PUT /api/character/outfits`, up to 160 characters each; blank lets Twin pick). Saving outfits does not bump the design version or generate anything: a new image is made only when that activity is next shown with an outfit that has no saved image, and switching back to an earlier outfit reuses its image. A failed generation falls back to the approved baseline; deleting avatar data removes both metadata and local user files without removing the shared style reference.
+Character Studio accepts a private PNG, JPEG, or WebP identity photo. The browser shrinks it to at most 1536 px on the long side and re-encodes it as WebP (JPEG where WebP encoding is unavailable) before upload; the server still rejects anything over 8 MB. The server stores it in the user's asset folder, never exposes its storage path, and sends it to the configured image model only when the user requests a baseline. The style anchor is the tracked server-only `data/style-references/running-avatar.png`; it is not a user asset, public URL, or conversation attachment. The prompt tells the model to take rendering and stylization from that image without copying its face, hair, skin tone, body, or clothing. Baseline candidates must be approved before activity art can generate. Each activity request uses that approved baseline as its primary identity reference, saves the result privately, and reuses a saved image on later occurrences. The library key is the approved baseline (the face), the activity, and that activity's outfit; the design version is ignored, so palette edits and switching back to an earlier baseline reuse saved images. Each activity has one outfit, editable under **Settings › Avatar › Outfits** (`PUT /api/character/outfits`, up to 160 characters each; blank lets Twin pick). Saving outfits does not bump the design version or generate anything: a new image is made only when that activity is next shown with an outfit that has no saved image, and switching back to an earlier outfit reuses its image. A failed generation falls back to the approved baseline; deleting avatar data removes both metadata and local user files without removing the shared style reference.
 
 To create a new baseline, connect an OpenAI key in Settings, open Avatar Studio, upload and save a clear photo, and choose **Generate baseline**. Generation does not replace an approved image. Review the candidate and choose **Approve** only when it resembles the person; **Regenerate** creates another candidate and becomes **Stop** while that request is pending. Stop cancels the local job, aborts an in-flight request owned by the running server, and discards any late output; it cannot guarantee that provider-side processing or billing has not already begun. After approval, Home can generate the current activity image from that approved character and will reuse a saved image with the same baseline, activity, and outfit.
 
@@ -324,7 +324,7 @@ Errors use `{ code, message, field_errors?, retryable?, current_version? }`. Ret
 - Raw handoff content is parsed with a 256 KB request limit and is not kept in the prototype state; the import record stores its hash, counts, and seven-day conceptual expiry marker.
 - Talk retention is configurable. The worker cleanup path removes messages beyond the chosen window.
 - Gmail stores minimal normalized cues and metadata, never a complete inbox or attachments.
-- Generated images are private user-scoped API reads and are deleted with account-owned records; filesystem asset deletion should be added before using this beyond local prototype work.
+- Generated images are private user-scoped API reads. Deleting all avatar images or the account removes that user's records and their whole asset folder, without touching other users' files.
 - Export omits encrypted credentials. Account deletion requires the exact phrase `DELETE MY TWIN`.
 - After account deletion, the next reload returns to fresh local onboarding rather than
   requiring demo reseeding.
@@ -356,3 +356,24 @@ must be run with a dedicated test database; it is skipped when TEST_DATABASE_URL
 Remaining deployment gaps are detailed in [database setup](db/README.md), including
 authentication, tenant isolation, scoped repositories, durable worker recovery, and
 tested backup/restore. Do not deploy this local prototype as-is.
+
+## Docker
+
+`compose.yaml` runs three containers: the app (server plus worker), PostgreSQL 16, and Caddy
+for automatic HTTPS. Put `POSTGRES_PASSWORD` and `TWIN_ENCRYPTION_KEY` in `.env`, and set
+`TWIN_SITE_ADDRESS` to the public domain (it defaults to `localhost` for a local rehearsal with
+a self-signed certificate). Then run `docker compose up -d --build`.
+
+- The app applies migrations on every start, then serves on `0.0.0.0:4173` inside the
+  network. Only Caddy publishes ports (80 and 443); the database and app are not reachable
+  from outside.
+- Saved data lives in two named volumes: `twin-db` (PostgreSQL records) and `twin-assets`
+  (image files). Rebuilding or replacing containers keeps both. Back them up together, because
+  image records in the database point at files in the asset volume.
+- `/healthz` answers `ok` for container health checks. On stop, the server refuses new
+  requests, waits for the current worker job (up to 20 seconds), then closes the database.
+- Google redirect URIs are set to `https://$TWIN_SITE_ADDRESS/api/integrations/{calendar,gmail}/callback`;
+  add both to the Google OAuth client. Google requires a real domain, not an IP address.
+- The image excludes `.env`, `node_modules`, `data/assets/`, `data/twin.json`, and
+  `config/*.local.json`, so the prototype Calendar feed is off inside Docker.
+- There is still no login: anyone who can reach the address acts as the single user.

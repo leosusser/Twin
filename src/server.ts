@@ -6,10 +6,12 @@ import { routeApi } from "./api/router.ts";
 import { loadPrototypeCalendarConfig } from "./config/prototype-calendar.ts";
 import { importSharedPrototypeCalendarForAllUsers } from "./services/prototype-calendar.ts";
 import { PostgresStore } from "./storage/store.ts";
-import { startWorker } from "./worker.ts";
+import { startWorker, stopWorker } from "./worker.ts";
 
 const root = fileURLToPath(new URL("../public", import.meta.url));
 const port = Number(process.env.PORT ?? 4173);
+// Loopback by default. Docker sets HOST=0.0.0.0 so the proxy container can reach it.
+const host = process.env.HOST || "127.0.0.1";
 let store: PostgresStore;
 try {
   store = await new PostgresStore().init();
@@ -34,6 +36,10 @@ if (prototypeCalendarConfig) {
 void startWorker(store);
 
 const server = createServer(async (req, res) => {
+  if (req.url === "/healthz") {
+    res.writeHead(200, { "content-type": "text/plain" });
+    return res.end("ok");
+  }
   if ((req.url ?? "").startsWith("/api/"))
     return routeApi(req, res, store, {
       prototypeCalendarSourceUrl: prototypeCalendarConfig?.sourceUrl,
@@ -65,9 +71,26 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () =>
-  console.log(`Personal Twin ready at http://localhost:${port}`),
-);
+server.listen(port, host, () => console.log(`Personal Twin ready at http://localhost:${port}`));
+
+// On stop or redeploy: refuse new requests, let the current job and requests
+// finish, then close the database so no write is cut off midway.
+let stopping = false;
+async function shutdown(signal: string) {
+  if (stopping) return;
+  stopping = true;
+  console.log(`${signal} received; shutting down`);
+  const force = setTimeout(() => process.exit(1), 25_000);
+  force.unref();
+  const closed = new Promise((done) => server.close(done));
+  server.closeIdleConnections();
+  await stopWorker();
+  await closed;
+  await store.close().catch(() => {});
+  process.exit(0);
+}
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
+process.on("SIGINT", () => void shutdown("SIGINT"));
 
 function mime(extension: string) {
   return (

@@ -723,11 +723,12 @@ document.addEventListener("change", async (event) => {
       toast("Choose a PNG, JPEG, or WebP photo.", true);
       return;
     }
-    if (file.size > 8_000_000) {
+    const dataUrl = await compressedPhotoDataUrl(file);
+    if (dataUrl.length > 10_000_000) {
       toast("Use a photo smaller than 8 MB.", true);
       return;
     }
-    app.avatarPreview = { name: file.name, dataUrl: await fileDataUrl(file) };
+    app.avatarPreview = { name: file.name, dataUrl };
     render();
   }
 });
@@ -1059,6 +1060,26 @@ function activityName(key) {
       bathroom: "Bathroom break",
     }[key] ?? "Getting ready"
   );
+}
+// Shrinks a photo before upload: at most 1536px on the long side, WebP (or JPEG
+// where the browser cannot encode WebP). Keeps the original if that is smaller.
+async function compressedPhotoDataUrl(file) {
+  const original = await fileDataUrl(file);
+  try {
+    const image = new Image();
+    image.src = original;
+    await image.decode();
+    const scale = Math.min(1, 1536 / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.naturalWidth * scale);
+    canvas.height = Math.round(image.naturalHeight * scale);
+    canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+    let compressed = canvas.toDataURL("image/webp", 0.82);
+    if (!compressed.startsWith("data:image/webp")) compressed = canvas.toDataURL("image/jpeg", 0.85);
+    return compressed.length < original.length ? compressed : original;
+  } catch {
+    return original;
+  }
 }
 function fileDataUrl(file) {
   return new Promise((resolve, reject) => {

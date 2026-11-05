@@ -8,6 +8,7 @@ import { cancelAvatarRequest } from "../src/services/avatar-cancellation.ts";
 import { encryptSecret } from "../src/integrations/secrets.ts";
 import { DEMO_USER_ID } from "../src/storage/store.ts";
 import { MemoryStore } from "./memory-store.ts";
+import { assetPath } from "../src/storage/assets.ts";
 
 test("avatar image edits keep identity first and supply the bundled style reference second", async () => {
   const store = await new MemoryStore(`avatar-worker-${randomUUID()}`).init();
@@ -22,6 +23,7 @@ test("avatar image edits keep identity first and supply the bundled style refere
     quality: string | null;
     background: string | null;
     outputFormat: string | null;
+    compression: string | null;
   }> = [];
 
   try {
@@ -95,6 +97,8 @@ test("avatar image edits keep identity first and supply the bundled style refere
         quality: form.get("quality") === null ? null : String(form.get("quality")),
         background: form.get("background") === null ? null : String(form.get("background")),
         outputFormat: form.get("output_format") === null ? null : String(form.get("output_format")),
+        compression:
+          form.get("output_compression") === null ? null : String(form.get("output_compression")),
       });
       return new Response(
         JSON.stringify({ data: [{ b64_json: Buffer.from("generated-image").toString("base64") }] }),
@@ -112,7 +116,10 @@ test("avatar image edits keep identity first and supply the bundled style refere
     assert.deepEqual(calls[0].names, ["identity-reference.png", "style-reference.png"]);
     assert.equal(calls[0].quality, "medium");
     assert.equal(calls[0].background, "transparent");
-    assert.equal(calls[0].outputFormat, "png");
+    assert.equal(calls[0].outputFormat, "webp");
+    assert.equal(calls[0].compression, "75");
+    assert.equal(baseline.mime, "image/webp");
+    assert.match(baseline.storage_key, new RegExp(`^${DEMO_USER_ID}/[0-9a-f-]+\\.webp$`));
     assert.match(calls[0].prompt, /Image 1 is the IDENTITY REFERENCE/);
     assert.match(calls[0].prompt, /Image 2 is the STYLE REFERENCE/);
     assert.match(calls[0].prompt, /Do not copy that character's specific face, curly hair/);
@@ -125,7 +132,7 @@ test("avatar image edits keep identity first and supply the bundled style refere
     assert.match(calls[0].prompt, /fully transparent background/);
     assert.match(calls[0].prompt, /Do not add a backdrop, floor plane, border, frame/);
     assert.equal(baseline.prompt_version, 5);
-    assert.equal((await stat(baseline.storage_key)).mode & 0o777, 0o600);
+    assert.equal((await stat(assetPath(baseline.storage_key))).mode & 0o777, 0o600);
 
     await store.transaction((draft) => {
       draft.avatar_requests.push({
@@ -162,7 +169,7 @@ test("avatar image edits keep identity first and supply the bundled style refere
     assert.ok(activity?.storage_key);
     generatedPaths.push(activity.storage_key);
     assert.deepEqual(calls[1].names, [
-      "identity-reference.png",
+      "identity-reference.webp",
       "style-reference.png",
       "previous-activity-reference.png",
     ]);
@@ -209,7 +216,7 @@ test("avatar image edits keep identity first and supply the bundled style refere
     );
     assert.ok(dressed?.storage_key);
     generatedPaths.push(dressed.storage_key);
-    assert.deepEqual(calls[2].names, ["identity-reference.png", "style-reference.png"]);
+    assert.deepEqual(calls[2].names, ["identity-reference.webp", "style-reference.png"]);
     assert.match(
       calls[2].prompt,
       /exactly this outfit for this activity.*red shorts and a white tee/,
@@ -220,7 +227,7 @@ test("avatar image edits keep identity first and supply the bundled style refere
     else process.env.TWIN_ENCRYPTION_KEY = previousKey;
     await Promise.all(
       [identityPath, priorActivityPath, ...generatedPaths].map((path) =>
-        unlink(path).catch(() => {}),
+        unlink(assetPath(path)).catch(() => {}),
       ),
     );
   }

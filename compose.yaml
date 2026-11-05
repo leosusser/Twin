@@ -1,0 +1,60 @@
+# Twin on one server: app, PostgreSQL, and Caddy for HTTPS.
+# Two named volumes hold everything that must survive a rebuild:
+#   twin-db      PostgreSQL records (people, plans, chats, encrypted keys)
+#   twin-assets  private image files, one folder per user
+# Required in .env next to this file: POSTGRES_PASSWORD, TWIN_ENCRYPTION_KEY.
+# Set TWIN_SITE_ADDRESS to the public domain (default: localhost, for a local rehearsal).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: twin
+      POSTGRES_DB: twin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - twin-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U twin -d twin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    stop_grace_period: 30s
+    # Reads OpenAI model names, Google client ID/secret and the encryption key
+    # from .env; the lines below override what must differ inside Docker.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql://twin:${POSTGRES_PASSWORD}@db:5432/twin
+      TWIN_ENCRYPTION_KEY: ${TWIN_ENCRYPTION_KEY:?Set TWIN_ENCRYPTION_KEY in .env}
+      TEST_DATABASE_URL: ""
+      GOOGLE_CALENDAR_REDIRECT_URI: https://${TWIN_SITE_ADDRESS:-localhost}/api/integrations/calendar/callback
+      GOOGLE_GMAIL_REDIRECT_URI: https://${TWIN_SITE_ADDRESS:-localhost}/api/integrations/gmail/callback
+    volumes:
+      - twin-assets:/data/assets
+    # No published port: only Caddy can reach the app.
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    command: caddy reverse-proxy --from ${TWIN_SITE_ADDRESS:-localhost} --to app:4173
+    volumes:
+      - caddy-data:/data
+
+volumes:
+  twin-db:
+  twin-assets:
+  caddy-data:

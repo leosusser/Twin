@@ -1,0 +1,20 @@
+# Keep secrets, personal data and local tooling out of the image.
+.env
+.env.*
+!.env.example
+node_modules
+data/assets
+data/pg
+data/twin.json
+data/*.tmp
+config/*.local.json
+.git
+.github
+.agents
+.claude
+.codex
+coverage
+test
+docs
+*.log
+.DS_Store

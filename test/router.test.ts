@@ -6,6 +6,7 @@ import { dirname } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { routeApi, type RouterDependencies } from "../src/api/router.ts";
 import { MemoryStore } from "./memory-store.ts";
+import { assetPath } from "../src/storage/assets.ts";
 import { encryptSecret } from "../src/integrations/secrets.ts";
 import {
   configuredModels,
@@ -1006,7 +1007,7 @@ test("private avatar photo and cached activity images survive reload without reg
     const snapshot = await store.snapshot();
     for (const asset of snapshot.avatar_assets)
       if (asset.kind === "source_photo" && asset.storage_key)
-        await unlink(asset.storage_key).catch(() => {});
+        await unlink(assetPath(asset.storage_key)).catch(() => {});
     await unlink(path).catch(() => {});
   }
 });

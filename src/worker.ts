@@ -1,8 +1,9 @@
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { PostgresStore, type Store } from "./storage/store.ts";
+import { readAsset, removeAsset, saveUserAsset } from "./storage/assets.ts";
 import { decryptSecret } from "./integrations/secrets.ts";
 import { GoogleProblem, syncCalendar, syncGmail } from "./integrations/google.ts";
 import { ProviderProblem } from "./integrations/openai.ts";
@@ -34,6 +35,13 @@ export async function startWorker(sharedStore: PostgresStore) {
   await pollJobs();
   timer = setInterval(() => void pollJobs(), 5_000);
   return timer;
+}
+// Stops new polls, then waits (up to the limit) for the job in progress to finish.
+export async function stopWorker(limitMs = 20_000) {
+  if (timer) clearInterval(timer);
+  timer = undefined;
+  const deadline = Date.now() + limitMs;
+  while (processing && Date.now() < deadline) await new Promise((done) => setTimeout(done, 100));
 }
 async function pollJobs() {
   if (processing) return;
@@ -341,7 +349,7 @@ async function executeAvatar(
   const identityMime = identity.mime ?? "image/png";
   const references: { bytes: Buffer; mime: string; name: string }[] = [
     {
-      bytes: await readFile(resolve(identity.storage_key!)),
+      bytes: await readAsset(identity.storage_key!),
       mime: identityMime,
       name: `identity-reference.${imageExtension(identityMime)}`,
     },
@@ -372,7 +380,7 @@ async function executeAvatar(
   if (priorActivity) {
     const mime = priorActivity.mime ?? "image/png";
     references.push({
-      bytes: await readFile(resolve(priorActivity.storage_key!)),
+      bytes: await readAsset(priorActivity.storage_key!),
       mime,
       name: `previous-activity-reference.${imageExtension(mime)}`,
     });
@@ -401,7 +409,9 @@ async function executeAvatar(
   form.set("background", "transparent");
   form.set("size", "1024x1536");
   form.set("quality", "medium");
-  form.set("output_format", "png");
+  // WebP keeps transparency at a fraction of PNG size.
+  form.set("output_format", "webp");
+  form.set("output_compression", String(imageCompression()));
   form.set(
     "safety_identifier",
     createHash("sha256").update(job.user_id).digest("hex").slice(0, 32),
@@ -437,9 +447,7 @@ async function executeAvatar(
   const bytes = Buffer.from(encoded, "base64");
   if (bytes.length > 20_000_000) throw new Error("IMAGE_OUTPUT_TOO_LARGE");
   const assetId = randomUUID();
-  const path = resolve(`./data/assets/${assetId}.png`);
-  await mkdir(dirname(path), { recursive: true });
-  await writeFile(path, bytes, { mode: 0o600 });
+  const storageKey = await saveUserAsset(job.user_id, assetId, "webp", bytes);
   const checksum = createHash("sha256").update(bytes).digest("hex");
   const saved = await targetStore.transaction((draft) => {
     const item = draft.avatar_requests.find((candidate) => candidate.id === request.id);
@@ -471,8 +479,8 @@ async function executeAvatar(
       ...(request.purpose === "activity" && outfit ? { outfit } : {}),
       prompt_version: avatarPromptVersion,
       model: process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1-mini",
-      storage_key: path,
-      mime: "image/png",
+      storage_key: storageKey,
+      mime: "image/webp",
       width: 1024,
       height: 1536,
       sha256: checksum,
@@ -486,7 +494,7 @@ async function executeAvatar(
     return true;
   });
   if (!saved) {
-    await unlink(path).catch(() => {});
+    await removeAsset(storageKey);
     throw new ProviderProblem("AVATAR_CANCELLED", "Avatar generation was stopped.", 409, false);
   }
 }
@@ -598,4 +606,9 @@ No text, logos, watermarks, borders, interface elements, or extra people.`;
 }
 function imageExtension(mime: string) {
   return mime === "image/jpeg" ? "jpg" : mime === "image/webp" ? "webp" : "png";
+}
+// 0-100; lower is smaller. 75 keeps avatars sharp on a phone at roughly a tenth of PNG size.
+function imageCompression() {
+  const value = Number(process.env.OPENAI_IMAGE_COMPRESSION ?? 75);
+  return Number.isInteger(value) && value >= 0 && value <= 100 ? value : 75;
 }

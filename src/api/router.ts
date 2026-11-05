@@ -1,7 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { readAsset, removeAsset, removeUserAssets, saveUserAsset } from "../storage/assets.ts";
 import {
   applyHandoff,
   hashHandoff,
@@ -658,9 +657,7 @@ export async function routeApi(
       const assetId = randomUUID();
       const extension =
         decoded.mime === "image/png" ? "png" : decoded.mime === "image/webp" ? "webp" : "jpg";
-      const path = resolve(`./data/assets/${assetId}.${extension}`);
-      await mkdir(dirname(path), { recursive: true });
-      await writeFile(path, decoded.bytes, { mode: 0o600 });
+      const storageKey = await saveUserAsset(userId, assetId, extension, decoded.bytes);
       const oldPhoto = state.avatar_assets.find(
         (item) => item.id === design.source_photo_asset_id && item.user_id === userId,
       );
@@ -679,7 +676,7 @@ export async function routeApi(
           kind: "source_photo" as const,
           prompt_version: 1,
           model: "user_upload",
-          storage_key: path,
+          storage_key: storageKey,
           original_name: String(body.filename ?? "reference-photo").slice(0, 180),
           mime: decoded.mime,
           sha256: createHash("sha256").update(decoded.bytes).digest("hex"),
@@ -693,7 +690,7 @@ export async function routeApi(
         current.updated_at = now;
         return created;
       });
-      if (oldPhoto?.storage_key) await unlink(oldPhoto.storage_key).catch(() => {});
+      if (oldPhoto?.storage_key) await removeAsset(oldPhoto.storage_key);
       return json(res, 201, {
         asset: safeAsset(asset),
         character: characterRead(await store.snapshot(), userId),
@@ -713,7 +710,7 @@ export async function routeApi(
         delete current.source_photo_asset_id;
         current.updated_at = new Date().toISOString();
       });
-      if (photo?.storage_key) await unlink(photo.storage_key).catch(() => {});
+      if (photo?.storage_key) await removeAsset(photo.storage_key);
       return json(res, 200, {
         deleted: true,
         character: characterRead(await store.snapshot(), userId),
@@ -734,7 +731,7 @@ export async function routeApi(
         delete current.baseline_asset_id;
         current.updated_at = new Date().toISOString();
       });
-      await Promise.all(files.map((file) => unlink(file).catch(() => {})));
+      await removeUserAssets(userId, files);
       return json(res, 200, {
         deleted: true,
         character: characterRead(await store.snapshot(), userId),
@@ -830,7 +827,7 @@ export async function routeApi(
         draft.avatar_assets = draft.avatar_assets.filter((item) => item.id !== asset.id);
         return asset;
       });
-      if (deleted.storage_key) await unlink(deleted.storage_key).catch(() => {});
+      if (deleted.storage_key) await removeAsset(deleted.storage_key);
       return json(res, 200, {
         deleted: true,
         character: characterRead(await store.snapshot(), userId),
@@ -892,7 +889,7 @@ export async function routeApi(
       );
       if (!asset)
         throw new HttpProblem(404, "ASSET_NOT_FOUND", "That private scene could not be found.");
-      const body = await readFile(asset.storage_key!);
+      const body = await readAsset(asset.storage_key!);
       res.writeHead(200, {
         "content-type": asset.mime ?? "image/png",
         "cache-control": "private, max-age=3600",
@@ -1102,7 +1099,7 @@ export async function routeApi(
       await store.transaction((draft) => {
         draft.avatar_assets = draft.avatar_assets.filter((item) => item.id !== asset.id);
       });
-      if (asset.storage_key) await unlink(asset.storage_key).catch(() => {});
+      if (asset.storage_key) await removeAsset(asset.storage_key);
       return json(res, 200, { deleted: true });
     }
     if (url.pathname === "/api/account/export" && method === "GET")
@@ -1119,7 +1116,7 @@ export async function routeApi(
         .filter((item) => item.user_id === userId && item.storage_key)
         .map((item) => item.storage_key!);
       await store.transaction((draft) => removeUserData(draft, userId));
-      await Promise.all(files.map((file) => unlink(file).catch(() => {})));
+      await removeUserAssets(userId, files);
       return json(res, 200, { deleted: true });
     }
     throw new HttpProblem(404, "NOT_FOUND", "That API route does not exist.");
