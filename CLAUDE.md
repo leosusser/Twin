@@ -11,6 +11,6 @@
 These apply to Claude Code only and take precedence over the matching `AGENTS.md` rules. Codex keeps its sandbox.
 
 - Claude is not sandboxed here. Network access and actions outside the repo are allowed when the task needs them.
-- Claude may `git commit` and `git push` to `origin` (github.com/leosusser/twin) without asking first. Commit only intended changes, never `.env` or secrets, and say in the handoff what was pushed.
+- Claude may `git commit` and `git push` to `origin` (github.com/leosusser/Twin) without asking first. Commit only intended changes, never `.env` or secrets, and say in the handoff what was pushed.
 - Never force-push or rewrite pushed history unless Leo asks.
 - Use the `frontend-design` skill for UI work in `public/`.
